@@ -1,4 +1,5 @@
 import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
+import "tailwindcss/tailwind.css";
 import icon from '../../assets/icon.svg';
 import './App.css';
 import { AI, Database, Home } from '../pages';
