@@ -103,6 +103,7 @@ const configuration: webpack.Configuration = {
         ],
         exclude: /\.module\.s?(c|a)ss$/,
       },
+
       // Fonts
       {
         test: /\.(woff|woff2|eot|ttf|otf)$/i,
