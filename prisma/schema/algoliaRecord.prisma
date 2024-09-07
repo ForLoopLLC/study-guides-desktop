@@ -1,0 +1,26 @@
+enum AlgoliaRecordType {
+  Question
+  Topic
+  SubCategory
+  Category
+  User
+  Batch
+  Course
+}
+
+model AlgoliaRecord {
+  id          String              @id @default(cuid())
+  batchId     String?
+  batch       ImportBatch?         @relation(fields: [batchId], references: [id], onDelete: Cascade)
+  type        AlgoliaRecordType
+  record      Json
+  createdAt   DateTime            @default(now())
+  updatedAt   DateTime            @updatedAt
+  uploaded    Boolean             @default(false)
+  uploadedAt  DateTime?
+
+  @@index([batchId])
+  @@index([type])
+  @@index([type, uploaded])
+  @@index([uploaded, type])
+}

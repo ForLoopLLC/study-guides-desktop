@@ -1,0 +1,48 @@
+model User {
+  id                String    @id @default(cuid())
+  name              String?
+  gamerTag          String?   
+  email             String?   @unique
+  emailVerified     DateTime?
+  image             String?
+  roles             UserRole[] 
+  accounts          Account[]
+  sessions          Session[]
+  survivalSessions  SurvivalSession[]
+  testSessions      TestSession[]
+  subscriptions     Subscription[]
+  interactions      UserQuestionInteraction[]
+  tagRatings        UserTagRating[]
+  tagReports        UserTagReport[]
+  questionRatings   UserQuestionRating[]
+  questionReports   UserQuestionReport[]
+  badges            UserBadge[]
+  questionAccess    QuestionAccess[]
+  tagAccess         TagAccess[]
+  recentTags        UserTagRecent[]
+  favoriteTags      UserTagFavorite[]
+  dismissedAnnouncements UserAnnouncementDismiss[]
+  challenges        UserChallenge[]
+  xp                ExperiencePoint[]
+  topicProgress     UserTopicProgress[]
+  stripeCustomerId  String? @unique
+  createdAt             DateTime @default(now())
+}
+
+model UserTopicProgress {
+  userId          String
+  topicId         String
+  questionId      String
+  studyMethod     StudyMethod       @default(None)
+  complete        Boolean           @default(true)
+  user            User              @relation(fields: [userId], references: [id], onDelete: Cascade)
+  topic           Tag               @relation(fields: [topicId], references: [id], onDelete: Cascade)
+  question        Question          @relation(fields: [questionId], references: [id], onDelete: Cascade)
+  createdAt       DateTime          @default(now())
+  updatedAt       DateTime          @default(now())
+
+  @@id([userId, studyMethod, topicId,  questionId])
+  @@map("UserTopicProgress")
+  @@index([userId, topicId])
+  @@index([studyMethod, complete, topicId])
+}

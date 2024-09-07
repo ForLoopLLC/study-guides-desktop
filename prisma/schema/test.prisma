@@ -1,0 +1,44 @@
+enum TestAnswerStatus {
+  Correct
+  Incorrect
+  Unanswered
+}
+
+model TestSession {
+  id                String        @id @default(cuid())
+  userId            String
+  user              User          @relation(fields: [userId], references: [id])
+  tagId             String
+  tag               Tag           @relation(fields: [tagId], references: [id])
+  tagType           TagType
+  startTime         DateTime      @default(now())
+  endTime           DateTime?
+  correctAnswers    Int           @default(0)
+  totalTime         Int           
+  score             Int           
+  questions         TestQuestion[]
+  metadata          Json?
+  createdAt         DateTime      @default(now())
+  updatedAt         DateTime      @updatedAt
+
+  @@map("TestSession")
+  @@index([userId])
+  @@index([score])  // New index for best session query
+  @@index([createdAt])  // New index for queries by creation time
+}
+
+model TestQuestion {
+  id                String                  @id @default(cuid())
+  sessionId         String
+  session           TestSession             @relation(fields: [sessionId], references: [id])
+  questionId        String
+  question          Question                @relation(fields: [questionId], references: [id])
+  answerStatus      TestAnswerStatus        @default(Unanswered)
+  answeredAt        DateTime                @default(now())
+  
+  @@map("TestQuestion")
+  @@index([sessionId])
+  @@index([questionId])
+  @@index([sessionId, answerStatus]) // New index for filtering by status within a session
+  @@index([sessionId, answeredAt])   // New index for sorting/filtering by answered time
+}

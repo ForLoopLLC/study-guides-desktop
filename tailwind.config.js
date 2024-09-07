@@ -1,8 +1,10 @@
 import colors from 'tailwindcss/colors';
 
 module.exports = {
-  purge: [],
-  darkMode: false, // or 'media' or 'class'
+  content: [
+    './src/**/*.html',
+    './src/**/*.tsx',
+  ],
   theme: {
     extend: {
       colors: {
@@ -10,9 +12,6 @@ module.exports = {
         cyan: colors.cyan,
       },
     },
-  },
-  variants: {
-    extend: {},
   },
   plugins: [],
 };

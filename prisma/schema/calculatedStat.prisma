@@ -1,0 +1,13 @@
+/// Calculated Stats
+enum CalculatedStatType {
+  TotalQuestions
+  TotalTopics
+}
+
+/// Calculated stats for the system
+model CalculatedStat {
+  id          String                @id @default(cuid())
+  type        CalculatedStatType    @unique
+  value       Int
+  updatedAt   DateTime              @updatedAt
+}
