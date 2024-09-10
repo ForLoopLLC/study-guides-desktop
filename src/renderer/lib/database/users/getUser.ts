@@ -1,5 +1,5 @@
-import { prisma } from "../index";
-import { User } from "../../../types";
+import { User } from '../../../../types';
+import { PrismaClient } from '@prisma/client';
 
 /**
  * Retrieves a user with their roles from the database.
@@ -10,7 +10,8 @@ import { User } from "../../../types";
  * @example const userWithRoles = await getUserWithRoles(userId);
  */
 export const getUser = async (
-  userId: string
+  userId: string,
+  prisma: PrismaClient,
 ): Promise<User | null> => {
   if (!userId) {
     return null;

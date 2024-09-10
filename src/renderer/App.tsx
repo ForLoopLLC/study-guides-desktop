@@ -1,17 +1,35 @@
-import { MemoryRouter as Router, Routes, Route } from 'react-router-dom';
-import "tailwindcss/tailwind.css";
-import icon from '../../assets/icon.svg';
+import { useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
+import 'tailwindcss/tailwind.css';
 import './App.css';
-import { AI, Database, Home } from '../pages';
+import { Route, Routes } from 'react-router-dom';
+import { Channels } from '../types';
+import { Questions, Tags, Users } from './pages/database';
 
-export default function App() {
+const App = () => {
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const handleNavigation = (route: any) => {
+      navigate(route);
+    };
+    const removeListener = window.electron.ipcRenderer.on(
+      'navigate',
+      handleNavigation,
+    );
+
+    return () => {
+      removeListener();
+    };
+  }, [navigate]);
+
   return (
-    <Router>
-      <Routes>
-        <Route path="/" element={<Home />} />
-        <Route path="/database" element={<Database />} />
-        <Route path="/ai" element={<AI />} />
-      </Routes>
-    </Router>
+    <Routes>
+      <Route path="/users" element={<Users />} />
+      <Route path="/tags" element={<Tags />} />
+      <Route path="/questions" element={<Questions />} />
+    </Routes>
   );
-}
+};
+
+export default App;

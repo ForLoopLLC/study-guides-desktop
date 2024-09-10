@@ -12,8 +12,9 @@ import path from 'path';
 import { app, BrowserWindow, shell, ipcMain } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
-import MenuBuilder from './menu';
+import MenuBuilder from './MenuBuilder';
 import { resolveHtmlPath } from './util';
+import { getPrismaClient } from './lib/database';
 
 class AppUpdater {
   constructor() {
@@ -25,11 +26,12 @@ class AppUpdater {
 
 let mainWindow: BrowserWindow | null = null;
 
-ipcMain.on('ipc-example', async (event, arg) => {
-  const msgTemplate = (pingPong: string) => `IPC test: ${pingPong}`;
-  console.log(msgTemplate(arg));
-  event.reply('ipc-example', msgTemplate('pong'));
+let prisma = getPrismaClient('development');  // Default environment
+
+ipcMain.on('connection', (_event, env: 'development' | 'test' | 'production') => {
+  prisma = getPrismaClient(env);  // Switch environment
 });
+
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -73,14 +75,19 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
+    fullscreen: true,
+    autoHideMenuBar: false,
     icon: getAssetPath('icon.png'),
     webPreferences: {
       preload: app.isPackaged
         ? path.join(__dirname, 'preload.js')
         : path.join(__dirname, '../../.erb/dll/preload.js'),
+      contextIsolation: true,
+      nodeIntegration: false,
     },
   });
 
+  mainWindow.setMenuBarVisibility(true);
   mainWindow.loadURL(resolveHtmlPath('index.html'));
 
   mainWindow.on('ready-to-show', () => {
