@@ -1,13 +1,15 @@
 import { BrowserWindow } from 'electron';
 import { PrismaClient } from '@prisma/client';
+import { Environment } from '../../types';
+
 
 class PrismaManager {
   private static instance: PrismaManager;
   private prisma: PrismaClient | null = null;
   private environment: 'development' | 'test' | 'production' = 'development';
+  private url: string = '';
 
   private constructor() {
-    console.log('PrismaManager constructor');
     this.setPrismaClient(this.environment); // Initialize with default environment
   }
 
@@ -30,19 +32,19 @@ class PrismaManager {
   // Set the Prisma client based on environment
   public setPrismaClient(env: 'development' | 'test' | 'production'): void {
     this.environment = env;
-    const databaseUrl = this.getDatabaseUrl(env);
+    this.url = this.getDatabaseUrl(env);
     this.prisma = new PrismaClient({
       datasources: {
         db: {
-          url: databaseUrl,
+          url: this.url,
         },
       },
     });
   }
 
   // Get the current environment
-  public getEnvironment(): string {
-    return this.environment;
+  public getEnvironment(): Environment {
+    return {env: this.environment, url: this.url};
   }
 
   // Get database URL based on environment

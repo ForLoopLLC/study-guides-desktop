@@ -5,10 +5,11 @@ import './App.css';
 import { Route, Routes } from 'react-router-dom';
 import { Channels } from '../types';
 import { Questions, Tags, Users } from './pages/database';
+import { useAppContext } from './contexts/AppContext';
 
 const App = () => {
   const navigate = useNavigate();
-  const [environment, setEnvironment] = useState<string>('development');
+  const appContext = useAppContext();
 
   useEffect(() => {
     const handleNavigation = (route: any) => {
@@ -26,7 +27,7 @@ const App = () => {
 
   useEffect(() => {
     const handleEnvUpdate = (newEnv: any) => {
-      setEnvironment(newEnv);
+      appContext.setEnvironment(newEnv);
     };
     const removeListener = window.electron.ipcRenderer.on(
       'env-update',
@@ -36,10 +37,6 @@ const App = () => {
       removeListener();
     };
   }, []);
-
-  useEffect(() => {
-    console.log('Environment:', environment);
-  }, [environment]);
 
   return (
     <Routes>

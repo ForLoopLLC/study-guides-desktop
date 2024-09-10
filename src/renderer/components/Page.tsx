@@ -1,4 +1,5 @@
-import React, { ReactNode, useEffect, useState } from 'react';
+import React, { ReactNode } from 'react';
+import { useAppContext } from '../contexts/AppContext';
 
 interface PageProps {
   title: string;
@@ -6,29 +7,15 @@ interface PageProps {
 }
 
 const Page: React.FC<PageProps> = ({ title, children }) => {
-  const [env, setEnv] = useState<'development' | 'test' | 'production'>(
-    'development',
-  );
-
-  useEffect(() => {
-    const handleEnvUpdate = (newEnv: any) => {
-      setEnv(newEnv);
-    };
-
-    // Listen for environment updates from the main process
-    const removeListener = window.electron.ipcRenderer.on('env-update', handleEnvUpdate);
-
-    return () => {
-      removeListener();
-    };
-  }, []);
+  const appContext = useAppContext();
 
   return (
     <div>
       <h1 className="text-3xl bg-blue-400 p-4 text-slate-50 font-bold">
         {title}
       </h1>
-      <p>Environment:{env}</p>
+      <p>Environment:{appContext.environment.env}</p>
+      <p>Url:{appContext.environment.url}</p>
       <div>{children}</div>
     </div>
   );
