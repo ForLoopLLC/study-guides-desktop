@@ -1,10 +1,10 @@
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'tailwindcss/tailwind.css';
 import './App.css';
 import { Route, Routes } from 'react-router-dom';
-import { Channels } from '../types';
 import { Questions, Tags, Users } from './pages/database';
+import { Home } from './pages';
 import { useAppContext } from './contexts/AppContext';
 
 const App = () => {
@@ -43,6 +43,7 @@ const App = () => {
       <Route path="/users" element={<Users />} />
       <Route path="/tags" element={<Tags />} />
       <Route path="/questions" element={<Questions />} />
+      <Route path="*" element={<Home />} />
     </Routes>
   );
 };

@@ -92,6 +92,7 @@ const createWindow = async () => {
     } else {
       mainWindow.show();
     }
+    prismaManager.setPrismaClient('development');
     mainWindow?.webContents.send('env-update', prismaManager.getEnvironment());
   });
 
