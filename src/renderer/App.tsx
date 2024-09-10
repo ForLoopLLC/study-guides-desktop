@@ -1,4 +1,4 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import 'tailwindcss/tailwind.css';
 import './App.css';
@@ -8,6 +8,7 @@ import { Questions, Tags, Users } from './pages/database';
 
 const App = () => {
   const navigate = useNavigate();
+  const [environment, setEnvironment] = useState<string>('development');
 
   useEffect(() => {
     const handleNavigation = (route: any) => {
@@ -22,6 +23,23 @@ const App = () => {
       removeListener();
     };
   }, [navigate]);
+
+  useEffect(() => {
+    const handleEnvUpdate = (newEnv: any) => {
+      setEnvironment(newEnv);
+    };
+    const removeListener = window.electron.ipcRenderer.on(
+      'env-update',
+      handleEnvUpdate,
+    );
+    return () => {
+      removeListener();
+    };
+  }, []);
+
+  useEffect(() => {
+    console.log('Environment:', environment);
+  }, [environment]);
 
   return (
     <Routes>

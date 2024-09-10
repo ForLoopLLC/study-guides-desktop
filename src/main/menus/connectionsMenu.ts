@@ -1,24 +1,32 @@
 import { MenuItemConstructorOptions, BrowserWindow } from 'electron';
+import { prismaManager } from '../lib/database';
 
-export const createConnectionsMenu = (mainWindow: BrowserWindow): MenuItemConstructorOptions => ({
+export const createConnectionsMenu = (
+  mainWindow: BrowserWindow,
+): MenuItemConstructorOptions => ({
   label: 'Connection',
   submenu: [
     {
       label: 'Development',
       click: () => {
-        mainWindow.webContents.send('connection', 'dev');
+        prismaManager.setPrismaClient('development');
+        mainWindow.webContents.send('env-update', 'development');
       },
     },
     {
       label: 'Test',
       click: () => {
-        mainWindow.webContents.send('connection', 'test');
+        prismaManager.setPrismaClient('test');
+        mainWindow.webContents.send('env-update', 'test');
+
       },
     },
     {
       label: 'Production',
       click: () => {
-        mainWindow.webContents.send('connection', 'prod');
+        prismaManager.setPrismaClient('production');
+        mainWindow.webContents.send('env-update', 'production');
+
       },
     },
   ],

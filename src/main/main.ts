@@ -14,7 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './MenuBuilder';
 import { resolveHtmlPath } from './util';
-import { getPrismaClient } from './lib/database';
+import { prismaManager } from './lib/database';
 
 class AppUpdater {
   constructor() {
@@ -25,13 +25,6 @@ class AppUpdater {
 }
 
 let mainWindow: BrowserWindow | null = null;
-
-let prisma = getPrismaClient('development');  // Default environment
-
-ipcMain.on('connection', (_event, env: 'development' | 'test' | 'production') => {
-  prisma = getPrismaClient(env);  // Switch environment
-});
-
 
 if (process.env.NODE_ENV === 'production') {
   const sourceMapSupport = require('source-map-support');
@@ -75,7 +68,7 @@ const createWindow = async () => {
     show: false,
     width: 1024,
     height: 728,
-    fullscreen: true,
+    fullscreen: false,
     autoHideMenuBar: false,
     icon: getAssetPath('icon.png'),
     webPreferences: {
@@ -99,6 +92,7 @@ const createWindow = async () => {
     } else {
       mainWindow.show();
     }
+    mainWindow?.webContents.send('env-update', prismaManager.getEnvironment());
   });
 
   mainWindow.on('closed', () => {
@@ -113,6 +107,7 @@ const createWindow = async () => {
     shell.openExternal(edata.url);
     return { action: 'deny' };
   });
+
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line

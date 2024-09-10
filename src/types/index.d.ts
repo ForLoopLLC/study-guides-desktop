@@ -1,3 +1,3 @@
-export * from "./user";
+export * from './user';
 
-export type Channels =  'navigate' | 'connection';
+export type Channels = 'navigate' | 'connection' | 'env-update';
