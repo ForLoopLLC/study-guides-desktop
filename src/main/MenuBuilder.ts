@@ -1,12 +1,8 @@
-import {
-  app,
-  Menu,
-  BrowserWindow,
-} from 'electron';
+import { app, Menu, BrowserWindow } from 'electron';
 import { createFileMenu } from './menus/fileMenu';
 import { createViewMenu } from './menus/viewMenu';
 import { createHelpMenu } from './menus/helpMenu';
-import { createDatabaseMenu } from './menus/databaseMenu';
+import { createScreensMenu } from './menus/screensMenu';
 import { createConnectionsMenu } from './menus/connectionsMenu';
 
 export default class MenuBuilder {
@@ -17,7 +13,9 @@ export default class MenuBuilder {
   }
 
   buildMenu(): Menu {
-    const isDev = process.env.NODE_ENV === 'development' || process.env.DEBUG_PROD === 'true';
+    const isDev =
+      process.env.NODE_ENV === 'development' ||
+      process.env.DEBUG_PROD === 'true';
 
     if (isDev) {
       this.setupDevelopmentEnvironment();
@@ -26,7 +24,7 @@ export default class MenuBuilder {
     const template = [
       createFileMenu(this.mainWindow),
       createConnectionsMenu(this.mainWindow),
-      createDatabaseMenu(this.mainWindow),
+      createScreensMenu(this.mainWindow),
       createViewMenu(this.mainWindow, isDev),
       createHelpMenu(),
     ];

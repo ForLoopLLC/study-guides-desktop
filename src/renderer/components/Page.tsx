@@ -1,6 +1,7 @@
 import React, { ReactNode } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import clsx from 'clsx';
+import PostgresTable from './PostgresTable';
 
 interface PageProps {
   title: string;
@@ -25,17 +26,14 @@ const Page: React.FC<PageProps> = ({ title, children }) => {
   return (
     <article>
       <header className={headerClass}>
-        <h1 className={`text-3xl text-slate-50 font-bold`}>{title}</h1>
+        <h1 className="text-3xl text-slate-50 font-bold">
+          {title} ({appContext.environment.env})
+        </h1>
         <section className="p-4">
-          <p className="text-xl text-slate-50 font-bold">
-            {appContext.environment.env}
-          </p>
-          <p className="text-xs text-slate-50 font-bold">
-            {appContext.environment.url}
-          </p>
+          <PostgresTable url={appContext.environment.url || ''} />
         </section>
       </header>
-      <main>{children}</main>
+      <main className="p-4">{children}</main>
     </article>
   );
 };

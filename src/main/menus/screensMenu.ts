@@ -1,8 +1,16 @@
 import { MenuItemConstructorOptions, BrowserWindow } from 'electron';
 
-export const createDatabaseMenu = (mainWindow: BrowserWindow): MenuItemConstructorOptions => ({
-  label: 'Database',
+export const createScreensMenu = (
+  mainWindow: BrowserWindow,
+): MenuItemConstructorOptions => ({
+  label: 'Screens',
   submenu: [
+    {
+      label: 'Home',
+      click: () => {
+        mainWindow.webContents.send('navigate', '/');
+      },
+    },
     {
       label: 'Tags',
       click: () => {

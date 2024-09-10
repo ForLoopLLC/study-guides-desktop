@@ -6,3 +6,12 @@ export interface Environment {
     env: "development" | "test" | "production" | null
     url: string | null;
 }
+
+export interface PostgresConnectionInfo {
+    user: string;
+    password: string;
+    host: string;
+    port: number;
+    database: string;
+  }
+  
