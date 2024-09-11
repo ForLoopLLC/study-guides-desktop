@@ -10,23 +10,30 @@ export const createConnectionsMenu = (
       label: 'Development',
       click: () => {
         prismaManager.setPrismaClient('development');
-        mainWindow.webContents.send('env-update', prismaManager.getEnvironment());
+        mainWindow.webContents.send(
+          'env-update',
+          prismaManager.getEnvironment(),
+        );
       },
     },
     {
       label: 'Test',
       click: () => {
         prismaManager.setPrismaClient('test');
-        mainWindow.webContents.send('env-update', prismaManager.getEnvironment());
-
+        mainWindow.webContents.send(
+          'env-update',
+          prismaManager.getEnvironment(),
+        );
       },
     },
     {
       label: 'Production',
       click: () => {
         prismaManager.setPrismaClient('production');
-        mainWindow.webContents.send('env-update', prismaManager.getEnvironment());
-
+        mainWindow.webContents.send(
+          'env-update',
+          prismaManager.getEnvironment(),
+        );
       },
     },
   ],

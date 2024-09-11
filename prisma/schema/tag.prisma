@@ -1,6 +1,9 @@
 enum TagType {
   Category
   SubCategory
+  University
+  Region
+  Department
   Course
   Topic
   UserFolder

@@ -1,10 +1,11 @@
-import React from 'react';
-import { Page } from '../../../components';
+import { Page, TagList } from '../../../components';
+import { TagFilter } from '../../../../types';
+
 
 const Tags = () => {
   return (
     <Page title="Tags">
-      <div>content</div>
+      <TagList/>
     </Page>
   );
 };

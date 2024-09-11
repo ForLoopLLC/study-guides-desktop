@@ -1,4 +1,4 @@
-import React, { ReactNode } from 'react';
+import React, { useState, ReactNode } from 'react';
 import { useAppContext } from '../contexts/AppContext';
 import clsx from 'clsx';
 import PostgresTable from './PostgresTable';
@@ -10,6 +10,7 @@ interface PageProps {
 
 const Page: React.FC<PageProps> = ({ title, children }) => {
   const appContext = useAppContext();
+  const [isPostgresVisible, setIsPostgresVisible] = useState(false); // State to track visibility
 
   const headerClass = clsx(
     'p-4', // Base classes
@@ -23,15 +24,24 @@ const Page: React.FC<PageProps> = ({ title, children }) => {
     },
   );
 
+  const togglePostgresVisibility = () => {
+    setIsPostgresVisible((prev) => !prev); // Toggle visibility state
+  };
+
   return (
     <article>
       <header className={headerClass}>
-        <h1 className="text-3xl text-slate-50 font-bold">
+        <h1
+          className="text-3xl text-slate-50 font-bold cursor-pointer"
+          onClick={togglePostgresVisibility} // Toggle visibility on click
+        >
           {title} ({appContext.environment.env})
         </h1>
-        <section className="p-4">
-          <PostgresTable url={appContext.environment.url || ''} />
-        </section>
+        {isPostgresVisible && ( // Conditionally render PostgresTable
+          <section className="p-4">
+            <PostgresTable url={appContext.environment.url || ''} />
+          </section>
+        )}
       </header>
       <main className="p-4">{children}</main>
     </article>

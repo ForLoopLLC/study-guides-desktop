@@ -9,12 +9,13 @@
  * `./src/main.js` using webpack. This gives us some performance wins.
  */
 import path from 'path';
-import { app, BrowserWindow, shell, ipcMain } from 'electron';
+import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './MenuBuilder';
 import { resolveHtmlPath } from './util';
 import { prismaManager } from './lib/database';
+import './lib/database/handlers';
 
 class AppUpdater {
   constructor() {
@@ -108,7 +109,6 @@ const createWindow = async () => {
     shell.openExternal(edata.url);
     return { action: 'deny' };
   });
-
 
   // Remove this if your app does not use auto updates
   // eslint-disable-next-line

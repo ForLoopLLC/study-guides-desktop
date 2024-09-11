@@ -1,7 +1,6 @@
 import { BrowserWindow } from 'electron';
 import { PrismaClient } from '@prisma/client';
-import { Environment } from '../../types';
-
+import { Environment } from '../../../types';
 
 class PrismaManager {
   private static instance: PrismaManager;
@@ -44,7 +43,7 @@ class PrismaManager {
 
   // Get the current environment
   public getEnvironment(): Environment {
-    return {env: this.environment, url: this.url};
+    return { env: this.environment, url: this.url };
   }
 
   // Get database URL based on environment
