@@ -1,5 +1,5 @@
 import { MenuItemConstructorOptions, BrowserWindow } from 'electron';
-import { prismaManager } from '../lib/database';
+import { environmentManager } from '../lib/database';
 
 export const createConnectionsMenu = (
   mainWindow: BrowserWindow,
@@ -9,30 +9,30 @@ export const createConnectionsMenu = (
     {
       label: 'Development',
       click: () => {
-        prismaManager.setPrismaClient('development');
+        environmentManager.setEnvironment('development');
         mainWindow.webContents.send(
           'env-update',
-          prismaManager.getEnvironment(),
+          environmentManager.getEnvironment(),
         );
       },
     },
     {
       label: 'Test',
       click: () => {
-        prismaManager.setPrismaClient('test');
+        environmentManager.setEnvironment('test');
         mainWindow.webContents.send(
           'env-update',
-          prismaManager.getEnvironment(),
+          environmentManager.getEnvironment(),
         );
       },
     },
     {
       label: 'Production',
       click: () => {
-        prismaManager.setPrismaClient('production');
+        environmentManager.setEnvironment('production');
         mainWindow.webContents.send(
           'env-update',
-          prismaManager.getEnvironment(),
+          environmentManager.getEnvironment(),
         );
       },
     },

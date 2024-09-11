@@ -1,5 +1,5 @@
 import { Tag, TagFilter } from '../../../../types';
-import { prismaManager } from '..';
+import { environmentManager } from '..';
 import { PaginatedResult } from '../../../../types';
 
 export const getTags = async (
@@ -7,7 +7,7 @@ export const getTags = async (
   limit: number = 10,
   filter: TagFilter = 'All',
 ): Promise<PaginatedResult<Tag>> => {
-  const prisma = prismaManager.getPrismaClient();
+  const prisma = environmentManager.getPrismaClient();
 
   const skip = (page - 1) * limit;
 

@@ -17,8 +17,17 @@ export const useAppContext = () => {
   return context;
 };
 
-export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => {
-  const [environment, setEnvironment] = useState<Environment>({env: 'development', url: ''});
+export const AppProvider: React.FC<{ children: ReactNode }> = ({
+  children,
+}) => {
+  const [environment, setEnvironment] = useState<Environment>({
+    env: 'development',
+    url: '',
+    algoliaAdminKey: '',
+    algoliaAppId: '',
+    openAiApiKey: '',
+    openAiModel: '',
+  });
 
   const value = {
     environment,
@@ -26,9 +35,5 @@ export const AppProvider: React.FC<{ children: ReactNode }> = ({ children }) => 
     // Add other values you want to share here
   };
 
-  return (
-    <AppContext.Provider value={value}>
-      {children}
-    </AppContext.Provider>
-  );
+  return <AppContext.Provider value={value}>{children}</AppContext.Provider>;
 };

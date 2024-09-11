@@ -1,6 +1,6 @@
 import { Tag } from '../../../../types';
 import { ContentRatingType, TagType } from '@prisma/client';
-import { prismaManager } from '..';
+import { environmentManager } from '..';
 
 interface UpdateTagInput {
   id: string;
@@ -16,7 +16,7 @@ interface UpdateTagInput {
 }
 
 const updateTag = async (input: UpdateTagInput): Promise<Tag | null> => {
-  const prisma = prismaManager.getPrismaClient();
+  const prisma = environmentManager.getPrismaClient();
 
   try {
     // Fetch the existing tag to get the current metadata
@@ -29,14 +29,16 @@ const updateTag = async (input: UpdateTagInput): Promise<Tag | null> => {
     }
 
     // Ensure existing metadata is an object before merging
-    const existingMetadata = (typeof existingTag.metadata === 'object' && existingTag.metadata !== null)
-      ? existingTag.metadata as Record<string, any>
-      : {};
+    const existingMetadata =
+      typeof existingTag.metadata === 'object' && existingTag.metadata !== null
+        ? (existingTag.metadata as Record<string, any>)
+        : {};
 
     // Ensure input metadata is an object
-    const inputMetadata = (typeof input.metadata === 'object' && input.metadata !== null)
-      ? input.metadata
-      : {};
+    const inputMetadata =
+      typeof input.metadata === 'object' && input.metadata !== null
+        ? input.metadata
+        : {};
 
     // Merge the existing metadata with the new metadata
     const mergedMetadata = { ...existingMetadata, ...inputMetadata };

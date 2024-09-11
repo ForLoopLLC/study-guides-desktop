@@ -14,7 +14,7 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './MenuBuilder';
 import { resolveHtmlPath } from './util';
-import { prismaManager } from './lib/database';
+import { environmentManager } from './lib/database';
 import './lib/database/handlers';
 
 class AppUpdater {
@@ -93,8 +93,11 @@ const createWindow = async () => {
     } else {
       mainWindow.show();
     }
-    prismaManager.setPrismaClient('development');
-    mainWindow?.webContents.send('env-update', prismaManager.getEnvironment());
+    environmentManager.setEnvironment('development');
+    mainWindow?.webContents.send(
+      'env-update',
+      environmentManager.getEnvironment(),
+    );
   });
 
   mainWindow.on('closed', () => {

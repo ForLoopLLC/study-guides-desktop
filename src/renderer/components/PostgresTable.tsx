@@ -6,6 +6,12 @@ interface PostgresTableProps {
 }
 
 const PostgresTable: React.FC<PostgresTableProps> = ({ url }) => {
+  if (!url) {
+    return (
+      <p className="text-red-500">No PostgreSQL connection URL provided</p>
+    );
+  }
+
   const connectionInfo = parsePostgresUrl(url);
 
   if (!connectionInfo) {
@@ -35,7 +41,9 @@ const PostgresTable: React.FC<PostgresTableProps> = ({ url }) => {
         </tr>
         <tr className="border-t border-gray-300">
           <td className="text-sm px-4 py-2">Database</td>
-          <td className="text-sm px-4 py-2">{connectionInfo.database || 'N/A'}</td>
+          <td className="text-sm px-4 py-2">
+            {connectionInfo.database || 'N/A'}
+          </td>
         </tr>
       </tbody>
     </table>

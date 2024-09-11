@@ -7,6 +7,10 @@ export type Channels = 'navigate' | 'connection' | 'env-update';
 
 export interface Environment {
     env: "development" | "test" | "production" | null
+    algoliaAdminKey: string | null;
+    algoliaAppId: string | null;
+    openAiApiKey: string | null;
+    openAiModel: string | null;
     url: string | null;
 }
 
