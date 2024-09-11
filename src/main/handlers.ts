@@ -12,10 +12,10 @@ ipcMain.handle('update-tag', async (_event, updatedTag) => {
   if (!tag) {
     throw new Error('Tag not found');
   }
-
+  // get parent tags
   const index = await createTagIndex(tag, []);
   if (index) {
-    const result = await publishTagIndex(index);
+    const result = await publishTagIndex([index]);
   }
   return tag;
 });
