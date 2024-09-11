@@ -1,7 +1,7 @@
 import type { TagType as PrismaTagType, ContentRatingType } from '@prisma/client';
 export * from './user';
 export * from './tag';
-export * from './algoliaRecord';
+export * from './search';
 
 export type Channels = 'navigate' | 'connection' | 'env-update';
 

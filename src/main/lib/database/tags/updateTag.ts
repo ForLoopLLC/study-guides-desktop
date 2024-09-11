@@ -1,6 +1,6 @@
 import { Tag } from '../../../../types';
 import { ContentRatingType, TagType } from '@prisma/client';
-import { environmentManager } from '..';
+import { environmentManager } from '../../environment';
 
 interface UpdateTagInput {
   id: string;

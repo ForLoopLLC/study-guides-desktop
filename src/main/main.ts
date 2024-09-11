@@ -14,8 +14,8 @@ import { autoUpdater } from 'electron-updater';
 import log from 'electron-log';
 import MenuBuilder from './MenuBuilder';
 import { resolveHtmlPath } from './util';
-import { environmentManager } from './lib/database';
-import './lib/database/handlers';
+import { environmentManager } from './lib/environment';
+import './handlers';
 
 class AppUpdater {
   constructor() {

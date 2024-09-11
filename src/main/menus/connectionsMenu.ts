@@ -1,5 +1,5 @@
 import { MenuItemConstructorOptions, BrowserWindow } from 'electron';
-import { environmentManager } from '../lib/database';
+import { environmentManager } from '../lib/environment';
 
 export const createConnectionsMenu = (
   mainWindow: BrowserWindow,

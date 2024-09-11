@@ -31,7 +31,19 @@ class EnvironmentManager {
     return this.prisma;
   }
 
-  // Set the Prisma client based on environment
+  public getAlgoliaBaseUrl(): string {
+    return `https://${this.algoliaAppId}.algolia.net`;
+  }
+
+  public getAlgoliaHeaders(): Record<string, string> {
+    return {
+      'X-Algolia-API-Key': this.algoliaAdminKey,
+      'X-Algolia-Application-Id': this.algoliaAppId,
+      'Content-Type': 'application/json',
+    };
+  }
+
+  //
   public setEnvironment(env: 'development' | 'test' | 'production'): void {
     this.environment = env;
     this.url = this.getDatabaseUrl(env);

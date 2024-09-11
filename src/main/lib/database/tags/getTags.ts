@@ -1,5 +1,5 @@
 import { Tag, TagFilter } from '../../../../types';
-import { environmentManager } from '..';
+import { environmentManager } from '../../environment';
 import { PaginatedResult } from '../../../../types';
 
 export const getTags = async (
