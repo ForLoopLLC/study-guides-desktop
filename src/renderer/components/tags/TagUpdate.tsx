@@ -170,8 +170,8 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
           onClick={handleCancel}
           disabled={!hasChanges()}
           className={clsx(
-            'p-2 rounded text-black',
-            hasChanges() ? 'bg-orange-300' : 'bg-gray-300 cursor-not-allowed', // Gray when disabled
+            'p-2 rounded text-white',
+            hasChanges() ? 'bg-orange-500' : 'bg-gray-300 cursor-not-allowed', // Gray when disabled
           )}
         >
           Cancel

@@ -1,19 +1,7 @@
-import { Tag } from '../../../../types';
-import { ContentRatingType, TagType } from '@prisma/client';
+import { Tag, UpdateTagInput } from '../../../../types';
 import { environmentManager } from '../../environment';
 
-interface UpdateTagInput {
-  id: string;
-  name?: string;
-  description?: string;
-  type?: TagType;
-  contentRating?: ContentRatingType;
-  contentDescriptors?: string[];
-  metaTags?: string[];
-  parentTagId?: string;
-  public?: boolean;
-  metadata?: any; // Assuming metadata is a JSON object
-}
+
 
 const updateTag = async (input: UpdateTagInput): Promise<Tag | null> => {
   const prisma = environmentManager.getPrismaClient();

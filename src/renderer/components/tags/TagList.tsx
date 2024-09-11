@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useGetTags } from '../../hooks';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { useGetTags, useUpdateTags } from '../../hooks';
+import { FaArrowLeft, FaArrowRight, FaSpinner } from 'react-icons/fa'; // Import FaSpinner for loading spinner
 import { TagType } from '@prisma/client';
 import { useAppContext } from '../../contexts/AppContext';
 import { TagFilter } from '../../../types';
@@ -22,6 +22,12 @@ const tagTypeColors: Record<TagType, string> = {
 const getTagTypeLetter = (type: TagType) => TagType[type][0];
 
 const TagList: React.FC = () => {
+  const {
+    updateTags,
+    isLoading,
+    success,
+    error: updateError,
+  } = useUpdateTags();
   const [filter, setFilter] = useState<TagFilter>('All');
   const appContext = useAppContext();
   const count = 15;
@@ -54,15 +60,34 @@ const TagList: React.FC = () => {
     refetch(); // Refetch the tag list after a tag is updated
   };
 
+  const handleUpdateIndexes = async () => {
+    await updateTags(tags);
+    refetch();
+  };
+
   return (
     <div>
-      <h1 className="text-2xl font-bold">Tags</h1>
+      <section
+        id="toolbar"
+        className="flex flex-wrap gap-1 justify-start items-center border-2 p-2"
+      >
+        <button
+          onClick={handleUpdateIndexes}
+          disabled={tags.length === 0 || isLoading} // Disable button if no tags or loading
+          className="p-2 bg-blue-500 text-white rounded flex items-center justify-center disabled:opacity-50"
+        >
+          {isLoading ? (
+            <FaSpinner className="animate-spin mr-2" /> // Add spinner when loading
+          ) : null}
+          Update Indexes
+        </button>
+      </section>
 
       {/* Pagination and filter controls */}
       <div className="mt-4 mb-4 flex items-center space-x-4">
         <button
           onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          disabled={page === 1}
+          disabled={page === 1 || isLoading} // Disable during loading
           className="p-2 bg-gray-300 rounded flex items-center justify-center disabled:opacity-50"
         >
           <FaArrowLeft className="text-xl" />
@@ -72,7 +97,7 @@ const TagList: React.FC = () => {
         </p>
         <button
           onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={page === totalPages}
+          disabled={page === totalPages || isLoading} // Disable during loading
           className="p-2 bg-gray-300 rounded flex items-center justify-center disabled:opacity-50"
         >
           <FaArrowRight className="text-xl" />
@@ -85,6 +110,7 @@ const TagList: React.FC = () => {
             id="filter"
             value={filter}
             onChange={handleFilterChange}
+            disabled={isLoading} // Disable filter during loading
             className="p-2 border rounded"
           >
             <option value="All">All</option>
