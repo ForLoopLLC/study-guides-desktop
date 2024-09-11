@@ -6,6 +6,9 @@ enum AlgoliaRecordType {
   User
   Batch
   Course
+  Department
+  Region
+  University
 }
 
 model AlgoliaRecord {

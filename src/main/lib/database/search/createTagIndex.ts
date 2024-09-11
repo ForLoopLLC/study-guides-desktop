@@ -1,12 +1,28 @@
-
 import {
   Tag,
   AlgoliaRecord,
   AlgoliaRecordType,
   ContentRatingType,
-} from "@prisma/client";
+  TagType,
+} from '@prisma/client';
 import { AlgoliaTagRecord, TagInfo } from '../../../../types';
-import { environmentManager } from "../../environment";
+import { environmentManager } from '../../environment';
+
+const mapTagTypeToAlgoliaRecordType = (tagType: TagType): AlgoliaRecordType => {
+  const lookup: Record<TagType, AlgoliaRecordType> = {
+    [TagType.Topic]: AlgoliaRecordType.Topic,
+    [TagType.Category]: AlgoliaRecordType.Category,
+    [TagType.SubCategory]: AlgoliaRecordType.SubCategory,
+    [TagType.University]: AlgoliaRecordType.University,
+    [TagType.Region]: AlgoliaRecordType.Region,
+    [TagType.Department]: AlgoliaRecordType.Department,
+    [TagType.Course]: AlgoliaRecordType.Course,
+    [TagType.UserFolder]: AlgoliaRecordType.SubCategory,
+  };
+
+  // Return the corresponding AlgoliaRecordType
+  return lookup[tagType];
+};
 
 const createTagIndex = async (
   tag: Tag,
@@ -31,6 +47,8 @@ const createTagIndex = async (
       missingMetaTags: tag.metaTags.length === 0,
     };
 
+    const algoliaRecordType = mapTagTypeToAlgoliaRecordType(tag.type);
+
     const record = await prisma.algoliaRecord.upsert({
       where: {
         id: tag.id,
@@ -38,12 +56,13 @@ const createTagIndex = async (
       update: {
         id: tag.id,
         record: algoliaTagRecord,
+        type: algoliaRecordType,
         updatedAt: new Date(),
         uploaded: false,
       },
       create: {
         id: tag.id,
-        type: AlgoliaRecordType.Topic,
+        type: algoliaRecordType,
         record: algoliaTagRecord,
         createdAt: new Date(),
         updatedAt: new Date(),
