@@ -5,6 +5,7 @@ import SelectTagType from './SelectTagType';
 import SelectContentRating from './SelectContentRating';
 import clsx from 'clsx';
 import tagReducer from './tagReducer';
+import { FaClipboard } from 'react-icons/fa'; // Import a clipboard icon from react-icons
 
 interface TagUpdateProps {
   tag: Tag;
@@ -14,7 +15,10 @@ interface TagUpdateProps {
 const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
   const { updateTag, isLoading, success, error } = useUpdateTag();
   const [state, dispatch] = useReducer(tagReducer, tag);
-  const { localSuccess, localError, resetStatus } = useLocalStatus(success, error);
+  const { localSuccess, localError, resetStatus } = useLocalStatus(
+    success,
+    error,
+  );
 
   useEffect(() => {
     dispatch({ type: 'RESET', payload: tag });
@@ -38,7 +42,6 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
     onUpdate();
   };
 
-  // Cancel function to restore the original tag values
   const handleCancel = () => {
     dispatch({ type: 'RESET', payload: tag });
   };
@@ -48,9 +51,26 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
     dispatch({ type: 'SET_FIELD', field, value: array });
   };
 
+  // Function to copy the tag ID to clipboard
+  const copyToClipboard = async () => {
+    await navigator.clipboard.writeText(tag.id);
+    alert('Tag ID copied to clipboard!');
+  };
+
   return (
     <div>
-      <div className="text-slate-600 font-semibold mb-4 text-center">{tag.id}</div>
+      {/* Display tag ID with copy-to-clipboard icon */}
+      <div className="text-slate-600 font-semibold mb-4 text-center flex items-center justify-center space-x-2">
+        <span>{tag.id}</span>
+        <button
+          onClick={copyToClipboard}
+          className="text-gray-500 hover:text-gray-700"
+          title="Copy to clipboard"
+        >
+          <FaClipboard />
+        </button>
+      </div>
+
       <div>
         <label className="block font-bold mb-1">Name:</label>
         <input

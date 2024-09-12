@@ -166,6 +166,10 @@ const TagList: React.FC = () => {
             <p className="text-gray-500">Select a tag to edit</p>
           )}
         </div>
+        {/* Tag Tree display */}
+        <div id="tag tree">
+
+        </div>
       </div>
     </div>
   );
