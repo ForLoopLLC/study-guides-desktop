@@ -11,6 +11,7 @@ import baseConfig from './webpack.config.base';
 import webpackPaths from './webpack.paths';
 import checkNodeEnv from '../scripts/check-node-env';
 import deleteSourceMaps from '../scripts/delete-source-maps';
+import Dotenv from 'dotenv-webpack';
 
 checkNodeEnv('production');
 deleteSourceMaps();
@@ -66,6 +67,12 @@ const configuration: webpack.Configuration = {
 
     new webpack.DefinePlugin({
       'process.type': '"browser"',
+    }),
+
+    new Dotenv({
+      path: path.resolve(__dirname, '../../.env'), // Specify the path to your .env file
+      safe: true, // This checks that all required env variables are set in .env.example
+      systemvars: true, // Load all system variables as well
     }),
   ],
 

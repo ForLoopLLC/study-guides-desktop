@@ -50,6 +50,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
 
   return (
     <div>
+      <div className="text-slate-600 font-semibold mb-4 text-center">{tag.id}</div>
       <div>
         <label className="block font-bold mb-1">Name:</label>
         <input
