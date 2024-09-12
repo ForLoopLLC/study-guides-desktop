@@ -1,11 +1,11 @@
 import React, { useState } from 'react';
-import { useGetTags } from '../../hooks';
-import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
+import { useGetTags, usePublishIndex } from '../../hooks';
+import { FaArrowLeft, FaArrowRight, FaSpinner } from 'react-icons/fa';
 import { TagType } from '@prisma/client';
 import { useAppContext } from '../../contexts/AppContext';
 import { TagFilter } from '../../../types';
 import { TagUpdate } from '../../components';
-import TagTypeCircle  from './TagTypeCircle';
+import TagTypeCircle from './TagTypeCircle';
 
 const TagList: React.FC = () => {
   const [filter, setFilter] = useState<TagFilter>('All');
@@ -19,6 +19,16 @@ const TagList: React.FC = () => {
     filter,
     appContext.environment,
   );
+
+  const {
+    publishIndex,
+    isLoading: isPublishLoading,
+    progress,
+    totalProcessed,
+    isComplete,
+    error: publishError,
+  } = usePublishIndex(filter, appContext.environment);
+
   const [activeTab, setActiveTab] = useState<'edit' | 'tree'>('edit'); // Control the active tab
 
   if (error) {
@@ -41,6 +51,10 @@ const TagList: React.FC = () => {
     refetch(); // Refetch the tag list after a tag is updated
   };
 
+  const handleUpdateIndexes = async () => {
+    publishIndex();
+  };
+
   return (
     <div>
       {/* Toolbar */}
@@ -49,12 +63,32 @@ const TagList: React.FC = () => {
         className="flex flex-wrap gap-1 justify-start items-center border-2 p-2"
       >
         <button
+          onClick={handleUpdateIndexes}
           disabled={tags.length === 0 || isLoading} // Disable button if no tags or loading
           className="p-2 bg-blue-500 text-white rounded flex items-center justify-center disabled:opacity-50"
         >
+          {isLoading ? (
+            <FaSpinner className="animate-spin mr-2" /> // Add spinner when loading
+          ) : null}
           Update Indexes
         </button>
       </section>
+
+      <section id="messagebar" className="mt-4 p-4 border bg-gray-100 rounded">
+        {isPublishLoading && (
+          <p>
+            Publishing in progress: {progress}% ({totalProcessed} tags
+            processed)
+          </p>
+        )}
+        {isComplete && (
+          <p className="text-green-500">
+            Indexing complete! {totalProcessed} tags processed.
+          </p>
+        )}
+        {publishError && <p className="text-red-500">Error: {publishError}</p>}
+      </section>
+
 
       {/* Pagination and filter controls */}
       <div className="mt-4 mb-4 flex items-center space-x-4">
@@ -118,7 +152,9 @@ const TagList: React.FC = () => {
             <nav className="flex space-x-4">
               <button
                 className={`px-4 py-2 text-sm ${
-                  activeTab === 'edit' ? 'text-blue-500 border-b-2 border-blue-500' : ''
+                  activeTab === 'edit'
+                    ? 'text-blue-500 border-b-2 border-blue-500'
+                    : ''
                 }`}
                 onClick={() => setActiveTab('edit')}
               >
@@ -126,7 +162,9 @@ const TagList: React.FC = () => {
               </button>
               <button
                 className={`px-4 py-2 text-sm ${
-                  activeTab === 'tree' ? 'text-blue-500 border-b-2 border-blue-500' : ''
+                  activeTab === 'tree'
+                    ? 'text-blue-500 border-b-2 border-blue-500'
+                    : ''
                 }`}
                 onClick={() => setActiveTab('tree')}
               >

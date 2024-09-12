@@ -16,7 +16,6 @@ const usePublishIndex = (filter: TagFilter, env: Environment) => {
       setError(null);
       setProgress(0);
       setTotalProcessed(0);
-
       await window.electron.ipcRenderer.invoke('publish-index', filter);
     } catch (err: any) {
       setError(err.message || 'An unknown error occurred');
