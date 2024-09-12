@@ -18,3 +18,8 @@ export interface UpdateTagInput {
   public?: boolean;
   metadata?: any; // Assuming metadata is a JSON object
 }
+
+export interface TagWithRelations extends Tag {
+  parentTag: Tag | null;
+  childTags: Tag[];
+}
