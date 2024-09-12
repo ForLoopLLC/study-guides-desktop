@@ -4,9 +4,9 @@ import { Tag } from '../../../types';
 import SelectTagType from './SelectTagType';
 import SelectContentRating from './SelectContentRating';
 import clsx from 'clsx';
-import tagReducer from './tagReducer';
 import { FaClipboard } from 'react-icons/fa'; // Import a clipboard icon from react-icons
 import TagTypeCircle from './TagTypeCircle';
+import tagReducer from './tagReducer';
 
 interface TagUpdateProps {
   tag: Tag;
@@ -16,10 +16,7 @@ interface TagUpdateProps {
 const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
   const { updateTag, isLoading, success, error } = useUpdateTag();
   const [state, dispatch] = useReducer(tagReducer, tag);
-  const { localSuccess, localError, resetStatus } = useLocalStatus(
-    success,
-    error,
-  );
+  const { localSuccess, localError, resetStatus } = useLocalStatus(success, error);
 
   useEffect(() => {
     dispatch({ type: 'RESET', payload: tag });
@@ -91,6 +88,13 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
               value: e.target.value,
             })
           }
+          onPaste={(e) => 
+            dispatch({
+              type: 'SET_FIELD',
+              field: 'parentTagId',
+              value: e.clipboardData.getData('text'),
+            })
+          }
           className="p-2 border rounded mb-4 w-full"
         />
       </div>
@@ -107,6 +111,13 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
               value: e.target.value,
             })
           }
+          onPaste={(e) => 
+            dispatch({
+              type: 'SET_FIELD',
+              field: 'name',
+              value: e.clipboardData.getData('text'),
+            })
+          }
           className="p-2 border rounded mb-4 w-full"
         />
       </div>
@@ -120,6 +131,13 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
               type: 'SET_FIELD',
               field: 'description',
               value: e.target.value,
+            })
+          }
+          onPaste={(e) => 
+            dispatch({
+              type: 'SET_FIELD',
+              field: 'description',
+              value: e.clipboardData.getData('text'),
             })
           }
           className="p-2 border rounded mb-4 w-full"

@@ -28,6 +28,8 @@ const Page: React.FC<PageProps> = ({ title, children }) => {
     setIsPostgresVisible((prev) => !prev); // Toggle visibility state
   };
 
+  const pageTitle = title ? `${title} - ${appContext.environment.env}` : appContext.environment.env;
+
   return (
     <article>
       <header className={headerClass}>
@@ -35,7 +37,7 @@ const Page: React.FC<PageProps> = ({ title, children }) => {
           className="text-3xl text-slate-50 font-bold cursor-pointer"
           onClick={togglePostgresVisibility} // Toggle visibility on click
         >
-          {title} ({appContext.environment.env})
+          {pageTitle}
         </h1>
         {isPostgresVisible && ( // Conditionally render PostgresTable
           <section className="p-4">

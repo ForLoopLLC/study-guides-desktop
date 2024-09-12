@@ -4,6 +4,8 @@ import { createViewMenu } from './menus/viewMenu';
 import { createHelpMenu } from './menus/helpMenu';
 import { createScreensMenu } from './menus/screensMenu';
 import { createConnectionsMenu } from './menus/connectionsMenu';
+import {createEditMenu} from './menus/editMenu';
+import { create } from 'domain';
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
@@ -23,6 +25,7 @@ export default class MenuBuilder {
 
     const template = [
       createFileMenu(this.mainWindow),
+      createEditMenu(this.mainWindow),
       createConnectionsMenu(this.mainWindow),
       createScreensMenu(this.mainWindow),
       createViewMenu(this.mainWindow, isDev),
