@@ -5,21 +5,7 @@ import { TagType } from '@prisma/client';
 import { useAppContext } from '../../contexts/AppContext';
 import { TagFilter } from '../../../types';
 import { TagUpdate } from '../../components';
-
-// Map each TagType to a color
-const tagTypeColors: Record<TagType, string> = {
-  [TagType.Category]: 'bg-blue-500',
-  [TagType.SubCategory]: 'bg-green-500',
-  [TagType.University]: 'bg-red-500',
-  [TagType.Region]: 'bg-yellow-500',
-  [TagType.Department]: 'bg-purple-500',
-  [TagType.Course]: 'bg-teal-500',
-  [TagType.Topic]: 'bg-pink-500',
-  [TagType.UserFolder]: 'bg-orange-500',
-};
-
-// Helper function to get the first letter of the tag type
-const getTagTypeLetter = (type: TagType) => TagType[type][0];
+import TagTypeCircle  from './TagTypeCircle';
 
 const TagList: React.FC = () => {
   const [filter, setFilter] = useState<TagFilter>('All');
@@ -120,11 +106,7 @@ const TagList: React.FC = () => {
               onClick={() => handleTagClick(tag)}
               className="flex items-center cursor-pointer hover:bg-gray-100 p-2 rounded"
             >
-              <div
-                className={`w-8 h-8 flex items-center justify-center rounded-full text-white mr-3 ${tagTypeColors[tag.type]}`}
-              >
-                {getTagTypeLetter(tag.type)}
-              </div>
+              <TagTypeCircle type={tag.type} />
               <span className="text-lg">{tag.name}</span>
             </li>
           ))}
@@ -140,7 +122,7 @@ const TagList: React.FC = () => {
                 }`}
                 onClick={() => setActiveTab('edit')}
               >
-                Edit Form
+                Edit
               </button>
               <button
                 className={`px-4 py-2 text-sm ${
