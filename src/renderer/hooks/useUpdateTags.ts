@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { Tag } from '../../types/tag';
 
-export const useUpdateTags = () => {
+const useUpdateTags = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean>(false);
@@ -28,3 +28,5 @@ export const useUpdateTags = () => {
 
   return { updateTags, isLoading, success, error };
 };
+
+export default useUpdateTags;

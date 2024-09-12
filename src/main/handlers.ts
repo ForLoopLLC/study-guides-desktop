@@ -1,18 +1,10 @@
 import { ipcMain } from 'electron';
-import { getTags, updateTag } from './lib/database/tags';
+import { getTags, updateTag, touchTag } from './lib/database/tags';
 import { createTagIndex } from './lib/database/search';
 import { publishTagIndex } from './lib/search/tags';
-import { UpdateTagInput } from '../types';
+import { UpdateTagInput, TagFilter } from '../types';
 import { Tag } from '@prisma/client';
-
-// Helper function to chunk array into smaller batches
-function chunkArray<T>(array: T[], size: number): T[][] {
-  const result = [];
-  for (let i = 0; i < array.length; i += size) {
-    result.push(array.slice(i, i + size));
-  }
-  return result;
-}
+import { chunkArray } from './util';
 
 ipcMain.handle('get-tags', async (_event, { page, limit, filter }) => {
   try {
@@ -21,6 +13,49 @@ ipcMain.handle('get-tags', async (_event, { page, limit, filter }) => {
   } catch (error: any) {
     console.error(`Error fetching tags: ${error.message}`);
     throw new Error('Failed to fetch tags.');
+  }
+});
+
+ipcMain.handle('publish-index', async (event, filter) => {
+  try {
+    let page = 1;
+    const limit = 500;
+    let allTags: Tag[] = [];
+    let hasMore = true;
+    let totalProcessed = 0;
+
+    // Loop through all pages
+    while (hasMore) {
+      const { data: tags } = await getTags(page, limit, filter);
+
+      if (tags.length === 0) {
+        hasMore = false;
+        break;
+      }
+
+      allTags = allTags.concat(tags);
+      page += 1; // Increment page to fetch the next set of results
+
+      // Touch and publish tags after each page is fetched
+      const touchedTags = await Promise.all(
+        tags.map((tag) => touchTag(tag.id)),
+      );
+      const indexes = await Promise.all(
+        touchedTags.map((tag) => createTagIndex(tag, [])),
+      );
+      await publishTagIndex(indexes.filter((index) => index !== null));
+
+      // Update total processed and send progress
+      totalProcessed += tags.length;
+      const payload = { page, totalProcessed };
+      event.sender.send('publish-index-progress', payload);
+    }
+
+    event.sender.send('publish-index-complete', { totalProcessed });
+  } catch (error: any) {
+    console.error(`Error publishing index: ${error.message}`);
+    event.sender.send('publish-index-error', { message: error.message });
+    throw new Error('Failed to publish index.');
   }
 });
 
@@ -56,17 +91,21 @@ ipcMain.handle('update-tags', async (_event, updatedTags) => {
       const tags = await Promise.all(
         batch.map(async (tag: UpdateTagInput) => {
           return await updateTag(tag);
-        })
+        }),
       );
 
-      allUpdatedTags = allUpdatedTags.concat(tags.filter((tag) => tag !== null));
+      allUpdatedTags = allUpdatedTags.concat(
+        tags.filter((tag) => tag !== null),
+      );
 
       // Get parent tags and create indexes for the current batch
       const indexes = (
         await Promise.all(
-          tags.filter((tag) => tag !== null).map(async (tag) => {
-            return await createTagIndex(tag, []);
-          })
+          tags
+            .filter((tag) => tag !== null)
+            .map(async (tag) => {
+              return await createTagIndex(tag, []);
+            }),
         )
       ).filter((index) => index !== null); // Filter out null indexes
 

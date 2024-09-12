@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useGetTags, useUpdateTags } from '../../hooks';
+import { useGetTags, usePublishIndex } from '../../hooks';
 import { FaArrowLeft, FaArrowRight, FaSpinner } from 'react-icons/fa'; // Import FaSpinner for loading spinner
 import { TagType } from '@prisma/client';
 import { useAppContext } from '../../contexts/AppContext';
@@ -22,23 +22,25 @@ const tagTypeColors: Record<TagType, string> = {
 const getTagTypeLetter = (type: TagType) => TagType[type][0];
 
 const TagList: React.FC = () => {
-  const {
-    updateTags,
-    isLoading,
-    success,
-    error: updateError,
-  } = useUpdateTags();
   const [filter, setFilter] = useState<TagFilter>('All');
   const appContext = useAppContext();
   const count = 15;
   const [page, setPage] = useState(1);
   const [selectedTag, setSelectedTag] = useState(null); // State to track selected tag for editing
-  const { tags, refetch, total, error } = useGetTags(
+  const { tags, refetch, total, isLoading, error } = useGetTags(
     page,
     count,
     filter,
     appContext.environment,
   );
+  const {
+    publishIndex,
+    isLoading: isPublishLoading,
+    progress,
+    totalProcessed,
+    isComplete,
+    error: publishError,
+  } = usePublishIndex(filter, appContext.environment);
 
   if (error) {
     return <p className="text-red-500">Error: {error}</p>;
@@ -61,8 +63,7 @@ const TagList: React.FC = () => {
   };
 
   const handleUpdateIndexes = async () => {
-    await updateTags(tags);
-    refetch();
+    publishIndex();
   };
 
   return (
@@ -82,6 +83,20 @@ const TagList: React.FC = () => {
           Update Indexes
         </button>
       </section>
+      <section id="messagebar" className="mt-4 p-4 border bg-gray-100 rounded">
+        {isPublishLoading && (
+          <p>
+            Publishing in progress: {progress}% ({totalProcessed} tags
+            processed)
+          </p>
+        )}
+        {isComplete && (
+          <p className="text-green-500">
+            Indexing complete! {totalProcessed} tags processed.
+          </p>
+        )}
+        {publishError && <p className="text-red-500">Error: {publishError}</p>}
+      </section>
 
       {/* Pagination and filter controls */}
       <div className="mt-4 mb-4 flex items-center space-x-4">
@@ -93,11 +108,11 @@ const TagList: React.FC = () => {
           <FaArrowLeft className="text-xl" />
         </button>
         <p className="text-sm font-bold">
-          Page {page} of {totalPages}
+          Page {page} of {totalPages} ({total} tags)
         </p>
         <button
           onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={page === totalPages || isLoading} // Disable during loading
+          disabled={page === totalPages || isLoading || tags.length === 0} // Disable during loading
           className="p-2 bg-gray-300 rounded flex items-center justify-center disabled:opacity-50"
         >
           <FaArrowRight className="text-xl" />

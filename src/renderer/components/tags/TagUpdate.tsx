@@ -1,31 +1,10 @@
-import React, { useReducer, useEffect, useState } from 'react';
-import { useUpdateTag } from '../../hooks/useUpdateTag';
-import { TagType, ContentRatingType } from '@prisma/client';
+import React, { useReducer, useEffect } from 'react';
+import { useUpdateTag, useLocalStatus } from '../../hooks';
 import { Tag } from '../../../types';
 import SelectTagType from './SelectTagType';
 import SelectContentRating from './SelectContentRating';
 import clsx from 'clsx';
-
-// Define the action types
-type ActionType =
-  | {
-      type: 'SET_FIELD';
-      field: string;
-      value: string | string[] | TagType | ContentRatingType;
-    }
-  | { type: 'RESET'; payload: Tag };
-
-// Define the reducer
-const tagReducer = (state: Tag, action: ActionType): Tag => {
-  switch (action.type) {
-    case 'SET_FIELD':
-      return { ...state, [action.field]: action.value };
-    case 'RESET':
-      return action.payload;
-    default:
-      return state;
-  }
-};
+import tagReducer from './tagReducer';
 
 interface TagUpdateProps {
   tag: Tag;
@@ -34,23 +13,14 @@ interface TagUpdateProps {
 
 const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
   const { updateTag, isLoading, success, error } = useUpdateTag();
-
-  // State for success and error messages
-  const [localSuccess, setLocalSuccess] = useState(false);
-  const [localError, setLocalError] = useState<string | null>(null);
-
-  // Initialize the reducer with the original tag as the initial state
   const [state, dispatch] = useReducer(tagReducer, tag);
+  const { localSuccess, localError, resetStatus } = useLocalStatus(success, error);
 
-  // Reset state when the selected tag changes
   useEffect(() => {
     dispatch({ type: 'RESET', payload: tag });
-    // Clear success and error messages when a new tag is selected
-    setLocalSuccess(false);
-    setLocalError(null);
+    resetStatus();
   }, [tag]);
 
-  // Helper function to check if the current state differs from the original tag
   const hasChanges = () => {
     return (
       state.name !== tag.name ||
@@ -65,12 +35,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
 
   const handleUpdate = async () => {
     await updateTag(state);
-    if (success) {
-      setLocalSuccess(true);
-      onUpdate();
-    } else if (error) {
-      setLocalError(error);
-    }
+    onUpdate();
   };
 
   // Cancel function to restore the original tag values

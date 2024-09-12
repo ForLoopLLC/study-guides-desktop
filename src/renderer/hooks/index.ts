@@ -1,3 +1,5 @@
-export * from './useGetTags';
-export * from './useUpdateTag';
-export * from './useUpdateTags';
+export {default as useGetTags }  from './useGetTags';
+export {default as useUpdateTag }  from './useUpdateTag';
+export {default as useUpdateTags }  from './useUpdateTags';
+export {default as usePublishIndex }  from './usePublishIndex';
+export {default as useLocalStatus } from './useLocalStatus';
