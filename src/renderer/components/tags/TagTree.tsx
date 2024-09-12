@@ -1,5 +1,5 @@
 import React from 'react';
-import { TagWithRelations, Tag} from '../../../types';
+import { TagWithRelations, Tag } from '../../../types';
 import TagTypeCircle from './TagTypeCircle';
 
 interface TagTreeProps {
@@ -12,7 +12,7 @@ const TagTree: React.FC<TagTreeProps> = ({ tag, onSelected }) => {
     <section>
       {tag && tag.parentTag && (
         <div className="border p-2 mb-2">
-          <div>Parent</div>
+          <div className="text-slate-500">Parent</div>
           <ul id="tags">
             {[tag.parentTag].map((parentTag) => (
               <li
@@ -30,7 +30,7 @@ const TagTree: React.FC<TagTreeProps> = ({ tag, onSelected }) => {
 
       {tag && (
         <div className="border p-2 mb-2">
-          <div>Selected</div>
+          <div className="text-slate-500">Selected</div>
           <ul id="tags">
             {[tag].map((selectedTag) => (
               <li
@@ -48,7 +48,9 @@ const TagTree: React.FC<TagTreeProps> = ({ tag, onSelected }) => {
 
       {tag && tag.childTags.length > 0 && (
         <div className="border p-2">
-          <div>Children</div>
+          <div className="text-slate-500">
+            Children ({tag.childTags.length} records)
+          </div>
           <ul id="tags" className="">
             {tag.childTags.map((childTag) => (
               <li
