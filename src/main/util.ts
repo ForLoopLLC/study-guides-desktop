@@ -1,6 +1,7 @@
 /* eslint import/prefer-default-export: off */
 import { URL } from 'url';
 import path from 'path';
+import crypto from "crypto";
 
 export function resolveHtmlPath(htmlFileName: string) {
   if (process.env.NODE_ENV === 'development') {
@@ -19,3 +20,12 @@ export function chunkArray<T>(array: T[], size: number): T[][] {
   }
   return result;
 }
+
+
+
+export const getHash = (input: string): string => {
+  return crypto
+    .createHash("sha256") // Create a SHA-256 hash object
+    .update(input) // Update the hash with the input string
+    .digest("hex"); // Calculate the digest as a hexadecimal string
+};

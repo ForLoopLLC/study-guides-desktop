@@ -1,7 +1,6 @@
 import { Tag, UpdateTagInput } from '../../../../types';
 import { environmentManager } from '../../environment';
-
-
+import { getHash } from '../../../util';
 
 const updateTag = async (input: UpdateTagInput): Promise<Tag | null> => {
   const prisma = environmentManager.getPrismaClient();
@@ -14,6 +13,13 @@ const updateTag = async (input: UpdateTagInput): Promise<Tag | null> => {
 
     if (!existingTag) {
       throw new Error('Tag not found');
+    }
+
+    let parentTag = null;
+    if (existingTag.parentTagId) {
+      parentTag = await prisma.tag.findUnique({
+        where: { id: existingTag.parentTagId },
+      });
     }
 
     // Ensure existing metadata is an object before merging
@@ -31,12 +37,21 @@ const updateTag = async (input: UpdateTagInput): Promise<Tag | null> => {
     // Merge the existing metadata with the new metadata
     const mergedMetadata = { ...existingMetadata, ...inputMetadata };
 
+    let hash;
+    if (parentTag && existingTag.name !== input.name) {
+      // Generate a new hash if the name has changed and the tag has a parent
+      hash = getHash(parentTag.name + input.name);
+    } else {
+      hash = existingTag.hash;
+    }
+
     // Perform the update with merged metadata
     const updatedTag = await prisma.tag.update({
       where: { id: input.id },
       data: {
         name: input.name,
         description: input.description,
+        hash: hash,
         type: input.type,
         contentRating: input.contentRating,
         contentDescriptors: input.contentDescriptors,
