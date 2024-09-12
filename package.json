@@ -1,6 +1,7 @@
 {
-  "name": "electron-react-boilerplate",
-  "description": "A foundation for scalable desktop apps",
+  "name": "studyguides-admin-console",
+  "description": "An administrative console for managing study guides",
+  "productName": "StudyGuides Console",
   "keywords": [
     "electron",
     "boilerplate",
@@ -186,8 +187,8 @@
     "webpack-merge": "^5.9.0"
   },
   "build": {
-    "productName": "ElectronReact",
-    "appId": "org.erb.ElectronReact",
+    "productName": "StudyGuides Console",
+    "appId": "com.studyguides.console",
     "asar": true,
     "asarUnpack": "**\\*.{node,dll}",
     "files": [
