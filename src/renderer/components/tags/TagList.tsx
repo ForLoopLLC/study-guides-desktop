@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
-import { useGetTags, usePublishIndex } from '../../hooks';
-import { FaArrowLeft, FaArrowRight, FaSpinner } from 'react-icons/fa'; // Import FaSpinner for loading spinner
+import { useGetTags } from '../../hooks';
+import { FaArrowLeft, FaArrowRight } from 'react-icons/fa';
 import { TagType } from '@prisma/client';
 import { useAppContext } from '../../contexts/AppContext';
 import { TagFilter } from '../../../types';
@@ -33,14 +33,7 @@ const TagList: React.FC = () => {
     filter,
     appContext.environment,
   );
-  const {
-    publishIndex,
-    isLoading: isPublishLoading,
-    progress,
-    totalProcessed,
-    isComplete,
-    error: publishError,
-  } = usePublishIndex(filter, appContext.environment);
+  const [activeTab, setActiveTab] = useState<'edit' | 'tree'>('edit'); // Control the active tab
 
   if (error) {
     return <p className="text-red-500">Error: {error}</p>;
@@ -62,40 +55,19 @@ const TagList: React.FC = () => {
     refetch(); // Refetch the tag list after a tag is updated
   };
 
-  const handleUpdateIndexes = async () => {
-    publishIndex();
-  };
-
   return (
     <div>
+      {/* Toolbar */}
       <section
         id="toolbar"
         className="flex flex-wrap gap-1 justify-start items-center border-2 p-2"
       >
         <button
-          onClick={handleUpdateIndexes}
           disabled={tags.length === 0 || isLoading} // Disable button if no tags or loading
           className="p-2 bg-blue-500 text-white rounded flex items-center justify-center disabled:opacity-50"
         >
-          {isLoading ? (
-            <FaSpinner className="animate-spin mr-2" /> // Add spinner when loading
-          ) : null}
           Update Indexes
         </button>
-      </section>
-      <section id="messagebar" className="mt-4 p-4 border bg-gray-100 rounded">
-        {isPublishLoading && (
-          <p>
-            Publishing in progress: {progress}% ({totalProcessed} tags
-            processed)
-          </p>
-        )}
-        {isComplete && (
-          <p className="text-green-500">
-            Indexing complete! {totalProcessed} tags processed.
-          </p>
-        )}
-        {publishError && <p className="text-red-500">Error: {publishError}</p>}
       </section>
 
       {/* Pagination and filter controls */}
@@ -138,7 +110,7 @@ const TagList: React.FC = () => {
         </div>
       </div>
 
-      {/* Tags and edit form side by side */}
+      {/* Tags and Tabs */}
       <div className="flex">
         {/* Tags list */}
         <ul id="tags" className="w-1/2 pr-4 border-r">
@@ -158,17 +130,42 @@ const TagList: React.FC = () => {
           ))}
         </ul>
 
-        {/* Edit form */}
+        {/* Tabs and content */}
         <div className="w-1/2 pl-4">
-          {selectedTag ? (
-            <TagUpdate tag={selectedTag} onUpdate={handleTagUpdated} />
-          ) : (
-            <p className="text-gray-500">Select a tag to edit</p>
-          )}
-        </div>
-        {/* Tag Tree display */}
-        <div id="tag tree">
+          <div className="border-b border-gray-200">
+            <nav className="flex space-x-4">
+              <button
+                className={`px-4 py-2 text-sm ${
+                  activeTab === 'edit' ? 'text-blue-500 border-b-2 border-blue-500' : ''
+                }`}
+                onClick={() => setActiveTab('edit')}
+              >
+                Edit Form
+              </button>
+              <button
+                className={`px-4 py-2 text-sm ${
+                  activeTab === 'tree' ? 'text-blue-500 border-b-2 border-blue-500' : ''
+                }`}
+                onClick={() => setActiveTab('tree')}
+              >
+                Tag Tree
+              </button>
+            </nav>
+          </div>
 
+          <div className="mt-4">
+            {activeTab === 'edit' && selectedTag ? (
+              <TagUpdate tag={selectedTag} onUpdate={handleTagUpdated} />
+            ) : activeTab === 'tree' ? (
+              <div>
+                <h2 className="text-lg font-bold">Tag Tree</h2>
+                {/* Tag tree content goes here */}
+                <p>Tag Tree Display (to be built)</p>
+              </div>
+            ) : (
+              <p className="text-gray-500">Select a tag to edit</p>
+            )}
+          </div>
         </div>
       </div>
     </div>
