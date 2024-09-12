@@ -1,18 +1,23 @@
-import React, { useState } from 'react';
-import { useGetTags, usePublishIndex } from '../../hooks';
+import React, { useState, useEffect } from 'react';
+import {
+  useGetTags,
+  usePublishIndex,
+  useGetTagWithRelations,
+} from '../../hooks';
 import { FaArrowLeft, FaArrowRight, FaSpinner } from 'react-icons/fa';
 import { TagType } from '@prisma/client';
 import { useAppContext } from '../../contexts/AppContext';
-import { TagFilter } from '../../../types';
+import { TagFilter, Tag } from '../../../types';
 import { TagUpdate } from '../../components';
 import TagTypeCircle from './TagTypeCircle';
+import TagTree from './TagTree';
 
 const TagList: React.FC = () => {
   const [filter, setFilter] = useState<TagFilter>('All');
   const appContext = useAppContext();
   const count = 15;
   const [page, setPage] = useState(1);
-  const [selectedTag, setSelectedTag] = useState(null); // State to track selected tag for editing
+  const [selectedTag, setSelectedTag] = useState<Tag | null>(null); // State to track selected tag for editing
   const { tags, refetch, total, isLoading, error } = useGetTags(
     page,
     count,
@@ -28,6 +33,8 @@ const TagList: React.FC = () => {
     isComplete,
     error: publishError,
   } = usePublishIndex(filter, appContext.environment);
+
+  const { tag: tagWithRelations, fetchTag } = useGetTagWithRelations();
 
   const [activeTab, setActiveTab] = useState<'edit' | 'tree'>('edit'); // Control the active tab
 
@@ -55,6 +62,12 @@ const TagList: React.FC = () => {
     publishIndex();
   };
 
+  useEffect(() => {
+    if (selectedTag) {
+      fetchTag(selectedTag.id); // Refetch the tag list after indexing is complete
+    }
+  }, [selectedTag]);
+
   return (
     <div>
       {/* Toolbar */}
@@ -76,10 +89,7 @@ const TagList: React.FC = () => {
 
       <section id="messagebar" className="mt-4 p-4 border bg-gray-100 rounded">
         {isPublishLoading && (
-          <p>
-            Publishing in progress: {progress}% ({totalProcessed} tags
-            processed)
-          </p>
+          <p>Publishing in progress: ({totalProcessed} tags processed)</p>
         )}
         {isComplete && (
           <p className="text-green-500">
@@ -88,7 +98,6 @@ const TagList: React.FC = () => {
         )}
         {publishError && <p className="text-red-500">Error: {publishError}</p>}
       </section>
-
 
       {/* Pagination and filter controls */}
       <div className="mt-4 mb-4 flex items-center space-x-4">
@@ -178,9 +187,7 @@ const TagList: React.FC = () => {
               <TagUpdate tag={selectedTag} onUpdate={handleTagUpdated} />
             ) : activeTab === 'tree' ? (
               <div>
-                <h2 className="text-lg font-bold">Tag Tree</h2>
-                {/* Tag tree content goes here */}
-                <p>Tag Tree Display (to be built)</p>
+                {tagWithRelations && <TagTree tag={tagWithRelations} onSelected={(tag) => setSelectedTag(tag)} />}
               </div>
             ) : (
               <p className="text-gray-500">Select a tag to edit</p>

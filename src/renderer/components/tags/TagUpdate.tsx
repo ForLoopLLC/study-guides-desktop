@@ -6,6 +6,7 @@ import SelectContentRating from './SelectContentRating';
 import clsx from 'clsx';
 import tagReducer from './tagReducer';
 import { FaClipboard } from 'react-icons/fa'; // Import a clipboard icon from react-icons
+import TagTypeCircle from './TagTypeCircle';
 
 interface TagUpdateProps {
   tag: Tag;
@@ -27,6 +28,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
 
   const hasChanges = () => {
     return (
+      state.parentTagId !== tag.parentTagId ||
       state.name !== tag.name ||
       state.description !== tag.description ||
       state.type !== tag.type ||
@@ -60,15 +62,37 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
   return (
     <div>
       {/* Display tag ID with copy-to-clipboard icon */}
-      <div className="text-slate-600 font-semibold mb-4 text-center flex items-center justify-center space-x-2">
-        <span>{tag.id}</span>
-        <button
-          onClick={copyToClipboard}
-          className="text-gray-500 hover:text-gray-700"
-          title="Copy to clipboard"
+      <div>
+        <div
+          key={tag.id}
+          className="flex items-center cursor-pointer hover:bg-gray-100 p-2 rounded"
         >
-          <FaClipboard />
-        </button>
+          <TagTypeCircle type={tag.type} />
+          <span className="text-lg mr-2">{tag.name}</span>
+          <button
+            onClick={copyToClipboard}
+            className="text-gray-500 hover:text-gray-700"
+            title="Copy to clipboard"
+          >
+            <FaClipboard />
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <label className="block font-bold mb-1">Parent Tag Id:</label>
+        <input
+          type="text"
+          value={state.parentTagId || ''}
+          onChange={(e) =>
+            dispatch({
+              type: 'SET_FIELD',
+              field: 'parentTagId',
+              value: e.target.value,
+            })
+          }
+          className="p-2 border rounded mb-4 w-full"
+        />
       </div>
 
       <div>

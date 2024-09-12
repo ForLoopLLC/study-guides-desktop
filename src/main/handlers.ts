@@ -1,5 +1,10 @@
 import { ipcMain } from 'electron';
-import { getTags, updateTag, touchTag } from './lib/database/tags';
+import {
+  getTags,
+  updateTag,
+  touchTag,
+  getTagWithRelations,
+} from './lib/database/tags';
 import { createTagIndex } from './lib/database/search';
 import { publishTagIndex } from './lib/search/tags';
 import { UpdateTagInput, TagFilter } from '../types';
@@ -56,6 +61,16 @@ ipcMain.handle('publish-index', async (event, filter) => {
     console.error(`Error publishing index: ${error.message}`);
     event.sender.send('publish-index-error', { message: error.message });
     throw new Error('Failed to publish index.');
+  }
+});
+
+ipcMain.handle('get-tag-with-relations', async (_event, id) => {
+  try {
+    const tag = await getTagWithRelations(id);
+    return tag;
+  } catch (error: any) {
+    console.error(`Error fetching tag: ${error.message}`);
+    throw new Error('Failed to fetch tag.');
   }
 });
 
