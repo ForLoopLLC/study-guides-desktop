@@ -1,4 +1,5 @@
 import { ipcMain } from 'electron';
+import log from 'electron-log';
 import {
   getTags,
   updateTag,
@@ -7,16 +8,25 @@ import {
 } from './lib/database/tags';
 import { createTagIndex } from './lib/database/search';
 import { publishTagIndex } from './lib/search/tags';
-import { UpdateTagInput, TagFilter } from '../types';
+import { UpdateTagInput, LogLevel } from '../types';
 import { Tag } from '@prisma/client';
 import { chunkArray } from './util';
+
+ipcMain.on('log-message', (_event, level: string, message: string) => {
+  if (['info', 'warn', 'error', 'debug', 'verbose', 'silly'].includes(level)) {
+    (log as any)[level as LogLevel](message);
+  } else {
+    log.error(`Invalid log level: ${level}`);
+  }
+});
+
 
 ipcMain.handle('get-tags', async (_event, { page, limit, filter }) => {
   try {
     const tags = await getTags(page, limit, filter);
     return tags;
   } catch (error: any) {
-    console.error(`Error fetching tags: ${error.message}`);
+    log.error(`Error fetching tags: ${error.message}`);
     throw new Error('Failed to fetch tags.');
   }
 });
@@ -58,7 +68,7 @@ ipcMain.handle('publish-index', async (event, filter) => {
 
     event.sender.send('publish-index-complete', { totalProcessed });
   } catch (error: any) {
-    console.error(`Error publishing index: ${error.message}`);
+    log.error(`Error publishing index: ${error.message}`);
     event.sender.send('publish-index-error', { message: error.message });
     throw new Error('Failed to publish index.');
   }
@@ -69,7 +79,7 @@ ipcMain.handle('get-tag-with-relations', async (_event, id) => {
     const tag = await getTagWithRelations(id);
     return tag;
   } catch (error: any) {
-    console.error(`Error fetching tag: ${error.message}`);
+    log.error(`Error fetching tag: ${error.message}`);
     throw new Error('Failed to fetch tag.');
   }
 });
@@ -89,7 +99,7 @@ ipcMain.handle('update-tag', async (_event, updatedTag) => {
 
     return tag;
   } catch (error: any) {
-    console.error(`Error updating tag: ${error.message}`);
+    log.error(`Error updating tag: ${error.message}`);
     throw new Error('Failed to update tag.');
   }
 });
@@ -134,7 +144,7 @@ ipcMain.handle('update-tags', async (_event, updatedTags) => {
 
     return allUpdatedTags;
   } catch (error: any) {
-    console.error(`Error updating multiple tags in batches: ${error.message}`);
+    log.error(`Error updating multiple tags in batches: ${error.message}`);
     throw new Error('Failed to update multiple tags.');
   }
 });

@@ -11,12 +11,15 @@
 import path from 'path';
 import { app, BrowserWindow, shell } from 'electron';
 import { autoUpdater } from 'electron-updater';
-import log from 'electron-log';
 import MenuBuilder from './MenuBuilder';
-import { resolveHtmlPath } from './util';
+import { resolveHtmlPath, loadEnvFile, setupLogger } from './util';
 import { environmentManager } from './lib/environment';
+
+const log = setupLogger(app); // eslint-disable-line no-unused-vars
+
+
+log.info('Loading App.');
 import './handlers';
-import donenv from 'dotenv';
 
 class AppUpdater {
   constructor() {
@@ -26,14 +29,8 @@ class AppUpdater {
   }
 }
 
-// load environment file
-const envFilePath = app.isPackaged
-  ? path.join(process.resourcesPath, '.env')
-  : path.join(__dirname, '../../.env');
-
-console.log('Loading environment file from', envFilePath);
-donenv.config({ path: envFilePath });
-
+log.info('Loading environment file.');
+loadEnvFile(app);
 
 let mainWindow: BrowserWindow | null = null;
 
@@ -59,7 +56,7 @@ const installExtensions = async () => {
       extensions.map((name) => installer[name]),
       forceDownload,
     )
-    .catch(console.log);
+    .catch(log.error);
 };
 
 const createWindow = async () => {
@@ -147,7 +144,8 @@ app
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
+      log.info('App activated.');
       if (mainWindow === null) createWindow();
     });
   })
-  .catch(console.log);
+  .catch(log.error);
