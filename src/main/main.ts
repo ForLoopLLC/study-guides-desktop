@@ -16,6 +16,7 @@ import MenuBuilder from './MenuBuilder';
 import { resolveHtmlPath } from './util';
 import { environmentManager } from './lib/environment';
 import './handlers';
+import donenv from 'dotenv';
 
 class AppUpdater {
   constructor() {
@@ -24,6 +25,15 @@ class AppUpdater {
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
+
+// load environment file
+const envFilePath = app.isPackaged
+  ? path.join(process.resourcesPath, '.env')
+  : path.join(__dirname, '../../.env');
+
+console.log('Loading environment file from', envFilePath);
+donenv.config({ path: envFilePath });
+
 
 let mainWindow: BrowserWindow | null = null;
 
