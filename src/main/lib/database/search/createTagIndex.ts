@@ -7,6 +7,7 @@ import {
 } from '@prisma/client';
 import { AlgoliaTagRecord, TagInfo } from '../../../../types';
 import { environmentManager } from '../../environment';
+import {log} from '../../../main';
 
 const mapTagTypeToAlgoliaRecordType = (tagType: TagType): AlgoliaRecordType => {
   const lookup: Record<TagType, AlgoliaRecordType> = {
@@ -72,7 +73,8 @@ const createTagIndex = async (
 
     return record;
   } catch (error) {
-    console.error(`Error adding/updating topic search record. ${error}`);
+    const err = error as Error;
+    log.error('index',`Error adding/updating topic search record. ${err.message}.`);
     return null;
   }
 };

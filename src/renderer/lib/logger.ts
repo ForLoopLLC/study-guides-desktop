@@ -1,9 +1,7 @@
-import { ipcRenderer } from 'electron';
-import { LogLevel} from '../../types';
-
+import { LogLevel } from '../../types';
 
 const logMessage = (level: LogLevel, message: string) => {
-  ipcRenderer.send('log-message', level, message);
+  window.electron.ipcRenderer.invoke('log-message', level, message);
 };
 
 const logger = {

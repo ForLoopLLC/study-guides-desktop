@@ -12,6 +12,7 @@ import {
   AiContentRating,
   TagWithQuestions,
 } from '../../../types';
+import {log} from '../../main';
 
 const cleanAIQuestionResponse = (
   aiResponse: AIQuestionResponse,
@@ -136,7 +137,7 @@ export const getTopicAssistFromAI = async (
       return parsedResult as AITopicResponse;
     } catch (error) {
         const err = error as Error;
-      console.error(`The result is not a valid JSON string. ${err.message}`);
+      log.error('ai',`The result is not a valid JSON string. ${err.message}.`);
       return emptyAITopicResponse;
     }
   };
@@ -156,7 +157,7 @@ export const getQuestionAssistFromAI = async (
     return cleanedResult as AIQuestionResponse;
   } catch (error) {
     const err = error as Error;
-    console.error(`The result is not a valid JSON string. ${err.message}`);
+    log.error('ai',`The result is not a valid JSON string. ${err.message}.`);
     return emptyAIQuestionResponse;
   }
 };
@@ -192,7 +193,7 @@ export const getDistractors = async (question: Question): Promise<string[]> => {
     return distractors;
   } catch (error) {
     const err = error as Error;
-    console.error(`The result is not a valid JSON string. ${err.message}`);
+    log.error('ai',`The result is not a valid JSON string. ${err.message}.`);
     return [];
   }
 };
@@ -212,7 +213,7 @@ export const getContentRating = async (
     return parsedResult as AiContentRating;
   } catch (error) {
     const err = error as Error;
-    console.error(`The result is not a valid JSON string. ${err.message}`);
+    log.error('ai',`The result is not a valid JSON string. ${err.message}.`);
     return {
       type: ContentRatingType.RatingPending,
       descriptors: [],
@@ -236,7 +237,7 @@ export const getMetaTags = async (
     return parsedResult;
   } catch (error) {
     const err = error as Error;
-    console.error(`The result is not a valid JSON string. ${err.message}`);
+    log.error('ai',`The result is not a valid JSON string. ${err.message}.`);
     return [];
   }
 };

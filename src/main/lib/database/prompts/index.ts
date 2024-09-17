@@ -1,5 +1,6 @@
 import { environmentManager } from '../../environment';
 import { Prompt, PromptType } from "@prisma/client";
+import { log } from '../../../main';
 
 export const getPrompt = async (type: PromptType): Promise<Prompt | null> => {
   try {
@@ -12,7 +13,8 @@ export const getPrompt = async (type: PromptType): Promise<Prompt | null> => {
 
     return prompt;
   } catch (error) {
-    console.error(`Error fetching prompt for ${type}`, error);
+    const err = error as Error;
+    log.error(`prompts`,`Error fetching prompt for ${type}. ${err.message}.`);
     return null;
   }
 };

@@ -1,11 +1,11 @@
 import { ipcMain } from 'electron';
-import log from 'electron-log';
+import { log } from '../main';
 import { LogLevel } from '../../types';
 
 ipcMain.on('log-message', (_event, level: string, message: string) => {
   if (['info', 'warn', 'error', 'debug', 'verbose', 'silly'].includes(level)) {
     (log as any)[level as LogLevel](message);
   } else {
-    log.error(`Invalid log level: ${level}`);
+    log.error('general',`Invalid log level: ${level}`);
   }
 });

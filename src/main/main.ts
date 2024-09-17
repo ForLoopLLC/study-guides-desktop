@@ -15,20 +15,20 @@ import MenuBuilder from './MenuBuilder';
 import { resolveHtmlPath, loadEnvFile, setupLogger } from './util';
 import { environmentManager } from './lib/environment';
 
-const log = setupLogger(app); // eslint-disable-line no-unused-vars
+export const log = setupLogger(app); // eslint-disable-line no-unused-vars
 
-log.info('Loading App.');
+log.info('Initialize','Loading App.');
 import './handlers';
 
 class AppUpdater {
   constructor() {
     log.transports.file.level = 'info';
-    autoUpdater.logger = log;
+    autoUpdater.logger = log.original;
     autoUpdater.checkForUpdatesAndNotify();
   }
 }
 
-log.info('Loading environment file.');
+log.info('Initialize', 'Loading environment file.');
 loadEnvFile(app);
 
 let mainWindow: BrowserWindow | null = null;
@@ -55,7 +55,7 @@ const installExtensions = async () => {
       extensions.map((name) => installer[name]),
       forceDownload,
     )
-    .catch(log.error);
+    .catch('Initialize',log.error);
 };
 
 const createWindow = async () => {
@@ -143,8 +143,8 @@ app
     app.on('activate', () => {
       // On macOS it's common to re-create a window in the app when the
       // dock icon is clicked and there are no other windows open.
-      log.info('App activated.');
+      log.info('Initialize', 'App activated.');
       if (mainWindow === null) createWindow();
     });
   })
-  .catch(log.error);
+  .catch(e => log.error('Initialize', e));

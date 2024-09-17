@@ -1,6 +1,7 @@
 import { Tag, UpdateTagInput } from '../../../../types';
 import { environmentManager } from '../../environment';
 import { getHash } from '../../../util';
+import {log} from '../../../main';
 
 const updateTag = async (input: UpdateTagInput): Promise<Tag | null> => {
   const prisma = environmentManager.getPrismaClient();
@@ -65,7 +66,8 @@ const updateTag = async (input: UpdateTagInput): Promise<Tag | null> => {
 
     return updatedTag;
   } catch (error) {
-    console.error('Error updating tag:', error);
+    const err = error as Error;
+    log.error('tag', `Error updating tag. ${err.message}.`);
     return null;
   }
 };

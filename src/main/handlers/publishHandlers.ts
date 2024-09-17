@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import log from 'electron-log';
+import {log} from '../main';
 import { getTags, touchTag } from '../lib/database/tags';
 import { createTagIndex } from '../lib/database/search';
 import { publishTagIndex } from '../lib/search/tags';
@@ -36,7 +36,7 @@ ipcMain.handle('publish-index', async (event, filter) => {
     event.sender.send('publish-index-complete', { totalProcessed });
   } catch (error) {
     const err = error as Error;
-    log.error(`Error publishing index: ${err.message}`);
+    log.error('publish',`Error publishing index: ${err.message}`);
     event.sender.send('publish-index-error', { message: err.message });
     throw new Error('Failed to publish index.');
   }

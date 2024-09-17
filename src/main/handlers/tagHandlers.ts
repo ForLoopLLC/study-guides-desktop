@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import log from 'electron-log';
+import { log } from '../main';
 import { getTags, updateTag, getTagWithRelations } from '../lib/database/tags';
 import { createTagIndex } from '../lib/database/search';
 import { publishTagIndex } from '../lib/search/tags';
@@ -10,7 +10,7 @@ ipcMain.handle('get-tags', async (_event, { page, limit, filter }) => {
     return tags;
   } catch (error) {
     const err = error as Error;
-    log.error(`Error fetching tags: ${err.message}`);
+    log.error('tags',`Error fetching tags: ${err.message}.`);
     throw new Error('Failed to fetch tags.');
   }
 });
@@ -21,7 +21,7 @@ ipcMain.handle('get-tag-with-relations', async (_event, id) => {
     return tag;
   } catch (error) {
     const err = error as Error;
-    log.error(`Error fetching tag: ${err.message}`);
+    log.error('tags',`Error fetching tag: ${err.message}.`);
     throw new Error('Failed to fetch tag.');
   }
 });
@@ -39,7 +39,7 @@ ipcMain.handle('update-tag', async (_event, updatedTag) => {
     return tag;
   } catch (error) {
     const err = error as Error;
-    log.error(`Error updating tag: ${err.message}`);
+    log.error('tag',`Error updating tag: ${err.message}.`);
     throw new Error('Failed to update tag.');
   }
 });
