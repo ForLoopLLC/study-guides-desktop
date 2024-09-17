@@ -17,7 +17,6 @@ import { environmentManager } from './lib/environment';
 
 const log = setupLogger(app); // eslint-disable-line no-unused-vars
 
-
 log.info('Loading App.');
 import './handlers';
 
