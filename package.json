@@ -198,11 +198,14 @@
     "files": [
       "dist",
       "node_modules",
-      "package.json"
+      "package.json",
+      "!node_modules/.prisma/client"
     ],
     "mac": {
       "sign": ".erb/scripts/notarize.js",
-      "notarize": false,
+      "notarize": {
+        "teamId": "process.env.APPLE_TEAM_ID"
+      },
       "target": {
         "target": "default",
         "arch": [
@@ -247,7 +250,17 @@
       "output": "release/build"
     },
     "extraResources": [
-      "./assets/**"
+      {
+        "from": "./assets/",
+        "to": "assets/"
+      },
+      {
+        "from": "node_modules/.prisma/client",
+        "to": ".prisma/client",
+        "filter": [
+          "**/*"
+        ]
+      }
     ],
     "publish": {
       "provider": "github",
