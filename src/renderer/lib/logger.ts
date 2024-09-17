@@ -1,16 +1,24 @@
 import { LogLevel } from '../../types';
 
-const logMessage = (level: LogLevel, message: string) => {
-  window.electron.ipcRenderer.invoke('log-message', level, message);
+const logMessage = async (level: LogLevel, category: string, message: string) => {
+  await window.electron.ipcRenderer
+    .invoke('log-message', level, category, message)
+    .catch((error) => console.error('Logging error:', error)); // Ensure to catch errors
 };
 
 const logger = {
-  info: (message: string) => logMessage('info', message),
-  warn: (message: string) => logMessage('warn', message),
-  error: (message: string) => logMessage('error', message),
-  debug: (message: string) => logMessage('debug', message),
-  verbose: (message: string) => logMessage('verbose', message),
-  silly: (message: string) => logMessage('silly', message),
+  info: (category: string, message: string) =>
+    logMessage('info', category, message),
+  warn: (category: string, message: string) =>
+    logMessage('warn', category, message),
+  error: (category: string, message: string) =>
+    logMessage('error', category, message),
+  debug: (category: string, message: string) =>
+    logMessage('debug', category, message),
+  verbose: (category: string, message: string) =>
+    logMessage('verbose', category, message),
+  silly: (category: string, message: string) =>
+    logMessage('silly', category, message),
 };
 
 export default logger;
