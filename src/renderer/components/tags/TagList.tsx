@@ -4,11 +4,11 @@ import {
   usePublishIndex,
   useGetTagWithRelations,
 } from '../../hooks';
-import { FaArrowLeft, FaArrowRight, FaSpinner } from 'react-icons/fa';
+import { FaSpinner } from 'react-icons/fa';
 import { TagType } from '@prisma/client';
 import { useAppContext } from '../../contexts/AppContext';
 import { TagFilter, Tag } from '../../../types';
-import { TagUpdate } from '../../components';
+import { TagUpdate, PaginationControls, FilterSelect } from '../../components';
 import TagTypeCircle from './TagTypeCircle';
 import TagTree from './TagTree';
 
@@ -44,10 +44,10 @@ const TagList: React.FC = () => {
 
   const totalPages = Math.ceil(total / count);
 
-  const handleFilterChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
-    setFilter(event.target.value as TagFilter);
+  const handleFilterChange = (filter: TagFilter) => {
+    setFilter(filter);
     setPage(1);
-    setSelectedTag(null); // Reset selected tag when filter changes
+    setSelectedTag(null);
   };
 
   const handleTagClick = (tag: any) => {
@@ -61,6 +61,14 @@ const TagList: React.FC = () => {
   const handleUpdateIndexes = async () => {
     publishIndex();
   };
+
+  const handlePageChange = (page: number) => {
+    setPage(page);
+  };
+
+  const getTagFilterLabel = (option: TagFilter) => option;
+  const getTagFilterValue = (option: TagFilter) => option;
+
 
   useEffect(() => {
     if (selectedTag) {
@@ -99,44 +107,23 @@ const TagList: React.FC = () => {
         {publishError && <p className="text-red-500">Error: {publishError}</p>}
       </section>
 
-      {/* Pagination and filter controls */}
+      <PaginationControls
+        currentPage={page}
+        onPageChange={handlePageChange}
+        totalPages={totalPages}
+        totalRecords={total}
+        isLoading={isLoading}
+      />
       <div className="mt-4 mb-4 flex items-center space-x-4">
-        <button
-          onClick={() => setPage((prev) => Math.max(prev - 1, 1))}
-          disabled={page === 1 || isLoading} // Disable during loading
-          className="p-2 bg-gray-300 rounded flex items-center justify-center disabled:opacity-50"
-        >
-          <FaArrowLeft className="text-xl" />
-        </button>
-        <p className="text-sm font-bold">
-          Page {page} of {totalPages} ({total} tags)
-        </p>
-        <button
-          onClick={() => setPage((prev) => Math.min(prev + 1, totalPages))}
-          disabled={page === totalPages || isLoading || tags.length === 0} // Disable during loading
-          className="p-2 bg-gray-300 rounded flex items-center justify-center disabled:opacity-50"
-        >
-          <FaArrowRight className="text-xl" />
-        </button>
-        <div className="flex-grow">
-          <label htmlFor="filter" className="mr-2 font-bold">
-            Filter:
-          </label>
-          <select
-            id="filter"
-            value={filter}
-            onChange={handleFilterChange}
-            disabled={isLoading} // Disable filter during loading
-            className="p-2 border rounded"
-          >
-            <option value="All">All</option>
-            {Object.keys(TagType).map((type) => (
-              <option key={type} value={type}>
-                {type}
-              </option>
-            ))}
-          </select>
-        </div>
+        <FilterSelect
+          value={filter}
+          onChange={handleFilterChange}
+          options={['All', ...Object.keys(TagType) as TagFilter[]]} // Ensure the filter options match the type
+          disabled={isLoading}
+          label="Filter:"
+          getOptionLabel={getTagFilterLabel}
+          getOptionValue={getTagFilterValue}
+        />
       </div>
 
       {/* Tags and Tabs */}
@@ -187,7 +174,12 @@ const TagList: React.FC = () => {
               <TagUpdate tag={selectedTag} onUpdate={handleTagUpdated} />
             ) : activeTab === 'tree' ? (
               <div>
-                {tagWithRelations && <TagTree tag={tagWithRelations} onSelected={(tag) => setSelectedTag(tag)} />}
+                {tagWithRelations && (
+                  <TagTree
+                    tag={tagWithRelations}
+                    onSelected={(tag) => setSelectedTag(tag)}
+                  />
+                )}
               </div>
             ) : (
               <p className="text-gray-500">Select a tag to edit</p>

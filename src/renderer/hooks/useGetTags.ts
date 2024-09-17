@@ -15,6 +15,7 @@ const useGetTags = (
 
   // Create a function to fetch tags, used by both the effect and refetch
   const fetchTags = useCallback(async () => {
+    console.log('Fetching tags');
     setIsLoading(true); // Set loading to true when fetch starts
     try {
       const result = await window.electron.ipcRenderer.invoke('get-tags', {
