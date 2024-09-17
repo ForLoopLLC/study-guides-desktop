@@ -104,9 +104,7 @@ const TagList: React.FC = () => {
             Indexing complete! {totalProcessed} tags processed.
           </p>
         )}
-        {publishError && (
-          <p className="text-red-500">Error: {publishError}</p>
-        )}
+        {publishError && <p className="text-red-500">Error: {publishError}</p>}
       </section>
 
       <div className="mt-4 mb-4 flex items-center space-x-4">
@@ -175,9 +173,13 @@ const TagList: React.FC = () => {
           >
             {(activeTabId) => (
               <>
-                {activeTabId === 'edit' && selectedTag ? (
-                  <TagUpdate tag={selectedTag} onUpdate={handleTagUpdated} />
-                ) : activeTabId === 'tree' ? (
+                {activeTabId === 'edit' && (
+                  <TagUpdate
+                    tag={selectedTag || undefined}
+                    onUpdate={handleTagUpdated}
+                  />
+                )}
+                {activeTabId === 'tree' ? (
                   <div>
                     {tagWithRelations && (
                       <TagTree
@@ -186,9 +188,7 @@ const TagList: React.FC = () => {
                       />
                     )}
                   </div>
-                ) : (
-                  <p className="text-gray-500">Select a tag to edit</p>
-                )}
+                ) : null}
               </>
             )}
           </Tabs>

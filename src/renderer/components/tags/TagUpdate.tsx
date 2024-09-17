@@ -9,40 +9,46 @@ import TagTypeCircle from './TagTypeCircle';
 import tagReducer from './tagReducer';
 
 interface TagUpdateProps {
-  tag: Tag;
+  tag?: Tag; // Make tag optional to handle no tag case
   onUpdate: () => void; // Callback function to trigger after update
 }
 
 const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
   const { updateTag, isLoading, success, error } = useUpdateTag();
-  const [state, dispatch] = useReducer(tagReducer, tag);
+  const [state, dispatch] = useReducer(tagReducer, tag || {} as Tag);
   const { localSuccess, localError, resetStatus } = useLocalStatus(success, error);
 
   useEffect(() => {
-    dispatch({ type: 'RESET', payload: tag });
-    resetStatus();
+    if (tag) {
+      dispatch({ type: 'RESET', payload: tag });
+      resetStatus();
+    }
   }, [tag]);
 
   const hasChanges = () => {
     return (
-      state.parentTagId !== tag.parentTagId ||
-      state.name !== tag.name ||
-      state.description !== tag.description ||
-      state.type !== tag.type ||
-      state.contentRating !== tag.contentRating ||
+      state.parentTagId !== tag?.parentTagId ||
+      state.name !== tag?.name ||
+      state.description !== tag?.description ||
+      state.type !== tag?.type ||
+      state.contentRating !== tag?.contentRating ||
       JSON.stringify(state.contentDescriptors) !==
-        JSON.stringify(tag.contentDescriptors) ||
-      JSON.stringify(state.metaTags) !== JSON.stringify(tag.metaTags)
+        JSON.stringify(tag?.contentDescriptors) ||
+      JSON.stringify(state.metaTags) !== JSON.stringify(tag?.metaTags)
     );
   };
 
   const handleUpdate = async () => {
-    await updateTag(state);
-    onUpdate();
+    if (tag) {
+      await updateTag(state);
+      onUpdate();
+    }
   };
 
   const handleCancel = () => {
-    dispatch({ type: 'RESET', payload: tag });
+    if (tag) {
+      dispatch({ type: 'RESET', payload: tag });
+    }
   };
 
   const handleArrayChange = (field: string, value: string) => {
@@ -52,9 +58,15 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
 
   // Function to copy the tag ID to clipboard
   const copyToClipboard = async () => {
-    await navigator.clipboard.writeText(tag.id);
-    alert('Tag ID copied to clipboard!');
+    if (tag) {
+      await navigator.clipboard.writeText(tag.id);
+      alert('Tag ID copied to clipboard!');
+    }
   };
+
+  if (!tag) {
+    return <p className="text-gray-500">Select a tag to edit</p>;
+  }
 
   return (
     <div>
