@@ -100,7 +100,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
               value: e.target.value,
             })
           }
-          onPaste={(e) => 
+          onPaste={(e) =>
             dispatch({
               type: 'SET_FIELD',
               field: 'parentTagId',
@@ -115,7 +115,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
         <label className="block font-bold mb-1">Name:</label>
         <input
           type="text"
-          value={state.name}
+          value={state.name || ''}
           onChange={(e) =>
             dispatch({
               type: 'SET_FIELD',
@@ -123,7 +123,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
               value: e.target.value,
             })
           }
-          onPaste={(e) => 
+          onPaste={(e) =>
             dispatch({
               type: 'SET_FIELD',
               field: 'name',
@@ -137,7 +137,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
       <div>
         <label className="block font-bold mb-1">Description:</label>
         <input
-          value={state.description ?? ''}
+          value={state.description || ''}
           onChange={(e) =>
             dispatch({
               type: 'SET_FIELD',
@@ -145,7 +145,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
               value: e.target.value,
             })
           }
-          onPaste={(e) => 
+          onPaste={(e) =>
             dispatch({
               type: 'SET_FIELD',
               field: 'description',
@@ -175,7 +175,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
           Content Descriptors (comma-separated):
         </label>
         <textarea
-          value={state.contentDescriptors.join(', ')}
+          value={(state.contentDescriptors || []).join(', ')}
           onChange={(e) =>
             handleArrayChange('contentDescriptors', e.target.value)
           }
@@ -188,7 +188,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
           Meta Tags (comma-separated):
         </label>
         <textarea
-          value={state.metaTags.join(', ')}
+          value={(state.metaTags || []).join(', ')}
           onChange={(e) => handleArrayChange('metaTags', e.target.value)}
           className="p-2 border rounded mb-4 w-full"
         />
