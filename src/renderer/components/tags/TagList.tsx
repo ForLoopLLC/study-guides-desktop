@@ -32,11 +32,11 @@ const TagList: React.FC = () => {
 
   const {
     publishIndex,
-    isLoading: isPublishLoading,
+    isLoading: processing,
     progress,
     totalProcessed,
     isComplete,
-    error: publishError,
+    error: processingError,
   } = usePublishIndex(filter, appContext.environment);
 
   const { tag: tagWithRelations, fetchTag } = useGetTagWithRelations();
@@ -96,15 +96,17 @@ const TagList: React.FC = () => {
       </section>
 
       <section id="messagebar" className="mt-4 p-4 border bg-gray-100 rounded">
-        {isPublishLoading && (
-          <p>Publishing in progress: ({totalProcessed} tags processed)</p>
+        {processing && (
+          <p>Indexing in progress: ({totalProcessed} tags processed)</p>
         )}
         {isComplete && (
           <p className="text-green-500">
             Indexing complete! {totalProcessed} tags processed.
           </p>
         )}
-        {publishError && <p className="text-red-500">Error: {publishError}</p>}
+        {processingError && (
+          <p className="text-red-500">Error: {processingError}</p>
+        )}
       </section>
 
       <div className="mt-4 mb-4 flex items-center space-x-4">
