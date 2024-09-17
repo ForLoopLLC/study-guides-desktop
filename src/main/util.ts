@@ -67,10 +67,6 @@ export const setupLogger = (app: App) :LoggerWithCategory => {
     log.transports.file.level = 'info';
   }
 
-  const formatMessage = (category: string | null, message: string) => {
-    return category ? `[${category}] ${message}` : message;
-  };
-
   return {
     info: (category: string | null, message: string) => log.info(category ? `[${category}] ${message}` : message),
     warn: (category: string | null, message: string) => log.warn(category ? `[${category}] ${message}` : message),
