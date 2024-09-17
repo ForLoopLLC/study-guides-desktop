@@ -1,9 +1,11 @@
 import { PrismaClient } from '@prisma/client';
+import OpenAI from 'openai';
 import { Environment } from '../../../types';
 
 class EnvironmentManager {
   private static instance: EnvironmentManager;
   private prisma: PrismaClient | null = null;
+  private ai: OpenAI | null = null;
   private environment: 'development' | 'test' | 'production' = 'development';
   private url: string = '';
   private algoliaAdminKey: string = '';
@@ -29,6 +31,13 @@ class EnvironmentManager {
       throw new Error('Prisma client not initialized.');
     }
     return this.prisma;
+  }
+
+  public getAiClient(): OpenAI {
+    if (!this.ai) {
+      throw new Error('AI client not initialized.');
+    }
+    return this.ai;
   }
 
   public getAlgoliaBaseUrl(): string {
@@ -58,6 +67,7 @@ class EnvironmentManager {
         },
       },
     });
+    this.ai = new OpenAI({ apiKey: this.getOpenAiKey(env) });
   }
 
   // Get the current environment

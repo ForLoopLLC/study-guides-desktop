@@ -25,8 +25,9 @@ ipcMain.handle('get-tags', async (_event, { page, limit, filter }) => {
   try {
     const tags = await getTags(page, limit, filter);
     return tags;
-  } catch (error: any) {
-    log.error(`Error fetching tags: ${error.message}`);
+  } catch (error) {
+    const err = error as Error;
+    log.error(`Error fetching tags: ${err.message}`);
     throw new Error('Failed to fetch tags.');
   }
 });
@@ -67,9 +68,10 @@ ipcMain.handle('publish-index', async (event, filter) => {
     }
 
     event.sender.send('publish-index-complete', { totalProcessed });
-  } catch (error: any) {
-    log.error(`Error publishing index: ${error.message}`);
-    event.sender.send('publish-index-error', { message: error.message });
+  } catch (error) {
+    const err = error as Error;
+    log.error(`Error publishing index: ${err.message}`);
+    event.sender.send('publish-index-error', { message: err.message });
     throw new Error('Failed to publish index.');
   }
 });
@@ -78,8 +80,9 @@ ipcMain.handle('get-tag-with-relations', async (_event, id) => {
   try {
     const tag = await getTagWithRelations(id);
     return tag;
-  } catch (error: any) {
-    log.error(`Error fetching tag: ${error.message}`);
+  } catch (error) {
+    const err = error as Error;
+    log.error(`Error fetching tag: ${err.message}`);
     throw new Error('Failed to fetch tag.');
   }
 });
@@ -98,8 +101,9 @@ ipcMain.handle('update-tag', async (_event, updatedTag) => {
     }
 
     return tag;
-  } catch (error: any) {
-    log.error(`Error updating tag: ${error.message}`);
+  } catch (error) {
+    const err = error as Error;
+    log.error(`Error updating tag: ${err.message}`);
     throw new Error('Failed to update tag.');
   }
 });
@@ -143,8 +147,9 @@ ipcMain.handle('update-tags', async (_event, updatedTags) => {
     }
 
     return allUpdatedTags;
-  } catch (error: any) {
-    log.error(`Error updating multiple tags in batches: ${error.message}`);
+  } catch (error) {
+    const err = error as Error;
+    log.error(`Error updating multiple tags in batches: ${err.message}`);
     throw new Error('Failed to update multiple tags.');
   }
 });

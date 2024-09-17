@@ -30,8 +30,9 @@ export const publishTagIndex = async (items: AlgoliaRecord[]) => {
       },
     );
     return response.data;
-  } catch (error: any) {
-    return { error: error.message };
+  } catch (error) {
+    const err = error as Error;
+    return { error: err.message };
   }
 };
 

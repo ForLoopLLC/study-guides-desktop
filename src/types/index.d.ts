@@ -1,10 +1,11 @@
 import type {
-  TagType as PrismaTagType,
-  ContentRatingType,
+  TagType as PrismaTagType
 } from '@prisma/client';
+
 export * from './user';
 export * from './tag';
 export * from './search';
+export * from './ai';
 
 export type Channels =
   | 'navigate'

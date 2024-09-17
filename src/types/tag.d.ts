@@ -1,10 +1,12 @@
 import type {
   Tag as PrismaTag,
+  Question as PrismaQuestion,
   TagType,
   ContentRatingType,
 } from '@prisma/client';
 
 export interface Tag extends PrismaTag {}
+export interface Question extends PrismaQuestion {}
 
 export interface UpdateTagInput {
   id: string;
@@ -23,3 +25,10 @@ export interface TagWithRelations extends Tag {
   parentTag: Tag | null;
   childTags: Tag[];
 }
+
+export interface TagWithQuestions extends Tag {
+  questions: {
+    question: Question;
+  }[];
+}
+
