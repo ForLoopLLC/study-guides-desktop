@@ -8,7 +8,12 @@ import { FaSpinner } from 'react-icons/fa';
 import { TagType } from '@prisma/client';
 import { useAppContext } from '../../contexts/AppContext';
 import { TagFilter, Tag } from '../../../types';
-import { TagUpdate, PaginationControls, FilterSelect } from '../../components';
+import {
+  TagUpdate,
+  PaginationControls,
+  FilterSelect,
+  Tabs,
+} from '../../components';
 import TagTypeCircle from './TagTypeCircle';
 import TagTree from './TagTree';
 
@@ -17,7 +22,7 @@ const TagList: React.FC = () => {
   const appContext = useAppContext();
   const count = 15;
   const [page, setPage] = useState(1);
-  const [selectedTag, setSelectedTag] = useState<Tag | null>(null); // State to track selected tag for editing
+  const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const { tags, refetch, total, isLoading, error } = useGetTags(
     page,
     count,
@@ -36,8 +41,6 @@ const TagList: React.FC = () => {
 
   const { tag: tagWithRelations, fetchTag } = useGetTagWithRelations();
 
-  const [activeTab, setActiveTab] = useState<'edit' | 'tree'>('edit'); // Control the active tab
-
   if (error) {
     return <p className="text-red-500">Error: {error}</p>;
   }
@@ -51,11 +54,11 @@ const TagList: React.FC = () => {
   };
 
   const handleTagClick = (tag: any) => {
-    setSelectedTag(tag); // Set the clicked tag for editing
+    setSelectedTag(tag);
   };
 
   const handleTagUpdated = () => {
-    refetch(); // Refetch the tag list after a tag is updated
+    refetch();
   };
 
   const handleUpdateIndexes = async () => {
@@ -69,28 +72,25 @@ const TagList: React.FC = () => {
   const getTagFilterLabel = (option: TagFilter) => option;
   const getTagFilterValue = (option: TagFilter) => option;
 
-
   useEffect(() => {
     if (selectedTag) {
-      fetchTag(selectedTag.id); // Refetch the tag list after indexing is complete
+      fetchTag(selectedTag.id);
     }
   }, [selectedTag]);
 
   return (
     <div>
-      {/* Toolbar */}
+      {/* Toolbar and Message Bar */}
       <section
         id="toolbar"
         className="flex flex-wrap gap-1 justify-start items-center border-2 p-2"
       >
         <button
           onClick={handleUpdateIndexes}
-          disabled={tags.length === 0 || isLoading} // Disable button if no tags or loading
+          disabled={tags.length === 0 || isLoading}
           className="p-2 bg-blue-500 text-white rounded flex items-center justify-center disabled:opacity-50"
         >
-          {isLoading ? (
-            <FaSpinner className="animate-spin mr-2" /> // Add spinner when loading
-          ) : null}
+          {isLoading ? <FaSpinner className="animate-spin mr-2" /> : null}
           Update Indexes
         </button>
       </section>
@@ -104,8 +104,22 @@ const TagList: React.FC = () => {
             Indexing complete! {totalProcessed} tags processed.
           </p>
         )}
-        {publishError && <p className="text-red-500">Error: {publishError}</p>}
+        {publishError && (
+          <p className="text-red-500">Error: {publishError}</p>
+        )}
       </section>
+
+      <div className="mt-4 mb-4 flex items-center space-x-4">
+        <FilterSelect
+          value={filter}
+          onChange={handleFilterChange}
+          options={['All', ...(Object.keys(TagType) as TagFilter[])]}
+          disabled={isLoading}
+          label="Filter:"
+          getOptionLabel={getTagFilterLabel}
+          getOptionValue={getTagFilterValue}
+        />
+      </div>
 
       <PaginationControls
         currentPage={page}
@@ -114,77 +128,70 @@ const TagList: React.FC = () => {
         totalRecords={total}
         isLoading={isLoading}
       />
-      <div className="mt-4 mb-4 flex items-center space-x-4">
-        <FilterSelect
-          value={filter}
-          onChange={handleFilterChange}
-          options={['All', ...Object.keys(TagType) as TagFilter[]]} // Ensure the filter options match the type
-          disabled={isLoading}
-          label="Filter:"
-          getOptionLabel={getTagFilterLabel}
-          getOptionValue={getTagFilterValue}
-        />
-      </div>
 
-      {/* Tags and Tabs */}
-      <div className="flex">
-        {/* Tags list */}
-        <ul id="tags" className="w-1/2 pr-4 border-r">
-          {tags.map((tag) => (
-            <li
-              key={tag.id}
-              onClick={() => handleTagClick(tag)}
-              className="flex items-center cursor-pointer hover:bg-gray-100 p-2 rounded"
-            >
-              <TagTypeCircle type={tag.type} />
-              <span className="text-lg">{tag.name}</span>
-            </li>
-          ))}
-        </ul>
-
-        {/* Tabs and content */}
-        <div className="w-1/2 pl-4">
-          <div className="border-b border-gray-200">
-            <nav className="flex space-x-4">
-              <button
-                className={`px-4 py-2 text-sm ${
-                  activeTab === 'edit'
-                    ? 'text-blue-500 border-b-2 border-blue-500'
-                    : ''
-                }`}
-                onClick={() => setActiveTab('edit')}
-              >
-                Edit
-              </button>
-              <button
-                className={`px-4 py-2 text-sm ${
-                  activeTab === 'tree'
-                    ? 'text-blue-500 border-b-2 border-blue-500'
-                    : ''
-                }`}
-                onClick={() => setActiveTab('tree')}
-              >
-                Tag Tree
-              </button>
-            </nav>
-          </div>
-
-          <div className="mt-4">
-            {activeTab === 'edit' && selectedTag ? (
-              <TagUpdate tag={selectedTag} onUpdate={handleTagUpdated} />
-            ) : activeTab === 'tree' ? (
-              <div>
-                {tagWithRelations && (
-                  <TagTree
-                    tag={tagWithRelations}
-                    onSelected={(tag) => setSelectedTag(tag)}
-                  />
+      <div className="flex mt-4">
+        {/* Left Section */}
+        <div className="w-1/2 pr-4 border-r">
+          <Tabs
+            tabs={[
+              { id: 'records', label: 'Records' },
+              { id: 'logs', label: 'Logs' },
+            ]}
+          >
+            {(activeTabId) => (
+              <>
+                {activeTabId === 'records' && (
+                  <ul id="tags">
+                    {tags.map((tag) => (
+                      <li
+                        key={tag.id}
+                        onClick={() => handleTagClick(tag)}
+                        className="flex items-center cursor-pointer hover:bg-gray-100 p-2 rounded"
+                      >
+                        <TagTypeCircle type={tag.type} />
+                        <span className="text-lg">{tag.name}</span>
+                      </li>
+                    ))}
+                  </ul>
                 )}
-              </div>
-            ) : (
-              <p className="text-gray-500">Select a tag to edit</p>
+                {activeTabId === 'logs' && (
+                  <div>
+                    {/* Logs content placeholder */}
+                    <p>Logs content will be here.</p>
+                  </div>
+                )}
+              </>
             )}
-          </div>
+          </Tabs>
+        </div>
+
+        {/* Right Section */}
+        <div className="w-1/2 pl-4">
+          <Tabs
+            tabs={[
+              { id: 'edit', label: 'Edit' },
+              { id: 'tree', label: 'Tag Tree' },
+            ]}
+          >
+            {(activeTabId) => (
+              <>
+                {activeTabId === 'edit' && selectedTag ? (
+                  <TagUpdate tag={selectedTag} onUpdate={handleTagUpdated} />
+                ) : activeTabId === 'tree' ? (
+                  <div>
+                    {tagWithRelations && (
+                      <TagTree
+                        tag={tagWithRelations}
+                        onSelected={(tag) => setSelectedTag(tag)}
+                      />
+                    )}
+                  </div>
+                ) : (
+                  <p className="text-gray-500">Select a tag to edit</p>
+                )}
+              </>
+            )}
+          </Tabs>
         </div>
       </div>
     </div>
