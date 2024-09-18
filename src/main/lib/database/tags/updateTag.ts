@@ -67,7 +67,6 @@ const updateTag = async (input: UpdateTagInput): Promise<Tag | null> => {
     return updatedTag;
   } catch (error) {
     const err = error as Error;
-    log.error('tag', `Error updating tag. ${err.message}.`);
     return null;
   }
 };

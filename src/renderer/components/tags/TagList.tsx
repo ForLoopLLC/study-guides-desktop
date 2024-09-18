@@ -16,17 +16,20 @@ import {
 } from '../../components';
 import TagTypeCircle from './TagTypeCircle';
 import TagTree from './TagTree';
+import Search from '../SearchBar';
 
 const TagList: React.FC = () => {
   const [filter, setFilter] = useState<TagFilter>('All');
   const appContext = useAppContext();
   const count = 15;
   const [page, setPage] = useState(1);
+  const [query, setQuery] = useState('');
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const { tags, refetch, total, isLoading, error } = useGetTags(
     page,
     count,
     filter,
+    query,
     appContext.environment,
   );
 
@@ -87,10 +90,10 @@ const TagList: React.FC = () => {
       >
         <button
           onClick={handleUpdateIndexes}
-          disabled={tags.length === 0 || isLoading}
+          disabled={tags.length === 0 || isLoading || processing}
           className="p-2 bg-blue-500 text-white rounded flex items-center justify-center disabled:opacity-50"
         >
-          {isLoading ? <FaSpinner className="animate-spin mr-2" /> : null}
+          {processing ? <FaSpinner className="animate-spin mr-2" /> : null}
           Update Indexes
         </button>
       </section>
@@ -109,7 +112,10 @@ const TagList: React.FC = () => {
         )}
       </section>
 
-      <div className="mt-4 mb-4 flex items-center space-x-4">
+      <section className="mt-4 mb-4 flex flex-row">
+        <div className='mr-3'>
+          <Search query={query} setQuery={setQuery} onUpdate={() => setPage(1)} />
+        </div>
         <FilterSelect
           value={filter}
           onChange={handleFilterChange}
@@ -119,15 +125,17 @@ const TagList: React.FC = () => {
           getOptionLabel={getTagFilterLabel}
           getOptionValue={getTagFilterValue}
         />
-      </div>
+      </section>
 
-      <PaginationControls
-        currentPage={page}
-        onPageChange={handlePageChange}
-        totalPages={totalPages}
-        totalRecords={total}
-        isLoading={isLoading}
-      />
+      <div className="flex flex-row justify-center">
+        <PaginationControls
+          currentPage={page}
+          onPageChange={handlePageChange}
+          totalPages={totalPages}
+          totalRecords={total}
+          isLoading={isLoading}
+        />
+      </div>
 
       <div className="flex mt-4">
         {/* Left Section */}

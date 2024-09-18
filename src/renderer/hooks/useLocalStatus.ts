@@ -1,30 +1,34 @@
 import { useState, useEffect } from 'react';
 
-const useLocalStatus = (globalSuccess: boolean, globalError: string | null) => {
-  const [localSuccess, setLocalSuccess] = useState(false);
+const useLocalStatus = (
+  updateSuccess: boolean,
+  updateError: string | null,
+  deleteSuccess: boolean,
+  deleteError: string | null
+) => {
+  const [localSuccess, setLocalSuccess] = useState<string | null>(null);
   const [localError, setLocalError] = useState<string | null>(null);
 
-  // Update local success and error messages when the global states change
   useEffect(() => {
-    if (globalSuccess) {
-      setLocalSuccess(true);
+    if (updateSuccess) {
+      setLocalSuccess('Tag updated successfully!');
+    } else if (deleteSuccess) {
+      setLocalSuccess('Tag deleted successfully!');
     }
-    if (globalError) {
-      setLocalError(globalError);
+    if (updateError) {
+      setLocalError(updateError);
+    } else if (deleteError) {
+      setLocalError(deleteError);
     }
-  }, [globalSuccess, globalError]);
+  }, [updateSuccess, updateError, deleteSuccess, deleteError]);
 
-  // Provide reset functions to clear success and error
   const resetStatus = () => {
-    setLocalSuccess(false);
+    setLocalSuccess(null);
     setLocalError(null);
   };
 
-  return {
-    localSuccess,
-    localError,
-    resetStatus,
-  };
+  return { localSuccess, localError, resetStatus };
 };
+
 
 export default useLocalStatus;

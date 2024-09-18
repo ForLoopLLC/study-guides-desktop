@@ -29,7 +29,7 @@ const FilterSelect = <T extends string | number | object>({
   };
 
   return (
-    <div className="flex-grow">
+    <div className="">
       {label && <label className="mr-2 font-bold">{label}</label>}
       <select
         value={getOptionLabel(value)}

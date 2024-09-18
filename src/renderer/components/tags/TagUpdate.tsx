@@ -1,5 +1,5 @@
 import React, { useReducer, useEffect } from 'react';
-import { useUpdateTag, useLocalStatus } from '../../hooks';
+import { useUpdateTag, useLocalStatus, useDeleteTag } from '../../hooks';
 import { Tag } from '../../../types';
 import SelectTagType from './SelectTagType';
 import SelectContentRating from './SelectContentRating';
@@ -14,14 +14,39 @@ interface TagUpdateProps {
 }
 
 const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
-  const { updateTag, isLoading, success, error } = useUpdateTag();
-  const [state, dispatch] = useReducer(tagReducer, tag || {} as Tag);
-  const { localSuccess, localError, resetStatus } = useLocalStatus(success, error);
+  const {
+    updateTag,
+    isLoading: isUpdating,
+    success: updateSuccess,
+    error: updateError,
+    resetStatus: resetUpdateStatus,
+  } = useUpdateTag();
+  const {
+    deleteTag,
+    isLoading: isDeleting,
+    success: deleteSuccess,
+    error: deleteError,
+    resetStatus: resetDeleteStatus,
+  } = useDeleteTag();
+  const [state, dispatch] = useReducer(tagReducer, tag || ({} as Tag));
+
+  const { localSuccess, localError, resetStatus } = useLocalStatus(
+    updateSuccess,
+    updateError,
+    deleteSuccess,
+    deleteError,
+  );
+
+  const resetAllStatus = () => {
+    resetUpdateStatus();
+    resetDeleteStatus();
+    resetStatus();
+  };
 
   useEffect(() => {
     if (tag) {
       dispatch({ type: 'RESET', payload: tag });
-      resetStatus();
+      resetAllStatus();
     }
   }, [tag]);
 
@@ -40,6 +65,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
 
   const handleUpdate = async () => {
     if (tag) {
+      resetAllStatus();
       await updateTag(state);
       onUpdate();
     }
@@ -48,6 +74,13 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
   const handleCancel = () => {
     if (tag) {
       dispatch({ type: 'RESET', payload: tag });
+    }
+  };
+
+  const handleDelete = async () => {
+    if (tag) {
+      resetAllStatus();
+      await deleteTag(tag.id);
     }
   };
 
@@ -194,13 +227,20 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
         />
       </div>
 
+      <section className='mt-2 mb-2 min-h-[24px]'>
+        {localSuccess && (
+          <p className="text-green-500">Tag updated successfully!</p>
+        )}
+        {localError && <p className="text-red-500">{localError}</p>}
+      </section>
+
       <div className="flex space-x-4">
         <button
           onClick={handleUpdate}
-          disabled={isLoading}
+          disabled={isUpdating}
           className={clsx(
             'p-2 rounded text-white',
-            isLoading ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-500',
+            isUpdating ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-500',
           )}
         >
           Update
@@ -216,12 +256,16 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
         >
           Cancel
         </button>
+        <button
+          onClick={handleDelete}
+          className={clsx(
+            'p-2 rounded text-white',
+            'bg-red-500', // Gray when disabled
+          )}
+        >
+          Delete
+        </button>
       </div>
-
-      {localSuccess && (
-        <p className="text-green-500 mt-4">Tag updated successfully!</p>
-      )}
-      {localError && <p className="text-red-500 mt-4">{localError}</p>}
     </div>
   );
 };

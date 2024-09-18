@@ -1,12 +1,13 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Tag } from '../../types/tag';
-import { Environment, TagFilter } from '../../types';
-import logger from '../lib/logger';
+import { Tag } from '../../../types/tag';
+import { Environment, TagFilter } from '../../../types';
+import logger from '../../lib/logger';
 
 const useGetTags = (
   page: number = 1,
   limit: number = 10,
   filter: TagFilter = 'All',
+  query: string = '',
   environment: Environment,
 ) => {
   const [tags, setTags] = useState<Tag[]>([]);
@@ -16,13 +17,17 @@ const useGetTags = (
 
   // Create a function to fetch tags, used by both the effect and refetch
   const fetchTags = useCallback(async () => {
-    logger.info('tags', 'Fetching tags');
+    logger.info(
+      'tags',
+      `Fetching tags with page: ${page}, limit: ${limit}, filter: ${filter}, query: ${query}`,
+    );
     setIsLoading(true); // Set loading to true when fetch starts
     try {
       const result = await window.electron.ipcRenderer.invoke('get-tags', {
         page,
         limit,
         filter,
+        query,
       });
       if (result.error) {
         setError(result.error);
@@ -35,7 +40,7 @@ const useGetTags = (
     } finally {
       setIsLoading(false); // Set loading to false after fetch completes
     }
-  }, [page, limit, filter]);
+  }, [page, limit, filter, query]);
 
   // Automatically fetch tags when dependencies change
   useEffect(() => {
