@@ -228,7 +228,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
       </div>
 
       <section className="mt-2 mb-2 min-h-[24px]">
-        {localSuccess && <p className="text-green-500">Success!</p>}
+        {localSuccess && <p className="text-green-500">{localSuccess}</p>}
         {localError && <p className="text-red-500">{localError}</p>}
       </section>
 
