@@ -13,6 +13,7 @@ import {
   PaginationControls,
   FilterSelect,
   Tabs,
+  LogViewer,
 } from '../../components';
 import TagTypeCircle from './TagTypeCircle';
 import TagTree from './TagTree';
@@ -164,8 +165,7 @@ const TagList: React.FC = () => {
                 )}
                 {activeTabId === 'logs' && (
                   <div>
-                    {/* Logs content placeholder */}
-                    <p>Logs content will be here.</p>
+                    <LogViewer />
                   </div>
                 )}
               </>

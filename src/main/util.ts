@@ -1,5 +1,5 @@
 /* eslint import/prefer-default-export: off */
-import { App } from 'electron';
+import { App, BrowserWindow } from 'electron';
 import { URL } from 'url';
 import path from 'path';
 import crypto from 'crypto';
@@ -7,6 +7,10 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import log from 'electron-log';
 import { LoggerWithCategory } from '../types';
+
+let tailInterval: NodeJS.Timeout | null = null;
+let lastSize = 0;
+
 
 export function resolveHtmlPath(htmlFileName: string) {
   if (process.env.NODE_ENV === 'development') {
@@ -78,6 +82,44 @@ export const setupLogger = (app: App) :LoggerWithCategory => {
     original: log,
   };
 
+};
+
+export const tailLogFile = (app: App, window: BrowserWindow) => {
+  const filePath = path.join(app.getPath('userData'), 'logs', 'app.log');
+
+  const checkFile = () => {
+    fs.stat(filePath, (err, stats) => {
+      if (err) {
+        console.error('Error checking file stats:', err);
+        return;
+      }
+
+      if (stats.size > lastSize) {
+        const stream = fs.createReadStream(filePath, { start: lastSize });
+        let newContent = '';
+        stream.on('data', chunk => newContent += chunk);
+        stream.on('end', () => {
+          lastSize = stats.size;
+          if (newContent) {
+            window.webContents.send('log-update', newContent);
+          }
+        });
+      }
+    });
+  };
+
+  // Start checking the file every second
+  if (!tailInterval) {
+    tailInterval = setInterval(checkFile, 1000);
+  }
+};
+
+
+export const stopTailLogFile = () => {
+  if (tailInterval) {
+    clearInterval(tailInterval);
+    tailInterval = null;
+  }
 };
 
 

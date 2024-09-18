@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import { TagFilter, Environment } from '../../types';
+import { TagFilter, Environment } from '../../../types';
 
 const usePublishIndex = (filter: TagFilter, env: Environment) => {
   const [isLoading, setIsLoading] = useState(false);

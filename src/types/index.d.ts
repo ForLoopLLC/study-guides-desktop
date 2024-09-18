@@ -19,7 +19,8 @@ export type Channels =
   | 'update-tag'
   | 'publish-index-progress'
   | 'publish-index-complete'
-  | 'publish-index-error';
+  | 'publish-index-error'
+  | 'log-update';
 
 export interface Environment {
   env: 'development' | 'test' | 'production' | null;
