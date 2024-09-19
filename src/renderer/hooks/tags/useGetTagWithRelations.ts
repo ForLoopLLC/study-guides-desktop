@@ -1,5 +1,5 @@
 import { useState, useCallback } from 'react';
-import { TagWithRelations } from '../../types';
+import { TagWithRelations } from '../../../types';
 
 const useGetTagWithRelations = () => {
   const [tag, setTag] = useState<TagWithRelations | null>(null); // Initialize with null

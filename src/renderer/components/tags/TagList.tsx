@@ -60,7 +60,7 @@ const TagList: React.FC = () => {
     error: processingError,
   } = usePublishIndex(filter, appContext.environment);
 
-  const { tag: tagWithRelations, fetchTag } = useGetTagWithRelations();
+  const { tag: tagWithRelations, fetchTag, reset } = useGetTagWithRelations();
 
   if (error) {
     return <p className="text-red-500">Error: {error}</p>;
@@ -69,9 +69,10 @@ const TagList: React.FC = () => {
   const totalPages = Math.ceil(total / count);
 
   const handleFilterChange = (filter: TagFilter) => {
+    setSelectedTag(null);
+    reset();
     setFilter(filter);
     setPage(1);
-    setSelectedTag(null);
   };
 
   const handleTagClick = (tag: any) => {
@@ -99,7 +100,6 @@ const TagList: React.FC = () => {
         if (result) {
           window.alert('Tag deleted successfully');
         }
-        
       } catch (error) {
         window.alert('Error deleting tag');
       }

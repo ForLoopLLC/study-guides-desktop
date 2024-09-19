@@ -39,7 +39,7 @@ const TagListMoreButton: React.FC<TagListMoreButtonProps> = ({
 
   return (
     <div className="relative" ref={menuRef}>
-      <button onClick={() => toggleMenu(tag.id)} className="ml-2">
+      <button onClick={() => toggleMenu(tag.id)} className="ml-2 text-slate-700">
         <FaEllipsisV />
       </button>
       {openMenu === tag.id && (

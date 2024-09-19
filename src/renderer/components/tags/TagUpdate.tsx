@@ -97,6 +97,25 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
     }
   };
 
+  const handlePaste = (
+    e: React.ClipboardEvent<HTMLInputElement | HTMLTextAreaElement>,
+    field: string,
+  ) => {
+    e.preventDefault();
+    const clipboardData = e.clipboardData.getData('text');
+    const target = e.target as HTMLInputElement | HTMLTextAreaElement;
+
+    // Get the current selection start and end positions
+    const { selectionStart, selectionEnd, value } = target;
+
+    // Insert clipboard data at the current cursor position
+    const newValue =
+      value.substring(0, selectionStart!) +
+      clipboardData +
+      value.substring(selectionEnd!);
+
+    dispatch({ type: 'SET_FIELD', field, value: newValue });
+  };
 
   if (!tag) {
     return <p className="text-gray-500">Select a tag to edit</p>;
@@ -134,13 +153,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
               value: e.target.value,
             })
           }
-          onPaste={(e) =>
-            dispatch({
-              type: 'SET_FIELD',
-              field: 'parentTagId',
-              value: e.clipboardData.getData('text'),
-            })
-          }
+          onPaste={(e) => handlePaste(e, 'parentTagId')}
           className="p-2 border rounded mb-4 w-full"
         />
       </div>
@@ -157,13 +170,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
               value: e.target.value,
             })
           }
-          onPaste={(e) =>
-            dispatch({
-              type: 'SET_FIELD',
-              field: 'name',
-              value: e.clipboardData.getData('text'),
-            })
-          }
+          onPaste={(e) => handlePaste(e, 'name')}
           className="p-2 border rounded mb-4 w-full"
         />
       </div>
@@ -179,13 +186,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
               value: e.target.value,
             })
           }
-          onPaste={(e) =>
-            dispatch({
-              type: 'SET_FIELD',
-              field: 'description',
-              value: e.clipboardData.getData('text'),
-            })
-          }
+          onPaste={(e) => handlePaste(e, 'description')}
           className="p-2 border rounded mb-4 w-full"
         />
       </div>
