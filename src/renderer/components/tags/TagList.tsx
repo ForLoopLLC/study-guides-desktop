@@ -114,8 +114,12 @@ const TagList: React.FC = () => {
       </section>
 
       <section className="mt-4 mb-4 flex flex-row">
-        <div className='mr-3'>
-          <Search query={query} setQuery={setQuery} onUpdate={() => setPage(1)} />
+        <div className="mr-3">
+          <Search
+            query={query}
+            setQuery={setQuery}
+            onUpdate={() => setPage(1)}
+          />
         </div>
         <FilterSelect
           value={filter}
@@ -165,7 +169,7 @@ const TagList: React.FC = () => {
                 )}
                 {activeTabId === 'logs' && (
                   <div>
-                    <LogViewer />
+                    <LogViewer keyName="tag-logs" />
                   </div>
                 )}
               </>

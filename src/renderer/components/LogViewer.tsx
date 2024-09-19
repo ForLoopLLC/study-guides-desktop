@@ -2,8 +2,10 @@ import React, { useEffect } from 'react';
 import { useLogTail } from '../hooks/useLogTail';
 import { FaEraser } from 'react-icons/fa'; // Importing Font Awesome icons
 
-const LogViewer: React.FC = () => {
-  const { logContent, startTail, stopTail, isTailing, clearLogs } = useLogTail();
+const LogViewer: React.FC<{ keyName: string }> = ({ keyName }) => {
+
+  const { logContent, startTail, stopTail, isTailing, clearLogs } =
+    useLogTail(keyName);
 
   useEffect(() => {
     startTail(); // Start tailing logs on mount

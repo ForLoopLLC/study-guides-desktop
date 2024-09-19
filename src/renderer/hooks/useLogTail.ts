@@ -1,8 +1,8 @@
 import { useState, useEffect } from 'react';
 
-export const useLogTail = () => {
+export const useLogTail = (keyName: string) => {
   const [logContent, setLogContent] = useState<string[]>(() => {
-    const storedLogs = localStorage.getItem('logContent');
+    const storedLogs = localStorage.getItem(keyName);
     return storedLogs ? JSON.parse(storedLogs) : [];
   });
   const [isTailing, setIsTailing] = useState<boolean>(false);
@@ -13,7 +13,7 @@ export const useLogTail = () => {
     const handleLogUpdate = (newContent: any) => {
       setLogContent(prev => {
         const updatedContent = [newContent, ...prev]; // Prepend new content
-        localStorage.setItem('logContent', JSON.stringify(updatedContent)); // Save to localStorage
+        localStorage.setItem(keyName, JSON.stringify(updatedContent)); // Save to localStorage
         return updatedContent;
       });
 
@@ -45,7 +45,7 @@ export const useLogTail = () => {
 
   const clearLogs = () => {
     setLogContent([]); // Clear the log content from state
-    localStorage.removeItem('logContent'); // Remove the content from localStorage
+    localStorage.removeItem(keyName); // Remove the content from localStorage
   };
 
   return {
