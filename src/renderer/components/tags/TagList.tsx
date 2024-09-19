@@ -3,6 +3,8 @@ import {
   useGetTags,
   usePublishIndex,
   useGetTagWithRelations,
+  useClearTagReports,
+  useDeleteTag,
 } from '../../hooks';
 import { FaSpinner } from 'react-icons/fa';
 import { TagType } from '@prisma/client';
@@ -18,6 +20,7 @@ import {
 import TagTypeCircle from './TagTypeCircle';
 import TagTree from './TagTree';
 import Search from '../SearchBar';
+import TagListMoreButton from './TagListMoreButton';
 
 const TagList: React.FC = () => {
   const [filter, setFilter] = useState<TagFilter>('All');
@@ -25,6 +28,20 @@ const TagList: React.FC = () => {
   const count = 15;
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState('');
+  const {
+    clearReports,
+    isLoading: clearingLoading,
+    success,
+    error: clearingError,
+    resetStatus,
+  } = useClearTagReports();
+  const {
+    deleteTag,
+    isLoading: isDeleting,
+    success: deleteSuccess,
+    error: deleteError,
+    resetStatus: resetDeleteStatus,
+  } = useDeleteTag();
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const { tags, refetch, total, isLoading, error } = useGetTags(
     page,
@@ -74,6 +91,35 @@ const TagList: React.FC = () => {
     setSelectedTag(null);
   };
 
+  const handleDelete = async (tag: Tag) => {
+    if (window.confirm(`Are you sure you want to delete ${tag.name}?`)) {
+      try {
+        const result = await deleteTag(tag.id);
+        await refetch();
+        if (result) {
+          window.alert('Tag deleted successfully');
+        }
+        
+      } catch (error) {
+        window.alert('Error deleting tag');
+      }
+    }
+  };
+
+  const handleClearReports = async (tag: Tag) => {
+    if (
+      window.confirm(`Are you sure you want to clear reports for ${tag.name}?`)
+    ) {
+      try {
+        await clearReports(tag.id);
+        await refetch();
+        window.alert('Reports cleared successfully');
+      } catch (error) {
+        window.alert('Error clearing reports');
+      }
+    }
+  };
+
   const getTagFilterLabel = (option: TagFilter) => option;
   const getTagFilterValue = (option: TagFilter) => option;
 
@@ -116,6 +162,10 @@ const TagList: React.FC = () => {
         )}
         {processingError && (
           <p className="text-red-500">Error: {processingError}</p>
+        )}
+
+        {clearingError && (
+          <p className="text-red-500">Error: {clearingError}</p>
         )}
       </section>
 
@@ -168,11 +218,20 @@ const TagList: React.FC = () => {
                     {tags.map((tag) => (
                       <li
                         key={tag.id}
-                        onClick={() => handleTagClick(tag)}
-                        className="flex items-center cursor-pointer hover:bg-gray-100 p-2 rounded"
+                        className="flex items-center justify-between cursor-pointer hover:bg-gray-100 p-2 rounded"
                       >
-                        <TagTypeCircle type={tag.type} />
-                        <span className="text-lg">{tag.name}</span>
+                        <div
+                          onClick={() => handleTagClick(tag)}
+                          className="flex items-center"
+                        >
+                          <TagTypeCircle type={tag.type} />
+                          <span className="text-lg ml-2">{tag.name}</span>
+                        </div>
+                        <TagListMoreButton
+                          tag={tag}
+                          handleDelete={handleDelete}
+                          handleClearReports={handleClearReports}
+                        />
                       </li>
                     ))}
                   </ul>

@@ -6,3 +6,4 @@ export { default as usePublishIndex } from './publish/usePublishIndex';
 export { default as useLocalStatus } from './useLocalStatus';
 export { default as useGetTagWithRelations } from './tags/useGetTagWithRelations';
 export { default as useLogTail } from './useLogTail';
+export { default as useClearTagReports } from './tags/useClearTagReports';

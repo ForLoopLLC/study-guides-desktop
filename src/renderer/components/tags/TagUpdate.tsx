@@ -97,6 +97,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
     }
   };
 
+
   if (!tag) {
     return <p className="text-gray-500">Select a tag to edit</p>;
   }

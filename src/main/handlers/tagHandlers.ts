@@ -5,6 +5,7 @@ import {
   updateTag,
   getTagWithRelations,
   deleteTag,
+  clearTagReports,
 } from '../lib/database/tags';
 import { createTagIndex, deleteTagIndex } from '../lib/database/search';
 import { publishTagIndex, unpublishTagIndex } from '../lib/search/tags';
@@ -62,6 +63,20 @@ ipcMain.handle('delete-tag', async (_event, id) => {
   } catch (error) {
     const err = error as Error;
     log.error('tag', `Error deleting tag ${id}: ${err.message}`);
+    throw new Error(err.message);
+  }
+});
+
+ipcMain.handle('clear-tag-reports', async (_event, id) => {
+  try {
+    const result = await clearTagReports(id);
+    if (result) {
+      log.info('tag', `Tag ${id} was cleared of reports.`);
+    }
+    return result;
+  } catch (error) {
+    const err = error as Error;
+    log.error('tag', `Error clearing reports for tag ${id}: ${err.message}`);
     throw new Error(err.message);
   }
 });
