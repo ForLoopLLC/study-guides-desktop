@@ -1,5 +1,4 @@
 import { Page, TagList } from '../../../components';
-import { TagFilter } from '../../../../types';
 
 
 const Tags = () => {
