@@ -71,6 +71,7 @@ const TagList: React.FC = () => {
 
   const handlePageChange = (page: number) => {
     setPage(page);
+    setSelectedTag(null);
   };
 
   const getTagFilterLabel = (option: TagFilter) => option;
@@ -81,6 +82,11 @@ const TagList: React.FC = () => {
       fetchTag(selectedTag.id);
     }
   }, [selectedTag]);
+
+  useEffect(() => {
+    setPage(1);
+    setSelectedTag(null);
+  }, [appContext.environment]);
 
   return (
     <div>
@@ -124,7 +130,11 @@ const TagList: React.FC = () => {
         <FilterSelect
           value={filter}
           onChange={handleFilterChange}
-          options={['All', 'Reported', ...(Object.keys(TagType) as TagFilter[])]}
+          options={[
+            'All',
+            'Reported',
+            ...(Object.keys(TagType) as TagFilter[]),
+          ]}
           disabled={isLoading}
           label="Filter:"
           getOptionLabel={getTagFilterLabel}
