@@ -218,11 +218,11 @@ const TagList: React.FC = () => {
                     {tags.map((tag) => (
                       <li
                         key={tag.id}
-                        className="flex items-center justify-between cursor-pointer hover:bg-gray-100 p-2 rounded"
+                        className="flex items-center justify-between cursor-pointer hover:bg-gray-100 p-2 rounded border-b"
                       >
                         <div
                           onClick={() => handleTagClick(tag)}
-                          className="flex items-center"
+                          className="flex items-center w-full"
                         >
                           <TagTypeCircle type={tag.type} />
                           <span className="text-lg ml-2">{tag.name}</span>
