@@ -35,7 +35,6 @@ const deleteTag = async (id: string): Promise<boolean> => {
     return true;
   } catch (error) {
     const err = error as Error;
-    console.log(err.message);
     throw new Error(`${err.message}`);
   }
 };
