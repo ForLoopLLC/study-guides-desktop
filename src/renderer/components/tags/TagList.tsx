@@ -97,6 +97,8 @@ const TagList: React.FC = () => {
       try {
         const result = await deleteTag(tag.id);
         await refetch();
+        reset();
+        setSelectedTag(null);
         if (result) {
           window.alert('Tag deleted successfully');
         }
