@@ -1,7 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Tag } from '../../../types/tag';
 import { Environment, TagFilter } from '../../../types';
-import logger from '../../lib/logger';
 
 const useGetTags = (
   page: number = 1,

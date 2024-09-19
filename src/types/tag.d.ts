@@ -5,7 +5,9 @@ import type {
   ContentRatingType,
 } from '@prisma/client';
 
-export interface Tag extends PrismaTag {}
+export interface Tag extends PrismaTag {
+
+}
 export interface Question extends PrismaQuestion {}
 
 export interface UpdateTagInput {

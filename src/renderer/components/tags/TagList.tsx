@@ -124,7 +124,7 @@ const TagList: React.FC = () => {
         <FilterSelect
           value={filter}
           onChange={handleFilterChange}
-          options={['All', ...(Object.keys(TagType) as TagFilter[])]}
+          options={['All', 'Reported', ...(Object.keys(TagType) as TagFilter[])]}
           disabled={isLoading}
           label="Filter:"
           getOptionLabel={getTagFilterLabel}

@@ -6,8 +6,8 @@ import {
   getTagWithRelations,
   deleteTag,
 } from '../lib/database/tags';
-import { createTagIndex } from '../lib/database/search';
-import { publishTagIndex } from '../lib/search/tags';
+import { createTagIndex, deleteTagIndex } from '../lib/database/search';
+import { publishTagIndex, unpublishTagIndex } from '../lib/search/tags';
 
 ipcMain.handle('get-tags', async (_event, { page, limit, filter, query }) => {
   try {
@@ -54,7 +54,9 @@ ipcMain.handle('delete-tag', async (_event, id) => {
   try {
     const result = await deleteTag(id);
     if (result) {
-      log.info('tag', `Tag deleted: ${id}.`);
+      await deleteTagIndex(id);
+      await unpublishTagIndex(id);
+      log.info('tag', `Tag ${id} deleted and unpublished.`);
     }
     return result;
   } catch (error) {

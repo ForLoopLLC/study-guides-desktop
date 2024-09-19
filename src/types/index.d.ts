@@ -47,7 +47,7 @@ export interface PaginatedResult<T> {
   data: T[];
 }
 
-export type TagFilter = PrismaTagType | 'All';
+export type TagFilter = PrismaTagType | 'All' | "Reported";
 
 export type LogLevel = 'info' | 'warn' | 'error' | 'debug' | 'verbose' | 'silly';
 

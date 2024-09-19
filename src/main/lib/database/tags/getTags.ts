@@ -15,11 +15,6 @@ export const getTags = async (
   // Conditionally build the where clause
   const where: any = {};
 
-  // Apply filter if it's not 'All'
-  if (filter !== 'All') {
-    where.type = filter;
-  }
-
   // Apply query to match title or id
   if (query) {
     where.OR = [
@@ -37,6 +32,18 @@ export const getTags = async (
       },
     ];
   }
+
+   // Define special filters that don't apply to `type`
+   const specialFilters = ['All', 'Reported'];
+
+   if (!specialFilters.includes(filter)) {
+     // If it's not one of the special filters, apply it to the `type` field
+     where.type = filter;
+   } else if (filter === 'Reported') {
+     where.reports = {
+       some: {}, // Filter for tags with at least one report
+     };
+   }
 
   const [tags, total] = await Promise.all([
     prisma.tag.findMany({
