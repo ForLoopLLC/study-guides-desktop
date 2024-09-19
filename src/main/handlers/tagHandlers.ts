@@ -59,7 +59,7 @@ ipcMain.handle('delete-tag', async (_event, id) => {
     return result;
   } catch (error) {
     const err = error as Error;
-    log.error('tag', `Error deleting tag: ${err.message}.`);
+    log.error('tag', `Error deleting tag ${id}: ${err.message}`);
     throw new Error(err.message);
   }
 });

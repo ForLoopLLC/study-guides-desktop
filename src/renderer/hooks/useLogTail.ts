@@ -1,21 +1,25 @@
 import { useState, useEffect } from 'react';
 
 export const useLogTail = () => {
-  const [logContent, setLogContent] = useState<string>(() => {
-    return localStorage.getItem('logContent') || ''; // Initialize from localStorage
+  const [logContent, setLogContent] = useState<string[]>(() => {
+    const storedLogs = localStorage.getItem('logContent');
+    return storedLogs ? JSON.parse(storedLogs) : [];
   });
   const [isTailing, setIsTailing] = useState<boolean>(false);
+  const [isFirstLoad, setIsFirstLoad] = useState<boolean>(true); // Track the first load
 
   useEffect(() => {
     // Listener for log updates from the main process
     const handleLogUpdate = (newContent: any) => {
-        console.log("handling log update", newContent)
       setLogContent(prev => {
-        const updatedContent =  prev + newContent; // Skip appending on first load
-        localStorage.setItem('logContent', updatedContent); // Save to localStorage
+        const updatedContent = [newContent, ...prev]; // Prepend new content
+        localStorage.setItem('logContent', JSON.stringify(updatedContent)); // Save to localStorage
         return updatedContent;
       });
 
+      if (isFirstLoad) {
+        setIsFirstLoad(false); // Mark first load as complete
+      }
     };
 
     const removeListener = window.electron.ipcRenderer.on('log-update', handleLogUpdate);
@@ -23,7 +27,7 @@ export const useLogTail = () => {
     return () => {
       removeListener();
     };
-  }, []);
+  }, [isFirstLoad]);
 
   const startTail = () => {
     if (!isTailing) {
@@ -39,18 +43,17 @@ export const useLogTail = () => {
     }
   };
 
-  // Function to clear log content and remove it from localStorage
   const clearLogs = () => {
-    setLogContent(''); // Clear the log content from state
+    setLogContent([]); // Clear the log content from state
     localStorage.removeItem('logContent'); // Remove the content from localStorage
   };
 
   return {
-    logContent,
+    logContent: logContent.join('\n'), // Convert array to string for rendering
     isTailing,
     startTail,
     stopTail,
-    clearLogs, // Return clearLogs so it can be used in the component
+    clearLogs,
   };
 };
 

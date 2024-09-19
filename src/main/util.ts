@@ -11,7 +11,6 @@ import { LoggerWithCategory } from '../types';
 let tailInterval: NodeJS.Timeout | null = null;
 let lastSize = 0;
 
-
 export function resolveHtmlPath(htmlFileName: string) {
   if (process.env.NODE_ENV === 'development') {
     const port = process.env.PORT || 1212;
@@ -57,7 +56,7 @@ export const loadEnvFile = (app: App) => {
   }
 };
 
-export const setupLogger = (app: App) :LoggerWithCategory => {
+export const setupLogger = (app: App): LoggerWithCategory => {
   // Set the log file path
   log.transports.file.resolvePath = () =>
     path.join(app.getPath('userData'), 'logs', 'app.log');
@@ -72,20 +71,36 @@ export const setupLogger = (app: App) :LoggerWithCategory => {
   }
 
   return {
-    info: (category: string | null, message: string) => log.info(category ? `[${category}] ${message}` : message),
-    warn: (category: string | null, message: string) => log.warn(category ? `[${category}] ${message}` : message),
-    error: (category: string | null, message: string) => log.error(category ? `[${category}] ${message}` : message),
-    debug: (category: string | null, message: string) => log.debug(category ? `[${category}] ${message}` : message),
-    verbose: (category: string | null, message: string) => log.verbose(category ? `[${category}] ${message}` : message),
-    silly: (category: string | null, message: string) => log.silly(category ? `[${category}] ${message}` : message),
+    info: (category: string | null, message: string) =>
+      log.info(category ? `[${category}] ${message}` : message),
+    warn: (category: string | null, message: string) =>
+      log.warn(category ? `[${category}] ${message}` : message),
+    error: (category: string | null, message: string) =>
+      log.error(category ? `[${category}] ${message}` : message),
+    debug: (category: string | null, message: string) =>
+      log.debug(category ? `[${category}] ${message}` : message),
+    verbose: (category: string | null, message: string) =>
+      log.verbose(category ? `[${category}] ${message}` : message),
+    silly: (category: string | null, message: string) =>
+      log.silly(category ? `[${category}] ${message}` : message),
     transports: log.transports, // Keep transports for backward compatibility
     original: log,
   };
-
 };
 
 export const tailLogFile = (app: App, window: BrowserWindow) => {
   const filePath = path.join(app.getPath('userData'), 'logs', 'app.log');
+
+  // Initialize lastSize to the current file size if it's zero
+  if (lastSize === 0) {
+    fs.stat(filePath, (err, stats) => {
+      if (err) {
+        console.error('Error getting file stats:', err);
+        return;
+      }
+      lastSize = stats.size; // Start tailing from the end of the file
+    });
+  }
 
   const checkFile = () => {
     fs.stat(filePath, (err, stats) => {
@@ -97,7 +112,7 @@ export const tailLogFile = (app: App, window: BrowserWindow) => {
       if (stats.size > lastSize) {
         const stream = fs.createReadStream(filePath, { start: lastSize });
         let newContent = '';
-        stream.on('data', chunk => newContent += chunk);
+        stream.on('data', (chunk) => (newContent += chunk));
         stream.on('end', () => {
           lastSize = stats.size;
           if (newContent) {
@@ -114,13 +129,9 @@ export const tailLogFile = (app: App, window: BrowserWindow) => {
   }
 };
 
-
 export const stopTailLogFile = () => {
   if (tailInterval) {
     clearInterval(tailInterval);
     tailInterval = null;
   }
 };
-
-
-
