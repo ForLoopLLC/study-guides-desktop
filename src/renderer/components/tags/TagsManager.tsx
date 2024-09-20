@@ -192,7 +192,7 @@ const TagsManager: React.FC = () => {
 
         {assistComplete && (
           <p className="text-green-500">
-            Assist complete! {totalPublished} tags assisted.
+            Assist complete! {totalAssisted} tags assisted.
           </p>
         )}
         {/* error display */}
