@@ -5,7 +5,7 @@ import {
   useGetTagWithRelations,
   useClearTagReports,
   useDeleteTag,
-  useAI,
+  useBatchAI,
 } from '../../hooks';
 import { FaSpinner } from 'react-icons/fa';
 import { TagType } from '@prisma/client';
@@ -28,13 +28,8 @@ const TagsManager: React.FC = () => {
   const count = 15;
   const [page, setPage] = useState(1);
   const [query, setQuery] = useState('');
-  const {
-    clearReports,
-    isLoading: clearingLoading,
-    success,
-    error: clearingError,
-    resetStatus,
-  } = useClearTagReports();
+  const { clearReports, isLoading: clearingLoading } = useClearTagReports();
+
   const {
     deleteTag,
     isLoading: isDeleting,
@@ -42,6 +37,7 @@ const TagsManager: React.FC = () => {
     error: deleteError,
     resetStatus: resetDeleteStatus,
   } = useDeleteTag();
+
   const [selectedTag, setSelectedTag] = useState<Tag | null>(null);
   const { tags, refetch, total, isLoading, error } = useGetTags(
     page,
@@ -53,22 +49,34 @@ const TagsManager: React.FC = () => {
 
   const {
     publishIndex,
-    isLoading: processing,
-    progress,
-    totalProcessed,
-    isComplete,
-    error: processingError,
+    isLoading: publishProcessing,
+    progress: publishProgress,
+    totalProcessed: totalPublished,
+    isComplete: publishComplete,
+    error: publishError,
   } = usePublishIndex(filter, query, appContext.environment);
 
-  const { tag: tagWithRelations, fetchTag, reset } = useGetTagWithRelations();
+  const {
+    batchAiAssist,
+    isLoading: assistProcessing,
+    progress: assistProgress,
+    totalProcessed: totalAssisted,
+    isComplete: assistComplete,
+    error: assistError,
+  } = useBatchAI(filter, query, appContext.environment);
 
-  const { getTagInput, getContentRatingInput, isLoading: aiLoading } = useAI();
+  const { tag: tagWithRelations, fetchTag, reset } = useGetTagWithRelations();
 
   if (error) {
     return <p className="text-red-500">Error: {error}</p>;
   }
 
   const totalPages = Math.ceil(total / count);
+
+  const handleAiAssist = async () => {
+    await batchAiAssist();
+    await refetch();
+  };
 
   const handleFilterChange = (filter: TagFilter) => {
     setSelectedTag(null);
@@ -86,7 +94,7 @@ const TagsManager: React.FC = () => {
   };
 
   const handleUpdateIndexes = async () => {
-    publishIndex();
+    await publishIndex();
   };
 
   const handlePageChange = (page: number) => {
@@ -147,30 +155,49 @@ const TagsManager: React.FC = () => {
       >
         <button
           onClick={handleUpdateIndexes}
-          disabled={tags.length === 0 || isLoading || processing}
+          disabled={tags.length === 0 || isLoading || publishProcessing}
           className="p-2 bg-blue-500 text-white rounded flex items-center justify-center disabled:opacity-50"
         >
-          {processing ? <FaSpinner className="animate-spin mr-2" /> : null}
+          {publishProcessing ? (
+            <FaSpinner className="animate-spin mr-2" />
+          ) : null}
           Update Indexes
+        </button>
+        <button
+          onClick={handleAiAssist}
+          disabled={tags.length === 0 || isLoading || publishProcessing}
+          className="p-2 bg-blue-500 text-white rounded flex items-center justify-center disabled:opacity-50"
+        >
+          {publishProcessing ? (
+            <FaSpinner className="animate-spin mr-2" />
+          ) : null}
+          Assist
         </button>
       </section>
 
       <section id="messagebar" className="mt-4 p-4 border bg-gray-100 rounded">
-        {processing && (
-          <p>Indexing in progress: ({totalProcessed} tags processed)</p>
+        {/* progress display */}
+        {publishProcessing && (
+          <p>Indexing in progress: ({totalPublished} tags published)</p>
         )}
-        {isComplete && (
+        {assistProcessing && (
+          <p>Indexing in progress: ({totalAssisted} tags assisted)</p>
+        )}
+        {/* completed display */}
+        {publishComplete && (
           <p className="text-green-500">
-            Indexing complete! {totalProcessed} tags processed.
+            Indexing complete! {totalPublished} tags published.
           </p>
         )}
-        {processingError && (
-          <p className="text-red-500">Error: {processingError}</p>
-        )}
 
-        {clearingError && (
-          <p className="text-red-500">Error: {clearingError}</p>
+        {assistComplete && (
+          <p className="text-green-500">
+            Assist complete! {totalPublished} tags assisted.
+          </p>
         )}
+        {/* error display */}
+        {publishError && <p className="text-red-500">Error: {publishError}</p>}
+        {assistError && <p className="text-red-500">Error: {assistError}</p>}
       </section>
 
       <section className="mt-4 mb-4 flex flex-row">

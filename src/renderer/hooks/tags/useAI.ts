@@ -20,35 +20,15 @@ const useAI = () => {
       return input;
     } catch (error) {
       const err = error as Error;
-      throw new Error(`Failed to get AI tag assist for ${tagId}. ${err.message}`);
-    } finally {
-      setIsLoading(false);
-    }
-  };
-
-  const getContentRatingInput = async (tagId: string): Promise<UpdateTagInput | null> => {
-    setIsLoading(true);
-
-    try {
-      const input = await window.electron.ipcRenderer.invoke(
-        'get-ai-content-rating',
-        tagId,
+      throw new Error(
+        `Failed to get AI tag assist for ${tagId}. ${err.message}`,
       );
-
-      if (input.error) {
-        throw new Error(input.error);
-      }
-
-      return input;
-    } catch (error) {
-      const err = error as Error;
-      throw new Error(`Failed to get AI tag content rating for ${tagId}. ${err.message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
-  return { getTagInput, getContentRatingInput, isLoading };
+  return { getTagInput, isLoading };
 };
 
 export default useAI;

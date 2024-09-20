@@ -20,6 +20,9 @@ export type Channels =
   | 'publish-index-progress'
   | 'publish-index-complete'
   | 'publish-index-error'
+  | 'batch-assist-tags-progress'
+  | 'batch-assist-tags-complete'
+  | 'batch-assist-tags-error'
   | 'log-update';
 
 export interface Environment {

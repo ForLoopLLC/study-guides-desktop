@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Tag } from '../../types/tag';
+import { Tag } from '../../../types';
 
 const useUpdateTags = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);

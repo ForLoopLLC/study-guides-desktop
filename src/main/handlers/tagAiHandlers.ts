@@ -5,6 +5,8 @@ import {
   getContentRatingInput,
 } from '../lib/ai';
 
+// todo batch-assist-tags
+
 ipcMain.handle('get-ai-content-rating', async (_event, tagId) => {
   try {
     const tagInput = await getContentRatingInput(tagId);

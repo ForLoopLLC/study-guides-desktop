@@ -8,3 +8,4 @@ export { default as useGetTagWithRelations } from './tags/useGetTagWithRelations
 export { default as useLogTail } from './useLogTail';
 export { default as useClearTagReports } from './tags/useClearTagReports';
 export { default as useAI } from './tags/useAI';
+export { default as useBatchAI } from './tags/useBatchAI';

@@ -1,38 +1,29 @@
 import { useState } from 'react';
-import { cleanIpcError } from '../../util';
 
 const useClearTagReports = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
-  const [error, setError] = useState<string | null>(null);
-  const [success, setSuccess] = useState<boolean>(false);
 
-  const resetStatus = () => {
-    setError(null);
-    setSuccess(false);
-  };
-
-  const clearReports = async (id: string) => {
+  const clearReports = async (id: string): Promise<boolean | null> => {
     setIsLoading(true);
-    setError(null);
-    setSuccess(false);
-
     try {
-      const result = await window.electron.ipcRenderer.invoke('clear-tag-reports', id);
+      const result = await window.electron.ipcRenderer.invoke(
+        'clear-tag-reports',
+        id,
+      );
 
       if (result.error) {
-        setError(cleanIpcError(result.error, 'clear-tag-reports'));
-      } else {
-        setSuccess(true);
+        throw new Error(result.error);
       }
+      return true;
     } catch (error) {
       const err = error as Error;
-      setError(cleanIpcError(err.message, 'clear-tag-reports'));
+      throw new Error(`Failed to clear reports for ${id}. ${err.message}`);
     } finally {
       setIsLoading(false);
     }
   };
 
-  return { clearReports, isLoading, success, error , resetStatus};
+  return { clearReports, isLoading };
 };
 
 export default useClearTagReports;
