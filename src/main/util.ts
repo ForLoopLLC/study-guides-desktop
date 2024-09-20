@@ -135,3 +135,7 @@ export const stopTailLogFile = () => {
     tailInterval = null;
   }
 };
+
+export const stripBackticks = (str: string): string => {
+  return str.replace(/^```json\s*|```$/g, '').trim();
+};
