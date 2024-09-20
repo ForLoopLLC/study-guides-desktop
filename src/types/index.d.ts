@@ -1,6 +1,4 @@
-import type {
-  TagType as PrismaTagType
-} from '@prisma/client';
+import type { TagType as PrismaTagType } from '@prisma/client';
 
 import log from 'electron-log';
 
@@ -15,15 +13,21 @@ export type Channels =
   | 'env-update'
   | 'update-tags'
   | 'get-tags'
-  | 'publish-index'
+  | 'publish-tags-index'
   | 'update-tag'
-  | 'publish-index-progress'
-  | 'publish-index-complete'
-  | 'publish-index-error'
+  | 'publish-tags-index-progress'
+  | 'publish-tags-index-complete'
+  | 'publish-tags-index-error'
   | 'batch-assist-tags-progress'
   | 'batch-assist-tags-complete'
   | 'batch-assist-tags-error'
-  | 'log-update';
+  | 'log-update'
+  | 'publish-users-index'
+  | 'get-users'
+  | 'update-user'
+  | 'publish-users-index-progress'
+  | 'publish-users-index-complete'
+  | 'publish-users-index-error';
 
 export interface Environment {
   env: 'development' | 'test' | 'production' | null;
@@ -50,11 +54,16 @@ export interface PaginatedResult<T> {
   data: T[];
 }
 
-export type TagFilter = PrismaTagType | 'All' | "Reported";
+export type TagFilter = PrismaTagType | 'All' | 'Reported';
+export type UserFilter = 'All' | 'Admin' | 'User' | 'Tester' | 'Freelancer';
 
-export type LogLevel = 'info' | 'warn' | 'error' | 'debug' | 'verbose' | 'silly';
-
-
+export type LogLevel =
+  | 'info'
+  | 'warn'
+  | 'error'
+  | 'debug'
+  | 'verbose'
+  | 'silly';
 
 export interface LoggerWithCategory {
   info: (category: string | null, message: string) => void;
@@ -66,4 +75,3 @@ export interface LoggerWithCategory {
   transports: typeof log.transports;
   original: typeof log;
 }
-

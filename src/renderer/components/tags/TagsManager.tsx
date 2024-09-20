@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import {
   useGetTags,
-  usePublishIndex,
+  usePublishTagsIndex,
   useGetTagWithRelations,
   useClearTagReports,
   useDeleteTag,
@@ -54,7 +54,7 @@ const TagsManager: React.FC = () => {
     totalProcessed: totalPublished,
     isComplete: publishComplete,
     error: publishError,
-  } = usePublishIndex(filter, query, appContext.environment);
+  } = usePublishTagsIndex(filter, query, appContext.environment);
 
   const {
     batchAiAssist,

@@ -17,7 +17,7 @@ export const getUser = async (
     return null;
   }
 
-  const userWithRoles = await prisma.user.findUnique({
+  const user = await prisma.user.findUnique({
     where: { id: userId },
     include: {
       roles: {
@@ -28,15 +28,12 @@ export const getUser = async (
     },
   });
 
-  if (!userWithRoles) {
+  if (!user) {
     return null;
   }
 
-  return {
-    ...userWithRoles,
-    roles: userWithRoles.roles.map((userRole) => ({
-      ...userRole,
-      role: userRole.role,
-    })),
-  };
+  return user
 };
+
+
+export default getUser;

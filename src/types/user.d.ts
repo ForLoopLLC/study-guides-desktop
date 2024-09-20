@@ -23,3 +23,13 @@ export interface User extends Omit<PrismaUser, 'roles'> {
   emailVerified: Date | null;
   stripeCustomerId: string | null;
 }
+
+export type AlgoliaUserRecord = {
+  objectID: string;
+  id: string;
+  name: string | null;
+  gamerTag: string | null;
+  email: string | null;
+  image: string | null;
+  stripeCustomerId: string | null;
+};

@@ -1,8 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { TagFilter, Environment } from '../../../types';
+import { UserFilter, Environment } from '../../../types';
 
-const usePublishIndex = (
-  filter: TagFilter,
+const usePublishTagsIndex = (
+  filter: UserFilter,
   query: string,
   env: Environment,
 ) => {
@@ -20,8 +20,8 @@ const usePublishIndex = (
       setError(null);
       setProgress(0);
       setTotalProcessed(0);
-      console.log('publish-index', filter, query);
-      await window.electron.ipcRenderer.invoke('publish-index', {
+      console.log('publish-users-index', filter, query);
+      await window.electron.ipcRenderer.invoke('publish-users-index', {
         filter,
         query,
       });
@@ -65,15 +65,15 @@ const usePublishIndex = (
 
     // Register the listeners
     const unsubscribeProgress = window.electron.ipcRenderer.on(
-      'publish-index-progress',
+      'publish-users-index-progress',
       handleProgress,
     );
     const unsubscribeComplete = window.electron.ipcRenderer.on(
-      'publish-index-complete',
+      'publish-users-index-complete',
       handleComplete,
     );
     const unsubscribeError = window.electron.ipcRenderer.on(
-      'publish-index-error',
+      'publish-users-index-error',
       handleError,
     );
 
@@ -95,4 +95,4 @@ const usePublishIndex = (
   };
 };
 
-export default usePublishIndex;
+export default usePublishTagsIndex;
