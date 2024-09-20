@@ -5,7 +5,7 @@ import { createTagIndex } from '../lib/database/search';
 import { publishTagIndex } from '../lib/search/tags';
 import { Tag } from '@prisma/client';
 
-ipcMain.handle('publish-index', async (event, filter) => {
+ipcMain.handle('publish-index', async (event, { filter, query }) => {
   try {
     let page = 1;
     const limit = 500;
@@ -14,8 +14,7 @@ ipcMain.handle('publish-index', async (event, filter) => {
     let totalProcessed = 0;
 
     while (hasMore) {
-      const { data: tags } = await getTags(page, limit, filter);
-
+      const { data: tags } = await getTags(page, limit, filter, query);
       if (tags.length === 0) {
         hasMore = false;
         break;

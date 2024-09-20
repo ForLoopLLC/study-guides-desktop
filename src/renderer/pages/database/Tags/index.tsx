@@ -1,10 +1,10 @@
-import { Page, TagList } from '../../../components';
+import { Page, TagsManager } from '../../../components';
 
 
 const Tags = () => {
   return (
     <Page title="Tags">
-      <TagList/>
+      <TagsManager/>
     </Page>
   );
 };

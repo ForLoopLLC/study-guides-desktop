@@ -1,5 +1,5 @@
 import React, { useReducer, useEffect } from 'react';
-import { useUpdateTag, useLocalStatus, useDeleteTag } from '../../hooks';
+import { useUpdateTag, useLocalStatus, useDeleteTag, useAI } from '../../hooks';
 import { Tag } from '../../../types';
 import SelectTagType from './SelectTagType';
 import SelectContentRating from './SelectContentRating';
@@ -37,6 +37,8 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
     deleteError,
   );
 
+  const { getTagInput, getContentRatingInput, isLoading: aiLoading } = useAI();
+
   const resetAllStatus = () => {
     resetUpdateStatus();
     resetDeleteStatus();
@@ -61,6 +63,28 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
         JSON.stringify(tag?.contentDescriptors) ||
       JSON.stringify(state.metaTags) !== JSON.stringify(tag?.metaTags)
     );
+  };
+
+  const handleAssist = async () => {
+    try {
+      if (!tag) return;
+      const assist = await getTagInput(tag.id);
+      if (assist) {
+        dispatch({
+          type: 'SET_FIELDS',
+          payload: {
+            contentRating: assist.contentRating ?? state.contentRating,
+            contentDescriptors:
+              assist.contentDescriptors ?? state.contentDescriptors,
+            metaTags: assist.metaTags ?? state.metaTags,
+          },
+        });
+        window.alert(`AI Assist completed for ${tag.name}`);
+      }
+    } catch (error) {
+      const err = error as Error;
+      window.alert(`Assist failed. ${err.message}`);
+    }
   };
 
   const handleUpdate = async () => {
@@ -237,7 +261,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
       <div className="flex space-x-4">
         <button
           onClick={handleUpdate}
-          disabled={isUpdating}
+          disabled={aiLoading || isUpdating || isDeleting}
           className={clsx(
             'p-2 rounded text-white',
             isUpdating ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-500',
@@ -248,7 +272,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
 
         <button
           onClick={handleCancel}
-          disabled={!hasChanges()}
+          disabled={!hasChanges() || aiLoading || isUpdating || isDeleting}
           className={clsx(
             'p-2 rounded text-white',
             hasChanges() ? 'bg-orange-500' : 'bg-gray-300 cursor-not-allowed', // Gray when disabled
@@ -257,7 +281,18 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
           Cancel
         </button>
         <button
+          onClick={handleAssist}
+          disabled={aiLoading || isUpdating || isDeleting}
+          className={clsx(
+            'p-2 rounded text-white',
+            'bg-yellow-500', // Gray when disabled
+          )}
+        >
+          Assist
+        </button>
+        <button
           onClick={handleDelete}
+          disabled={aiLoading || isUpdating || isDeleting}
           className={clsx(
             'p-2 rounded text-white',
             'bg-red-500', // Gray when disabled

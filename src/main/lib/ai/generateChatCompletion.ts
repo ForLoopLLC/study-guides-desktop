@@ -1,6 +1,7 @@
 import { environmentManager } from '../environment';
 import { stripBackticks } from '../../util';
 import { log } from '../../main';
+import { env } from 'process';
 
 export const generateChatCompletion = async (
   promptText: string,
@@ -8,8 +9,9 @@ export const generateChatCompletion = async (
 ): Promise<string> => {
   try {
     const client = environmentManager.getAiClient();
+    const { openAiModel } = environmentManager.getEnvironment();
     const completion = await client.chat.completions.create({
-      model: String(process.env.OPENAI_MODEL),
+      model: openAiModel || 'gpt-3.5-turbo',
       messages: [
         {
           role: 'system',

@@ -13,6 +13,10 @@ const useAI = () => {
         tagId,
       );
 
+      if (input.error) {
+        throw new Error(input.error);
+      }
+
       return input;
     } catch (error) {
       const err = error as Error;
@@ -30,6 +34,10 @@ const useAI = () => {
         'get-ai-content-rating',
         tagId,
       );
+
+      if (input.error) {
+        throw new Error(input.error);
+      }
 
       return input;
     } catch (error) {

@@ -1,2 +1,2 @@
-export { default as TagList } from './TagList';
-export { default as TagUpdate} from './TagUpdate';
+export { default as TagsManager } from './TagsManager';
+export { default as TagUpdate } from './TagUpdate';

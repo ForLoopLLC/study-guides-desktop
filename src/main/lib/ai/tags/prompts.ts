@@ -26,7 +26,8 @@ export const topicPrompt = {
   text: `
   You are a knowledge assistant for a study guide app that helps people learn through a series of questions and answers. Your tasks are as follows:
   
-  1. Generate one Content Rating type and as many Content Descriptors as appropriate for the given topic and questions. Choose from the following Content Rating types:
+  1. You *MUST* Generate one Content Rating type and as many Content Descriptors as appropriate for the given topic and questions. The content type
+     Everyone is allowed to have no Conent Discriptors all others must have at least one Content Descriptor. Choose from the following Content Rating types:
      - Everyone
      - Teen
      - Mature

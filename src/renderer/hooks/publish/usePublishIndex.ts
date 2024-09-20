@@ -1,7 +1,11 @@
 import { useState, useEffect, useCallback } from 'react';
 import { TagFilter, Environment } from '../../../types';
 
-const usePublishIndex = (filter: TagFilter, env: Environment) => {
+const usePublishIndex = (
+  filter: TagFilter,
+  query: string,
+  env: Environment,
+) => {
   const [isLoading, setIsLoading] = useState(false);
   const [progress, setProgress] = useState(0);
   const [totalProcessed, setTotalProcessed] = useState(0);
@@ -16,12 +20,16 @@ const usePublishIndex = (filter: TagFilter, env: Environment) => {
       setError(null);
       setProgress(0);
       setTotalProcessed(0);
-      await window.electron.ipcRenderer.invoke('publish-index', filter);
+      console.log('publish-index', filter, query);
+      await window.electron.ipcRenderer.invoke('publish-index', {
+        filter,
+        query,
+      });
     } catch (err: any) {
       setError(err.message || 'An unknown error occurred');
       setIsLoading(false);
     }
-  }, [filter]);
+  }, [filter, query]);
 
   useEffect(() => {
     // Reset states when the environment changes
@@ -30,7 +38,7 @@ const usePublishIndex = (filter: TagFilter, env: Environment) => {
     setTotalProcessed(0);
     setIsComplete(false);
     setError(null);
-  }, [filter, env]);
+  }, [filter, query, env]);
 
   useEffect(() => {
     // Listen for progress updates from the main process
