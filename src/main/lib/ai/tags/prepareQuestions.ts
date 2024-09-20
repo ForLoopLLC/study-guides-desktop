@@ -6,6 +6,7 @@ export const prepareQuestions = (
   tag: TagWithQuestions,
   all: boolean = false,
 ): string => {
+  
   const allQuestions = tag.questions;
   const shuffledQuestions = allQuestions.sort(() => 0.5 - Math.random());
   const selectedQuestions = all

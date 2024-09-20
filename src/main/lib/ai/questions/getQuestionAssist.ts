@@ -12,7 +12,7 @@ export const defaultResponse = {
   metaTags: [],
 };
 
-const cleanQuestionResponse = (
+const cleanResponse = (
   aiResponse: AIQuestionResponse,
 ): AIQuestionResponse => {
   const cleanedResponse: AIQuestionResponse = {
@@ -29,16 +29,16 @@ const cleanQuestionResponse = (
   return cleanedResponse;
 };
 
-export const getQuestionAssist = async (
+const getQuestionAssist = async (
   question: Question,
 ): Promise<AIQuestionResponse> => {
-  const prompt = questionPrompt;
-  const preparedQuestion = prepareQuestion(question, true);
 
-  const result = await generateChatCompletion(prompt.text, preparedQuestion);
+  const preparedQuestion = prepareQuestion(question, true);
+  const result = await generateChatCompletion(questionPrompt.text, preparedQuestion);
+
   try {
     const parsedResult = JSON.parse(result);
-    const cleanedResult = cleanQuestionResponse(
+    const cleanedResult = cleanResponse(
       parsedResult as AIQuestionResponse,
     );
     return cleanedResult as AIQuestionResponse;
@@ -48,3 +48,5 @@ export const getQuestionAssist = async (
     return defaultResponse;
   }
 };
+
+export default getQuestionAssist;

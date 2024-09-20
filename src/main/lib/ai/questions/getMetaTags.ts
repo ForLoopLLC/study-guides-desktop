@@ -4,7 +4,7 @@ import { log } from '../../../main';
 import { generateChatCompletion } from '../generateChatCompletion';
 import { prepareQuestion } from './prepareQuestion';
 
-export const getMetaTags = async (question: Question): Promise<string> => {
+const getMetaTags = async (question: Question): Promise<string> => {
   const preparedQuestion = prepareQuestion(question, true);
   const result = await generateChatCompletion(
     metaTagsPrompt.text,
@@ -20,3 +20,5 @@ export const getMetaTags = async (question: Question): Promise<string> => {
     return '';
   }
 };
+
+export default getMetaTags;

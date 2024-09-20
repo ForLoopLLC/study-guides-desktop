@@ -13,13 +13,13 @@ export const defaultResponse = {
   metaTags: [],
 };
 
-export const getTagWithQuestionsAssist = async (
+const getTagWithQuestionsAssist = async (
   tag: TagWithQuestions,
 ): Promise<AITopicResponse> => {
-  const prompt = topicPrompt; ////(await getPrompt(PromptType.ContentRating)) as Prompt;
-  const userPrompt = prepareQuestions(tag);
 
-  const result = await generateChatCompletion(prompt.text, userPrompt);
+  const preparedQuestions = prepareQuestions(tag);
+  const result = await generateChatCompletion(topicPrompt.text, preparedQuestions);
+
   try {
     const parsedResult = JSON.parse(result);
     return parsedResult as AITopicResponse;
@@ -29,3 +29,5 @@ export const getTagWithQuestionsAssist = async (
     return defaultResponse;
   }
 };
+
+export default getTagWithQuestionsAssist;

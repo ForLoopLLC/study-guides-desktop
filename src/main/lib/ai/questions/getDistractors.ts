@@ -4,7 +4,7 @@ import { generateChatCompletion } from '../generateChatCompletion';
 import { distractorPrompt } from './prompts';
 import { prepareQuestion } from './prepareQuestion';
 
-export const getDistractors = async (question: Question): Promise<string[]> => {
+const getDistractors = async (question: Question): Promise<string[]> => {
   const preparedQuestion = prepareQuestion(question);
   const result = await generateChatCompletion(
     distractorPrompt.text,
@@ -32,3 +32,5 @@ export const getDistractors = async (question: Question): Promise<string[]> => {
     return [];
   }
 };
+
+export default getDistractors;

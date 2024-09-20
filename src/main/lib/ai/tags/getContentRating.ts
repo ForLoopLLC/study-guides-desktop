@@ -5,15 +5,17 @@ import { log } from '../../../main';
 import { generateChatCompletion } from '../generateChatCompletion';
 import { prepareQuestions } from './prepareQuestions';
 
-export const getContentRating = async (
+const getContentRating = async (
   tag: TagWithQuestions,
 ): Promise<AiContentRatingResponse> => {
+
   const preparedQuestions = prepareQuestions(tag);
 
   const result = await generateChatCompletion(
     contentRatingPrompt.text,
     preparedQuestions,
   );
+
   try {
     const parsedResult = JSON.parse(result);
     return parsedResult as AiContentRatingResponse;
@@ -26,3 +28,5 @@ export const getContentRating = async (
     };
   }
 };
+
+export default getContentRating;
