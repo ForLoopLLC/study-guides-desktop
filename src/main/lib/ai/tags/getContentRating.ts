@@ -8,6 +8,10 @@ import { prepareQuestions } from './prepareQuestions';
 const getContentRating = async (
   tag: TagWithQuestions,
 ): Promise<AiContentRatingResponse> => {
+  const defaultResonse = {
+    contentRating: ContentRatingType.RatingPending,
+    contentDescriptors: [],
+  };
 
   const preparedQuestions = prepareQuestions(tag);
 
@@ -22,10 +26,7 @@ const getContentRating = async (
   } catch (error) {
     const err = error as Error;
     log.error('ai', `The result is not a valid JSON string. ${err.message}.`);
-    return {
-      type: ContentRatingType.RatingPending,
-      descriptors: [],
-    };
+    return defaultResonse;
   }
 };
 

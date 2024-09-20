@@ -1,20 +1,24 @@
 import { ContentRatingType } from '@prisma/client';
 
 export interface AiContentRatingResponse {
-  type: ContentRatingType;
-  descriptors: string[];
+  contentRating: ContentRatingType;
+  contentDescriptors: string[];
 }
 
-export interface AITopicResponse {
-  content: {
-    rating: ContentRatingType;
-    descriptors: string[];
-  };
+export interface AIMetaTagsResponse {
   metaTags: string[];
 }
 
-export interface AIQuestionResponse {
+export interface AILearnMoreResponse {
   learnMore: string;
-  distractors: string[];
-  metaTags: string[];
 }
+
+export interface AIDistractorsResponse {
+  distractors: string[];
+}
+
+export interface AITopicResponse extends AiContentRatingResponse, AIMetaTagsResponse {}
+export interface AIQuestionResponse extends AILearnMoreResponse, AIDistractorsResponse, AIMetaTagsResponse {}
+
+
+

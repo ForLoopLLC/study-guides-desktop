@@ -18,7 +18,7 @@ export const contentRatingPrompt = {
 
         It's ok for a content rating to have no descriptors.
 
-        Format your result as a JSON object e.g. {type: "ContentRatingType", descriptors: ["descriptor1", "descriptor2", "descriptor3"]}
+        Format your result as a JSON object e.g. {contentRating: "ContentRatingType", contentDescriptors: ["descriptor1", "descriptor2", "descriptor3"]}
         Ensure the response is valid JSON.
         `,
 };
@@ -45,11 +45,9 @@ export const topicPrompt = {
   Ensure the response a is valid JSON Object and includes results from step 1 and 2 in the following format:
   
   {
-    "content": {
-      "rating": "Teen",
-      "descriptors": ["Language", "AlcoholReference"]
-    },
-    "tags": ["climate", "change", "environment"]
+    "contentRating": "Teen",
+    "contentDescriptors": ["Language", "AlcoholReference"]
+    "metaTags": ["climate", "change", "environment"]
   }
   `,
 };

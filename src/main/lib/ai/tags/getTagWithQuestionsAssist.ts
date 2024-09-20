@@ -6,19 +6,19 @@ import { generateChatCompletion } from '../generateChatCompletion';
 import { ContentRatingType } from '@prisma/client';
 
 export const defaultResponse = {
-  content: {
-    rating: ContentRatingType.RatingPending,
-    descriptors: [],
-  },
+  contentRating: ContentRatingType.RatingPending,
+  contentDescriptors: [],
   metaTags: [],
 };
 
 const getTagWithQuestionsAssist = async (
   tag: TagWithQuestions,
 ): Promise<AITopicResponse> => {
-
   const preparedQuestions = prepareQuestions(tag);
-  const result = await generateChatCompletion(topicPrompt.text, preparedQuestions);
+  const result = await generateChatCompletion(
+    topicPrompt.text,
+    preparedQuestions,
+  );
 
   try {
     const parsedResult = JSON.parse(result);
