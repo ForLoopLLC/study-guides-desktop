@@ -13,11 +13,10 @@ const getContentRating = async (
     contentDescriptors: [],
   };
 
-  const preparedQuestions = prepareQuestions(tag);
 
   const result = await generateChatCompletion(
     contentRatingPrompt.text,
-    preparedQuestions,
+    tag.name,
   );
 
   try {

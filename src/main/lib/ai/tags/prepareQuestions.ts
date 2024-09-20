@@ -6,7 +6,11 @@ export const prepareQuestions = (
   tag: TagWithQuestions,
   all: boolean = false,
 ): string => {
-  
+  if (tag.questions.length === 0) {
+    log.warn('ai', `No questions found for tag ${tag.name}. Prompting AI to skip content rating.`);
+    return `I have no questions for this topic just fill out the metaTags based on this title "${tag.name} and skip the content rating."`;
+  }
+
   const allQuestions = tag.questions;
   const shuffledQuestions = allQuestions.sort(() => 0.5 - Math.random());
   const selectedQuestions = all
