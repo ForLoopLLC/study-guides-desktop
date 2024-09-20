@@ -1,6 +1,3 @@
-// export { default as getContentRating } from './tags/getContentRating';
-// export { default as getTagWithQuestionsAssist } from './tags/getTagWithQuestionsAssist';
-
 import { ipcMain } from 'electron';
 import { log } from '../main';
 import {
@@ -8,7 +5,7 @@ import {
   getContentRatingInput,
 } from '../lib/ai';
 
-ipcMain.handle('get-content-rating-assist', async (_event, tagId) => {
+ipcMain.handle('get-ai-content-rating', async (_event, tagId) => {
   try {
     const tagInput = await getContentRatingInput(tagId);
     log.info('ai', `Received AI content rating for tag ${tagInput.name}.`);
@@ -20,7 +17,7 @@ ipcMain.handle('get-content-rating-assist', async (_event, tagId) => {
   }
 });
 
-ipcMain.handle('get-tag-assist', async (_event, tagId) => {
+ipcMain.handle('get-ai-tag', async (_event, tagId) => {
   try {
     const tagInput = await getTagInput(tagId);
     log.info('ai', `Received AI assist for tag ${tagInput.name}.`);
