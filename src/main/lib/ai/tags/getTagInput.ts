@@ -9,6 +9,11 @@ const getTagInput = async (tagId: any): Promise<UpdateTagInput> => {
     throw new Error('Failed to fetch tag.');
   }
 
+  if (tag.questions.length === 0) {
+    log.info('ai', `Tag ${tag.name} has no questions.`);
+    return tag as UpdateTagInput;
+  }
+
   const assist: AITopicResponse = await getTagWithQuestionsAssist(tag);
   if (!assist) {
     throw new Error('Failed to fetch assist.');

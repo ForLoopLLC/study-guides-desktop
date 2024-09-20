@@ -22,10 +22,11 @@ const getTagWithQuestionsAssist = async (
 
   try {
     const parsedResult = JSON.parse(result);
+    log.info('ai', `Parsed AI response successfully for tag ${tag.name}.`);
     return parsedResult as AITopicResponse;
   } catch (error) {
     const err = error as Error;
-    log.error('ai', `The result is not a valid JSON string. ${err.message}.`);
+    log.error('ai', `The result is not a valid JSON string ${result}. ${err.message}.`);
     return defaultResponse;
   }
 };

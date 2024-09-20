@@ -75,7 +75,7 @@ ipcMain.handle('batch-assist-tags', async (event, { filter, query }) => {
     }
 
     event.sender.send('batch-assist-tags-complete', { totalProcessed });
-    log.info('ai', `Assist completeed with ${totalProcessed} tags.`);
+    log.info('ai', `Assist completed with ${totalProcessed} tags.`);
   } catch (error) {
     const err = error as Error;
     log.error('ai', `Error assisting: ${err.message}`);
