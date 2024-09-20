@@ -37,7 +37,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
     deleteError,
   );
 
-  const { getTagInput, getContentRatingInput, isLoading: aiLoading } = useAI();
+  const { getTagInput, isLoading: aiLoading } = useAI();
 
   const resetAllStatus = () => {
     resetUpdateStatus();
