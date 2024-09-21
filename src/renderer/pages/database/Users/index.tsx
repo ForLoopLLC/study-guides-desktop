@@ -1,10 +1,10 @@
 import React from 'react';
-import { Page } from '../../../components';
+import { Page, UsersManager } from '../../../components';
 
 const Users = () => {
   return (
     <Page title="Users">
-      <div>content</div>
+      <UsersManager />
     </Page>
   );
 };

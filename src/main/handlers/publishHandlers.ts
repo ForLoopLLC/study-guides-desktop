@@ -5,7 +5,7 @@ import { createTagIndex } from '../lib/database/search';
 import { publishTagIndex } from '../lib/search/tags';
 import { getUsers } from '../lib/database/users';
 import { createUserIndex } from '../lib/database/search';
-import { publishUserIndex } from '../lib/search/users';
+import { publishUsersIndex } from '../lib/search/users';
 import { User, Tag } from '@prisma/client';
 
 ipcMain.handle('publish-tags-index', async (event, { filter, query }) => {
@@ -71,7 +71,7 @@ ipcMain.handle('publish-users-index', async (event, { filter, query }) => {
       const indexes = await Promise.all(
         users.map((user) => createUserIndex(user)),
       );
-      await publishUserIndex(indexes.filter((index) => index !== null));
+      await publishUsersIndex(indexes.filter((index) => index !== null));
 
       totalProcessed += users.length;
       const payload = { page, totalProcessed };

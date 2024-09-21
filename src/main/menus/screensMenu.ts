@@ -17,11 +17,11 @@ export const createScreensMenu = (
     //     mainWindow.webContents.send('navigate', '/questions');
     //   },
     // },
-    // {
-    //   label: 'Users',
-    //   click: () => {
-    //     mainWindow.webContents.send('navigate', '/users');
-    //   },
-    // },
+    {
+      label: 'Users',
+      click: () => {
+        mainWindow.webContents.send('navigate', '/users');
+      },
+    },
   ],
 });

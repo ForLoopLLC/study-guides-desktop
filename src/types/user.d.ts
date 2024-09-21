@@ -24,6 +24,12 @@ export interface User extends Omit<PrismaUser, 'roles'> {
   stripeCustomerId: string | null;
 }
 
+export interface UpdateUserInput {
+  id: string;
+  gamerTag?: string;
+  metadata?: any; // Assuming metadata is a JSON object
+}
+
 export type AlgoliaUserRecord = {
   objectID: string;
   id: string;

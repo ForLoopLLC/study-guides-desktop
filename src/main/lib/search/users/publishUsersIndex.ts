@@ -2,7 +2,7 @@ import axios from 'axios';
 import { environmentManager } from '../../environment';
 import { AlgoliaRecord } from '@prisma/client';
 
-export const publishUserIndex = async (items: AlgoliaRecord[]) => {
+export const publishUsersIndex = async (items: AlgoliaRecord[]) => {
   const headers = environmentManager.getAlgoliaHeaders();
   const baseUrl = environmentManager.getAlgoliaBaseUrl();
 
@@ -38,4 +38,4 @@ export const publishUserIndex = async (items: AlgoliaRecord[]) => {
   }
 };
 
-export default publishUserIndex;
+export default publishUsersIndex;

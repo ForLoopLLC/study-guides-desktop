@@ -6,3 +6,4 @@ export { default as Tabs } from './Tabs';
 export { default as SearchBar } from './SearchBar';
 export { default as LogViewer } from './LogViewer';
 export * from './tags';
+export * from './users';
