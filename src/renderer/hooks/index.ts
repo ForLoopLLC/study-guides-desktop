@@ -12,3 +12,4 @@ export { default as useAI } from './tags/useAI';
 export { default as useBatchAI } from './tags/useBatchAI';
 export { default as useGetUsers } from './users/useGetUsers';
 export { default as useUpdateUser } from './users/useUpdateUser';
+export { default as useDeterministicColor } from './useDeterministicColor';
