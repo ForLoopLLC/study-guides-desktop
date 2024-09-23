@@ -39,13 +39,30 @@ export const getQuestions = async (
     ];
   }
 
-   if (filter === 'All') {
-     // no where clause needed
-   } else if (filter === 'Reported') {
-     where.reports = {
-       some: {}, // Filter for tags with at least one report
-     };
-   }
+  if (filter === 'All') {
+    // No where clause needed
+  } else if (filter === 'Reported') {
+    where.reports = {
+      some: {},
+    };
+  } else if (filter === 'MissingLearnMore') {
+    where.learnMore = {
+      equals: '', // Check for empty string
+    };
+  } else if (filter === 'MissingDistractors') {
+    where.OR = [
+      {
+        distractors: {
+          equals: [], // Checks if there are no distractors
+        },
+      },
+      {
+        distractors: {
+          hasSome: [], // Checks if distractors exist, but you can handle this in the logic outside Prisma
+        },
+      },
+    ];
+  }
 
   const [questions, total] = await Promise.all([
     prisma.question.findMany({
