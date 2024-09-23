@@ -11,12 +11,12 @@ export const createScreensMenu = (
         mainWindow.webContents.send('navigate', '/tags');
       },
     },
-    // {
-    //   label: 'Questions',
-    //   click: () => {
-    //     mainWindow.webContents.send('navigate', '/questions');
-    //   },
-    // },
+    {
+      label: 'Questions',
+      click: () => {
+        mainWindow.webContents.send('navigate', '/questions');
+      },
+    },
     {
       label: 'Users',
       click: () => {

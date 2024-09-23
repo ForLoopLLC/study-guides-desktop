@@ -5,9 +5,7 @@ import type {
   ContentRatingType,
 } from '@prisma/client';
 
-export interface Tag extends PrismaTag {
-
-}
+export interface Tag extends PrismaTag {}
 export interface Question extends PrismaQuestion {}
 
 export interface UpdateTagInput {
@@ -23,6 +21,18 @@ export interface UpdateTagInput {
   metadata?: any; // Assuming metadata is a JSON object
 }
 
+export interface UpdateQuestionInput {
+  id: string;
+  batchId?: string;
+  questionText: string;
+  answerText: string;
+  learnMore: string;
+  distractors: string[];
+  videoUrl?: string;
+  imageUrl?: string;
+  metadata?: any;
+}
+
 export interface TagWithRelations extends Tag {
   parentTag: Tag | null;
   childTags: Tag[];
@@ -33,4 +43,3 @@ export interface TagWithQuestions extends Tag {
     question: Question;
   }[];
 }
-

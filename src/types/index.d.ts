@@ -56,6 +56,7 @@ export interface PaginatedResult<T> {
 
 export type TagFilter = PrismaTagType | 'All' | 'Reported';
 export type UserFilter = 'All' | 'Admin' | 'User' | 'Tester' | 'Freelancer';
+export type QuestionFilter = 'All' | 'Reported' | 'MissingLearnMore' | 'MissingDistractors';
 
 export type LogLevel =
   | 'info'

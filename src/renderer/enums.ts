@@ -5,3 +5,10 @@ export enum UserFilterType {
     Tester = 'Tester',
     Freelancer = 'Freelancer',
   }
+
+  export enum QuestionFilterType {
+    All = 'All',
+    Reported = 'Reported',
+    MissingLearnMore = 'MissingLearnMore',
+    MissingDistractors = 'MissingDistractors',
+  }
