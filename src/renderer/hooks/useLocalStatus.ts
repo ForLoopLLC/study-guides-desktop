@@ -11,9 +11,9 @@ const useLocalStatus = (
 
   useEffect(() => {
     if (updateSuccess) {
-      setLocalSuccess('Tag updated successfully!');
+      setLocalSuccess('Updated successfully!');
     } else if (deleteSuccess) {
-      setLocalSuccess('Tag deleted successfully!');
+      setLocalSuccess('Deleted successfully!');
     }
     if (updateError) {
       setLocalError(updateError);

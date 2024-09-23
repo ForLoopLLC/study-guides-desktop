@@ -1,16 +1,10 @@
-import { User } from '../../../types';
+import { User, UserRole } from '../../../types';
 
 type ActionType =
-  | {
-      type: 'SET_FIELD';
-      field: string;
-      value: string | string[];
-    }
-  | {
-      type: 'SET_FIELDS';
-      payload: Partial<User>; // Allows updating multiple fields at once
-    }
-  | { type: 'RESET'; payload: User };
+  | { type: 'SET_FIELD'; field: string; value: string | string[] }
+  | { type: 'SET_FIELDS'; payload: Partial<User> }
+  | { type: 'RESET'; payload: User }
+  | { type: 'UPDATE_ROLES'; payload: UserRole[] };
 
 // Define the reducer
 const userReducer = (state: User, action: ActionType): User => {
@@ -21,6 +15,8 @@ const userReducer = (state: User, action: ActionType): User => {
       return { ...state, ...action.payload };
     case 'RESET':
       return action.payload;
+    case 'UPDATE_ROLES':
+      return { ...state, roles: action.payload }; // Update roles
     default:
       return state;
   }

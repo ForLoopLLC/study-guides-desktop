@@ -5,9 +5,9 @@ import {
   useGetTagWithRelations,
 } from '../../hooks';
 import { FaSpinner } from 'react-icons/fa';
-import { TagType } from '@prisma/client';
 import { useAppContext } from '../../contexts/AppContext';
 import { UserFilter, User } from '../../../types';
+import { UserFilterType } from '../../enums';
 import {
   UserUpdate,
   PaginationControls,
@@ -111,12 +111,12 @@ const UserManager: React.FC = () => {
       <section id="messagebar" className="mt-4 p-4 border bg-gray-100 rounded">
         {/* progress display */}
         {publishProcessing && (
-          <p>Indexing in progress: ({totalPublished} tags published)</p>
+          <p>Indexing in progress: ({totalPublished} users published)</p>
         )}
         {/* completed display */}
         {publishComplete && (
           <p className="text-green-500">
-            Indexing complete! {totalPublished} tags published.
+            Indexing complete! {totalPublished} users published.
           </p>
         )}
 
@@ -135,7 +135,7 @@ const UserManager: React.FC = () => {
         <FilterSelect
           value={filter}
           onChange={handleFilterChange}
-          options={[...(Object.keys(TagType) as UserFilter[])]}
+          options={[...(Object.keys(UserFilterType) as UserFilter[])]}
           disabled={isLoading}
           label="Filter:"
           getOptionLabel={getUserFilterLabel}

@@ -27,6 +27,7 @@ export interface User extends Omit<PrismaUser, 'roles'> {
 export interface UpdateUserInput {
   id: string;
   gamerTag?: string;
+  roles?: UserRole[];
   metadata?: any; // Assuming metadata is a JSON object
 }
 
