@@ -12,9 +12,7 @@ export const defaultResponse = {
   metaTags: [],
 };
 
-const cleanResponse = (
-  aiResponse: AIQuestionResponse,
-): AIQuestionResponse => {
+const cleanResponse = (aiResponse: AIQuestionResponse): AIQuestionResponse => {
   const cleanedResponse: AIQuestionResponse = {
     distractors: aiResponse.distractors.map((d: string) => {
       const trimmed = d.trim();
@@ -25,20 +23,18 @@ const cleanResponse = (
   return cleanedResponse;
 };
 
-
 const getQuestionAssist = async (
   question: Question,
 ): Promise<AIQuestionResponse> => {
-
   const preparedQuestion = prepareQuestion(question, true);
-  const result = await generateChatCompletion(questionPrompt.text, preparedQuestion);
+  const result = await generateChatCompletion(
+    questionPrompt.text,
+    preparedQuestion,
+  );
 
   try {
     const parsedResult = JSON.parse(result);
-    console.log(parsedResult);
-    const cleanedResult = cleanResponse(
-      parsedResult as AIQuestionResponse,
-    );
+    const cleanedResult = cleanResponse(parsedResult as AIQuestionResponse);
     return cleanedResult as AIQuestionResponse;
   } catch (error) {
     const err = error as Error;
