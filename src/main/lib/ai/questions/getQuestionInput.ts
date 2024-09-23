@@ -3,12 +3,12 @@ import { AIQuestionResponse, UpdateQuestionInput } from '../../../../types';
 import { getQuestion } from '../../database/questions';
 import { getQuestionAssist, mergeQuestionWithAssist } from '../index';
 
-const getTagInput = async (
+const getQuestionInput = async (
   questionId: any,
 ): Promise<UpdateQuestionInput> => {
   const question = await getQuestion(questionId);
   if (!question) {
-    throw new Error('Failed to fetch tag.');
+    throw new Error('Failed to fetch question.');
   }
 
   const assist: AIQuestionResponse = await getQuestionAssist(question);
@@ -20,4 +20,4 @@ const getTagInput = async (
   return mergedQuestion;
 };
 
-export default getTagInput;
+export default getQuestionInput;

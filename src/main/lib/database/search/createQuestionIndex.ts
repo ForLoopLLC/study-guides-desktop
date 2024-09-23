@@ -15,7 +15,6 @@ const createQuestionIndex = async (
       answerText: question.answerText,
       learnMore: question.learnMore,
       distractors: question.distractors,
-      tags: [],
       metadata: question.metadata,
       batchId: null,
       missingDistractors: false,

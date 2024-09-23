@@ -34,7 +34,6 @@ export type AlgoliaQuestionRecord = {
   answerText: string;
   learnMore: string;
   distractors: string[];
-  tags: string[];
   metadata: any;
   batchId: string | null;
   missingDistractors: boolean;

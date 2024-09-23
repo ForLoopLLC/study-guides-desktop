@@ -18,16 +18,13 @@ const cleanResponse = (
   const cleanedResponse: AIQuestionResponse = {
     distractors: aiResponse.distractors.map((d: string) => {
       const trimmed = d.trim();
-      return trimmed.endsWith('.') ? trimmed : `${trimmed}.`;
+      return trimmed.endsWith('.') ? trimmed.slice(0, -1) : trimmed;
     }),
     learnMore: aiResponse.learnMore.trim(),
-    metaTags: aiResponse.metaTags.map((d: string) => {
-      const trimmed = d.trim();
-      return trimmed.endsWith('.') ? trimmed : `${trimmed}.`;
-    }),
   };
   return cleanedResponse;
 };
+
 
 const getQuestionAssist = async (
   question: Question,
@@ -38,6 +35,7 @@ const getQuestionAssist = async (
 
   try {
     const parsedResult = JSON.parse(result);
+    console.log(parsedResult);
     const cleanedResult = cleanResponse(
       parsedResult as AIQuestionResponse,
     );

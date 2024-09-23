@@ -1,12 +1,24 @@
 import { ipcMain } from 'electron';
 import { log } from '../main';
 import {
+  getQuestion,
   getQuestions,
   updateQuestion,
   clearQuestionReports
 } from '../lib/database/questions';
 import { createQuestionIndex } from '../lib/database/search';
 import { publishQuestionIndex } from '../lib/search/questions';
+
+ipcMain.handle('get-question', async (_event, id) => {
+  try {
+    const questions = await getQuestion(id);
+    return questions;
+  } catch (error) {
+    const err = error as Error;
+    log.error('questions', `Error fetching question: ${err.message}.`);
+    throw new Error('Failed to fetch question.');
+  }
+});
 
 ipcMain.handle('get-questions', async (_event, { page, limit, filter, query }) => {
   try {

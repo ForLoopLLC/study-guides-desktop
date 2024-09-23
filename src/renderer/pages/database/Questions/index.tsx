@@ -1,10 +1,9 @@
-import React from 'react';
-import { Page } from '../../../components';
+import { Page, QuestionsManager } from '../../../components';
 
 const Questions = () => {
   return (
     <Page title="Questions">
-      <div>content</div>
+      <QuestionsManager />
     </Page>
   );
 };

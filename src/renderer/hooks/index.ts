@@ -8,6 +8,7 @@ export { default as useGetTagWithRelations } from './tags/useGetTagWithRelations
 export { default as useTagAI } from './tags/useTagAI';
 export { default as useTagBatchAI } from './tags/useTagBatchAI';
 // Questions
+export { default as useGetQuestion } from './questions/useGetQuestion';
 export { default as useGetQuestions } from './questions/useGetQuestions';
 export { default as useUpdateQuestion } from './questions/useUpdateQuestion';
 export { default as useUpdateQuestions } from './questions/useUpdateQuestions';
@@ -17,6 +18,7 @@ export { default as useQuestionBatchAI } from './questions/useQuestionBatchAI';
 // Publish
 export { default as usePublishTagsIndex } from './publish/usePublishTagIndex';
 export { default as usePublishUsersIndex } from './publish/usePublishUsersIndex';
+export { default as usePublishQuestionsIndex } from './publish/usePublishQuestionsIndex';
 // Users
 export { default as useGetUsers } from './users/useGetUsers';
 export { default as useUpdateUser } from './users/useUpdateUser';

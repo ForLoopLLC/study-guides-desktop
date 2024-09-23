@@ -56,7 +56,7 @@ export const getQuestions = async (
         questionText: 'asc', // Order by name in ascending order
       },
     }),
-    prisma.tag.count({
+    prisma.question.count({
       where, // Ensure count respects the filter and query
     }),
   ]);
