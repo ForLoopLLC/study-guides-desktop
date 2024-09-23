@@ -17,7 +17,7 @@ const deleteTagIndex = async (userId: string): Promise<boolean> => {
     const err = error as Error;
     log.error(
       'index',
-      `Error deleting Algolia record with user ID ${userId}: ${err.message}.`,
+      `Error deleting Algolia record with user ID ${userId}: ${err.message}`,
     );
     return false;
   }

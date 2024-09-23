@@ -26,3 +26,17 @@ export type AlgoliaTagRecord = {
   missingContentRating: boolean;
   missingMetaTags: boolean;
 };
+
+export type AlgoliaQuestionRecord = {
+  objectID: string;
+  id: string;
+  questionText: string;
+  answerText: string;
+  learnMore: string;
+  distractors: string[];
+  tags: string[];
+  metadata: any;
+  batchId: string | null;
+  missingDistractors: boolean;
+  missingLearnMore: boolean;
+};

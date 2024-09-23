@@ -1,14 +1,14 @@
 import { environmentManager } from '../../environment';
 import { log } from '../../../main';
 
-const deleteTagIndex = async (tagId: string): Promise<boolean> => {
+const deleteQuestionIndex = async (questionId: string): Promise<boolean> => {
   try {
     const prisma = environmentManager.getPrismaClient();
 
     // Delete the corresponding record from the AlgoliaRecord table
     await prisma.algoliaRecord.delete({
       where: {
-        id: tagId,
+        id: questionId,
       },
     });
 
@@ -17,10 +17,10 @@ const deleteTagIndex = async (tagId: string): Promise<boolean> => {
     const err = error as Error;
     log.error(
       'index',
-      `Error deleting Algolia record with tag ID ${tagId}: ${err.message}`,
+      `Error deleting Algolia record with question ID ${questionId}: ${err.message}.`,
     );
     return false;
   }
 };
 
-export default deleteTagIndex;
+export default deleteQuestionIndex;

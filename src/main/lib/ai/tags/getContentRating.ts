@@ -3,7 +3,6 @@ import { contentRatingPrompt } from './prompts';
 import { AiContentRatingResponse, TagWithQuestions } from '../../../../types';
 import { log } from '../../../main';
 import { generateChatCompletion } from '../generateChatCompletion';
-import { prepareQuestions } from './prepareQuestions';
 
 const getContentRating = async (
   tag: TagWithQuestions,
