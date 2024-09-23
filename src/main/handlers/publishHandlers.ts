@@ -79,11 +79,11 @@ ipcMain.handle('publish-users-index', async (event, { filter, query }) => {
       totalProcessed += users.length;
       const payload = { page, totalProcessed };
       event.sender.send('publish-users-index-progress', payload);
-      log.info('publish', `Processed ${totalProcessed} tags.`);
+      log.info('publish', `Processed ${totalProcessed} users.`);
     }
 
     event.sender.send('publish-users-index-complete', { totalProcessed });
-    log.info('publish', `Index published with ${totalProcessed} tags.`);
+    log.info('publish', `Index published with ${totalProcessed} users.`);
   } catch (error) {
     const err = error as Error;
     log.error('publish', `Error publishing index: ${err.message}`);
