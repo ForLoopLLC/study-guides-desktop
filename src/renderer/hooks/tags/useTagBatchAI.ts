@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Environment } from '../../../types';
 
-const useBatchAI = (filter: string, query: string, env: Environment,) => {
+const useTagBatchAI = (filter: string, query: string, env: Environment) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [progress, setProgress] = useState<number>(0);
   const [totalProcessed, setTotalProcessed] = useState<number>(0);
@@ -94,4 +94,4 @@ const useBatchAI = (filter: string, query: string, env: Environment,) => {
   };
 };
 
-export default useBatchAI;
+export default useTagBatchAI;

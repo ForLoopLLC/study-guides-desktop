@@ -1,5 +1,5 @@
 import React, { useReducer, useEffect } from 'react';
-import { useUpdateTag, useLocalStatus, useDeleteTag, useAI } from '../../hooks';
+import { useUpdateTag, useLocalStatus, useDeleteTag, useTagAI } from '../../hooks';
 import { Tag } from '../../../types';
 import SelectTagType from './SelectTagType';
 import SelectContentRating from './SelectContentRating';
@@ -37,7 +37,7 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
     deleteError,
   );
 
-  const { getTagInput, isLoading: aiLoading } = useAI();
+  const { getTagInput, isLoading: aiLoading } = useTagAI();
 
   const resetAllStatus = () => {
     resetUpdateStatus();

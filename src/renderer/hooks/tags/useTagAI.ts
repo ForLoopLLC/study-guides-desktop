@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { UpdateTagInput } from '../../../types';
 
-const useAI = () => {
+const useTagAI = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const getTagInput = async (tagId: string): Promise<UpdateTagInput | null> => {
@@ -31,4 +31,4 @@ const useAI = () => {
   return { getTagInput, isLoading };
 };
 
-export default useAI;
+export default useTagAI;

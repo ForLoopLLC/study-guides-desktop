@@ -5,7 +5,7 @@ import {
   useGetTagWithRelations,
   useClearTagReports,
   useDeleteTag,
-  useBatchAI,
+  useTagBatchAI,
 } from '../../hooks';
 import { FaSpinner } from 'react-icons/fa';
 import { TagType } from '@prisma/client';
@@ -63,7 +63,7 @@ const TagsManager: React.FC = () => {
     totalProcessed: totalAssisted,
     isComplete: assistComplete,
     error: assistError,
-  } = useBatchAI(filter, query, appContext.environment);
+  } = useTagBatchAI(filter, query, appContext.environment);
 
   const { tag: tagWithRelations, fetchTag, reset } = useGetTagWithRelations();
 

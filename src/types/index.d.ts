@@ -11,10 +11,10 @@ export type Channels =
   | 'navigate'
   | 'connection'
   | 'env-update'
-  | 'update-tags'
   | 'get-tags'
-  | 'publish-tags-index'
+  | 'update-tags'
   | 'update-tag'
+  | 'publish-tags-index'
   | 'publish-tags-index-progress'
   | 'publish-tags-index-complete'
   | 'publish-tags-index-error'
@@ -22,12 +22,22 @@ export type Channels =
   | 'batch-assist-tags-complete'
   | 'batch-assist-tags-error'
   | 'log-update'
-  | 'publish-users-index'
   | 'get-users'
   | 'update-user'
+  | 'publish-users-index'
   | 'publish-users-index-progress'
   | 'publish-users-index-complete'
-  | 'publish-users-index-error';
+  | 'publish-users-index-error'
+  | 'get-questions'
+  | 'update-questions'
+  | 'update-question'
+  | 'publish-questions-index'
+  | 'publish-questions-index-progress'
+  | 'publish-questions-index-complete'
+  | 'publish-questions-index-error'
+  | 'batch-assist-questions-progress'
+  | 'batch-assist-questions-complete'
+  | 'batch-assist-questions-error';
 
 export interface Environment {
   env: 'development' | 'test' | 'production' | null;
