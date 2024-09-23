@@ -2,7 +2,7 @@ import { environmentManager } from '../../environment';
 import { Prompt, PromptType } from "@prisma/client";
 import { log } from '../../../main';
 
-export const getXPrompt = async (type: PromptType): Promise<Prompt | null> => {
+export const getPrompt = async (type: PromptType): Promise<Prompt | null> => {
   try {
     const prisma = environmentManager.getPrismaClient();
     const prompt = await prisma.prompt.findUnique({
