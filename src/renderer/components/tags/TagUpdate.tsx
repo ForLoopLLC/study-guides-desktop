@@ -1,5 +1,10 @@
 import React, { useReducer, useEffect } from 'react';
-import { useUpdateTag, useLocalStatus, useDeleteTag, useTagAI } from '../../hooks';
+import {
+  useUpdateTag,
+  useLocalStatus,
+  useDeleteTag,
+  useTagAI,
+} from '../../hooks';
 import { Tag } from '../../../types';
 import SelectTagType from './SelectTagType';
 import SelectContentRating from './SelectContentRating';
@@ -109,7 +114,10 @@ const TagUpdate: React.FC<TagUpdateProps> = ({ tag, onUpdate }) => {
   };
 
   const handleArrayChange = (field: string, value: string) => {
-    const array = value.split(',').map((item) => item.trim());
+    const array = value
+      .split(',')
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
     dispatch({ type: 'SET_FIELD', field, value: array });
   };
 

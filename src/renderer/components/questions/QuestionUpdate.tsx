@@ -94,7 +94,10 @@ const QuestionUpdate: React.FC<QuestionUpdateProps> = ({
   };
 
   const handleArrayChange = (field: string, value: string) => {
-    const array = value.split(',').map((item) => item.trim());
+    const array = value
+      .split(',')
+      .map((item) => item.trim())
+      .filter((item) => item.length > 0);
     dispatch({ type: 'SET_FIELD', field, value: array });
   };
 

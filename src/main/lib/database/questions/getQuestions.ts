@@ -53,14 +53,10 @@ export const getQuestions = async (
     where.OR = [
       {
         distractors: {
-          equals: [], // Checks if there are no distractors
+          isEmpty: true,
         },
       },
-      {
-        distractors: {
-          hasSome: [], // Checks if distractors exist, but you can handle this in the logic outside Prisma
-        },
-      },
+
     ];
   }
 
