@@ -121,7 +121,7 @@ ipcMain.handle('publish-questions-index', async (event, { filter, query }) => {
       const indexes = await Promise.all(
         touchedQuestions.map((question) => createQuestionIndex(question)),
       );
-      await publishTagIndex(indexes.filter((index) => index !== null));
+      await publishQuestionIndex(indexes.filter((index) => index !== null));
 
       totalProcessed += questions.length;
       const payload = { page, totalProcessed };
