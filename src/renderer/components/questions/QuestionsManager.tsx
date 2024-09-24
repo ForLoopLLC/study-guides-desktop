@@ -132,7 +132,7 @@ const QuestionsManager: React.FC = () => {
       >
         <button
           onClick={handleUpdateIndexes}
-          disabled={questions.length === 0 || isLoading || publishProcessing}
+          disabled={questions.length === 0 || isLoading || publishProcessing || assistProcessing}
           className="p-2 bg-blue-500 text-white rounded flex items-center justify-center disabled:opacity-50"
         >
           {publishProcessing ? (
@@ -142,10 +142,10 @@ const QuestionsManager: React.FC = () => {
         </button>
         <button
           onClick={handleAiAssist}
-          disabled={questions.length === 0 || isLoading || publishProcessing}
+          disabled={questions.length === 0 || isLoading || publishProcessing || assistProcessing}
           className="p-2 bg-blue-500 text-white rounded flex items-center justify-center disabled:opacity-50"
         >
-          {publishProcessing ? (
+          {assistProcessing ? (
             <FaSpinner className="animate-spin mr-2" />
           ) : null}
           Assist
@@ -158,7 +158,7 @@ const QuestionsManager: React.FC = () => {
           <p>Indexing in progress: ({totalPublished} questions published)</p>
         )}
         {assistProcessing && (
-          <p>Indexing in progress: ({totalAssisted} questions assisted)</p>
+          <p>Assisting in progress: ({totalAssisted} questions assisted)</p>
         )}
         {/* completed display */}
         {publishComplete && (
@@ -243,6 +243,9 @@ const QuestionsManager: React.FC = () => {
                   <QuestionUpdate
                     question={selectedQuestion || undefined}
                     onUpdate={handleQuestionUpdated}
+                    isLoading={isLoading}
+                    publishProcessing={publishProcessing}
+                    assistProcessing={assistProcessing}
                   />
                 )}
               </>

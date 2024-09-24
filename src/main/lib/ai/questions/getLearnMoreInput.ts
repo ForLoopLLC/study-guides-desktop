@@ -1,21 +1,29 @@
 import { log } from '../../../main';
-import { AILearnMoreResponse, UpdateQuestionInput } from '../../../../types';
+import { UpdateQuestionInput } from '../../../../types';
 import { getQuestion } from '../../database/questions';
 import { getLearnMore, mergeQuestionWithAssist } from '../index';
+import { parseAILearnMoreResponse } from './parsers';
 
 const getContentRatingInput = async (
   questionId: string,
 ): Promise<UpdateQuestionInput> => {
-  const question = await getQuestion(questionId);
-  if (!question) {
-    throw new Error('Failed to fetch question.');
-  }
+  try {
+    const question = await getQuestion(questionId);
+    if (!question) {
+      throw new Error('Failed to fetch question.');
+    }
 
-  const assist: AILearnMoreResponse = await getLearnMore(question);
-  if (!assist) {
+    const raw = await getLearnMore(question);
+    const parsed = parseAILearnMoreResponse(raw);
+    if (!parsed) {
+      throw new Error('Failed to fetch assist.');
+    }
+    return mergeQuestionWithAssist(question, parsed);
+  } catch (error) {
+    const err = error as Error;
+    log.error('ai', `Failed to fetch assist. ${err.message}`);
     throw new Error('Failed to fetch assist.');
   }
-  return mergeQuestionWithAssist(question, assist);
 };
 
 export default getContentRatingInput;

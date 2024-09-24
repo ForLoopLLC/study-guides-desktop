@@ -24,6 +24,7 @@ const getContentRating = async (
   } catch (error) {
     const err = error as Error;
     log.error('ai', `The result is not a valid JSON string. ${err.message}.`);
+    log.error('ai', `Bad result. ${JSON.stringify(result)}.`);
     return defaultResonse;
   }
 };

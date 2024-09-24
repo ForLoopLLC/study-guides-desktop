@@ -18,7 +18,7 @@ export interface AIDistractorsResponse {
 }
 
 export interface AITopicResponse extends AiContentRatingResponse, AIMetaTagsResponse {}
-export interface AIQuestionResponse extends AILearnMoreResponse, AIDistractorsResponse
+export interface AIQuestionResponse extends AILearnMoreResponse, AIDistractorsResponse {}
 
 
 

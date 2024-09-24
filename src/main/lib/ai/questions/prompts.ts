@@ -3,11 +3,13 @@ export const metaTagsPrompt = {
         These questions need "tags" so the user can search for content easier.
         Your task is to generate tags for the following question.
         The tags should be short and concise. Preferably one word each and you should try to create at least 3 tags but no more than 5.
-        Ensure the response is a valid JSON object in the following format:
+        Ensure that the output is valid JSON, with all keys and values properly quoted and formatted in the following format:
 
         {
                 "metaTags":  ["tag1", "tag2", "tag3"],
-        }`,
+        }
+                
+        All special characters, such as backslashes used in LaTeX expressions, should be escaped properly (i.e., use \\ for backslashes)`,
 };
 
 export const distractorPrompt = {
@@ -15,13 +17,15 @@ export const distractorPrompt = {
         These questions often have multiple choice answers. We call the multiple choice answers that are not the correct answer, "distractors".
         Your task is to generate a "distractors" for the following question.
         The distractors should be short and concise and there needs to 3 plausible but incorrect distractors.
-        Ensure that the distractors are formatted with the same punctuation as the correct answer.
+        The distractors MUST not end with any punctuation.
 
-        Ensure the response is a valid JSON object in the following format:
+        Ensure that the output is valid JSON, with all keys and values properly quoted and formatted in the following format:
 
         {
                 "distractors":  ["one wrong answer", "another wrong answer", "yet another wrong answer"],
-        }`,
+        }
+                
+        All special characters, such as backslashes used in LaTeX expressions, should be escaped properly (i.e., use \\ for backslashes)`,
 };
 
 export const learnMorePrompt = {
@@ -31,23 +35,78 @@ export const learnMorePrompt = {
         Your task is to generate a "learn more" for the following question.
         Do not use any bold or italic formatting.
         
-        Ensure the response is a valid JSON object in the following format:
+        Ensure that the output is valid JSON, with all keys and values properly quoted and formatted in the following format:
 
         {
                 "learnMore": "detailed explanation here"
-        }`,
+        }
+                
+        All special characters, such as backslashes used in LaTeX expressions, should be escaped properly (i.e., use \\ for backslashes)`,
 };
 
 export const questionPrompt = {
-  text: `You are a knowledge assistant for a study guide app that helps people learn through a series of questions and answers. Your tasks are as follows:
-        1. Generate three plausible but incorrect distractors for the following question. The distractors should be short and concise and MUST not end with any punctuation.
-        2. Generate a detailed explanation of the correct answer for the following question. Do not use any bold or italic formatting.
+  text: `
+        You are a knowledge assistant for a study guide app that helps people learn through a series of questions and answers.
 
-        Ensure the response is a valid JSON object and includes results from step 1, 2 in the following format:
+        Your tasks are as follows:
 
-        {
-                "distractors": ["distractor1", "distractor2", "distractor3"],
-                "learnMore": "detailed explanation here"
-        }
+        Generate three plausible but incorrect distractors for the following question. The distractors should be short and concise and MUST not end with any punctuation.
+        Generate a detailed explanation of the correct answer for the following question.
+
+        Important requirements:
+                * Ensure that the output is formatted as plain text and follows the structure below.
+                * Make sure the distractors are separated clearly, without any punctuation at the end.
+                * Include a detailed explanation for why the correct answer is right.
+                * All LaTeX expressions must be properly escaped (e.g., \\ instead of \).
+                * Do NOT cut off sentences or expressions mid-way.
+
+        Output Format:
+                Distractors:
+                - distractor1
+                - distractor2
+                - distractor3
+
+                LearnMore:
+                Explanation of why the correct answer is right.
+
+        Output Example:
+                Distractors:
+                - The electron orbit is circular and stable due to constant speed
+                - The electron emits radiation while orbiting the nucleus
+                - The energy levels are continuous and not quantized
+
+                LearnMore:
+                In the Bohr model of the hydrogen atom, the energy levels of the electron are quantized, meaning that the electron can only exist in specific orbits with fixed energies. The electron does not radiate energy while in these
+
 `,
+};
+
+export const _questionPrompt = {
+  text: `
+              You are a knowledge assistant for a study guide app that helps people learn through a series of questions and answers.
+              
+              Your tasks are as follows:
+      
+              Generate three plausible but incorrect distractors for the following question. The distractors should be short and concise and MUST not end with any punctuation.
+              Generate a detailed explanation of the correct answer for the following question. Do not use any bold or italic formatting.
+      
+              Important requirements:
+              * Ensure that the output is valid JSON with proper escaping for all special characters (such as backslashes in LaTeX).
+              * All strings must be enclosed in double quotes, and keys must be properly formatted.
+              * Do NOT cut off sentences or expressions mid-way. Complete all fields fully.
+              * Ensure that the distractors do NOT end with any punctuation (e.g., no periods, exclamation marks).
+      
+              Format the response in the exact structure below:
+      
+              {
+              "distractors": ["distractor1", "distractor2", "distractor3"],
+              "learnMore": "detailed explanation here"
+              }
+      
+              Output Example:
+      
+              {
+              "distractors": ["Incorrect option A", "Wrong choice B", "Misleading C"],
+              "learnMore": "Explanation for why the correct answer is right."
+              }`,
 };

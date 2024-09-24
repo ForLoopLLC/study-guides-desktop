@@ -5,15 +5,22 @@ import clsx from 'clsx';
 import { FaClipboard } from 'react-icons/fa'; // Import a clipboard icon from react-icons
 import QuestionCircle from './QuestionCircle';
 import questionReducer from './questionReducer';
+import { FaSpinner } from 'react-icons/fa';
 
 interface QuestionUpdateProps {
   question?: Question; // Make tag optional to handle no tag case
   onUpdate: () => void; // Callback function to trigger after update
+  isLoading: boolean;
+  assistProcessing: boolean;
+  publishProcessing: boolean;
 }
 
 const QuestionUpdate: React.FC<QuestionUpdateProps> = ({
   question,
   onUpdate,
+  isLoading,
+  assistProcessing,
+  publishProcessing,
 }) => {
   const {
     updateQuestion,
@@ -22,6 +29,8 @@ const QuestionUpdate: React.FC<QuestionUpdateProps> = ({
     error: updateError,
     resetStatus: resetUpdateStatus,
   } = useUpdateQuestion();
+
+
 
   const [state, dispatch] = useReducer(
     questionReducer,
@@ -36,6 +45,8 @@ const QuestionUpdate: React.FC<QuestionUpdateProps> = ({
   );
 
   const { getQuestionInput, isLoading: aiLoading } = useQuestionAI();
+
+  const isBusy = isLoading || isUpdating || assistProcessing || publishProcessing || aiLoading;
 
   const resetAllStatus = () => {
     resetUpdateStatus();
@@ -222,18 +233,21 @@ const QuestionUpdate: React.FC<QuestionUpdateProps> = ({
       <div className="flex space-x-4">
         <button
           onClick={handleUpdate}
-          disabled={aiLoading || isUpdating}
+          disabled={isBusy}
           className={clsx(
-            'p-2 rounded text-white',
+            'p-2 text-white rounded flex items-center justify-center disabled:opacity-50',
             isUpdating ? 'bg-gray-500 cursor-not-allowed' : 'bg-blue-500',
           )}
         >
+          {isUpdating ? (
+            <FaSpinner className="animate-spin mr-2" />
+          ) : null}
           Update
         </button>
 
         <button
           onClick={handleCancel}
-          disabled={!hasChanges() || aiLoading || isUpdating}
+          disabled={!hasChanges() || isBusy}
           className={clsx(
             'p-2 rounded text-white',
             hasChanges() ? 'bg-orange-500' : 'bg-gray-300 cursor-not-allowed', // Gray when disabled
@@ -243,12 +257,15 @@ const QuestionUpdate: React.FC<QuestionUpdateProps> = ({
         </button>
         <button
           onClick={handleAssist}
-          disabled={aiLoading || isUpdating}
+          disabled={isBusy}
           className={clsx(
-            'p-2 rounded text-white',
+            'p-2 text-white rounded flex items-center justify-center disabled:opacity-50',
             'bg-yellow-500', // Gray when disabled
           )}
         >
+          {aiLoading ? (
+            <FaSpinner className="animate-spin mr-2" />
+          ) : null}
           Assist
         </button>
       </div>
