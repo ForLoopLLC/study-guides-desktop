@@ -64,6 +64,12 @@ export interface PaginatedResult<T> {
   data: T[];
 }
 
+export interface CursorResult<T> {
+  nextCursor: string | null;
+  data: T[];
+}
+
+
 export type TagFilter = PrismaTagType | 'All' | 'Reported';
 export type UserFilter = 'All' | 'Admin' | 'User' | 'Tester' | 'Freelancer';
 export type QuestionFilter = 'All' | 'Reported' | 'MissingLearnMore' | 'MissingDistractors';
