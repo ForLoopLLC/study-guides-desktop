@@ -13,6 +13,7 @@ const getMetaTags = async (question: Question): Promise<string> => {
 
   try {
     const parsedResult = JSON.parse(result);
+    log.info('ai', `Parsed AI response successfully for question ${question.id}.`);
     return parsedResult;
   } catch (error) {
     const err = error as Error;

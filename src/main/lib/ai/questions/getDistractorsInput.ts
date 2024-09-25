@@ -15,7 +15,8 @@ const getDistractorsInput = async (
 
     const raw = await getDistractors(question);
     const parsed = parseAIDistractorsResponse(raw);
-
+    log.info('ai', `Parsed AI distractor response successfully for question ${question.id}.`);
+    
     if (!parsed) {
       throw new Error('Failed to fetch assist.');
     }

@@ -3,7 +3,7 @@ import { environmentManager } from '../../environment';
 import { CursorResult } from '../../../../types';
 
 export const getTags = async (
-  cursor?: string,  // Optional cursor for pagination
+  cursor: string | null = null,  // Optional cursor for pagination
   limit: number = 1000,
   filter: TagFilter = 'All',
   query: string = '',

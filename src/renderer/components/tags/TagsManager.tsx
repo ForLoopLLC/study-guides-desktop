@@ -206,6 +206,7 @@ const TagsManager: React.FC = () => {
             query={query}
             setQuery={setQuery}
             onUpdate={() => setPage(1)}
+            loading={isLoading}
           />
         </div>
         <FilterSelect

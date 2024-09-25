@@ -2,7 +2,7 @@ import { ipcMain } from 'electron';
 import { log } from '../main';
 import { getTagInput, getContentRatingInput } from '../lib/ai';
 
-import { getTags, touchTag, updateTag } from '../lib/database/tags';
+import { getTagsCursor, updateTag } from '../lib/database/tags';
 import { createTagIndex } from '../lib/database/search';
 import { publishTagIndex } from '../lib/search/tags';
 import { Tag } from '@prisma/client';
@@ -39,41 +39,55 @@ ipcMain.handle('get-ai-tag', async (_event, tagId) => {
 
 ipcMain.handle('batch-assist-tags', async (event, { filter, query }) => {
   try {
-    let page = 1;
     const limit = 500;
     let allTags: Tag[] = [];
-    let hasMore = true;
+    let nextCursor: string | null = null;
     let totalProcessed = 0;
+    let hasMore = true;
 
     while (hasMore) {
-      const { data: tags } = await getTags(page, limit, filter, query);
+      const { data: tags, nextCursor: newCursor } = await getTagsCursor(
+        nextCursor,
+        limit,
+        filter,
+        query,
+      );
+      
       if (tags.length === 0) {
         hasMore = false;
         break;
       }
 
       const inputs = await Promise.all(tags.map((tag) => getTagInput(tag.id)));
-
       allTags = allTags.concat(tags);
-      page += 1;
 
+      // Process tags with AI assistant and update them
       const updatedTags = await Promise.all(
         inputs.map((input) => updateTag(input)),
       );
+      
+      // Create and publish tag indexes for the updated tags
       const indexes = await Promise.all(
         updatedTags
           .filter((x) => x !== null)
           .map((tag) => createTagIndex(tag, [])),
       );
-
       await publishTagIndex(indexes.filter((index) => index !== null));
 
+      // Update totalProcessed and emit progress to the frontend
       totalProcessed += tags.length;
-      const payload = { page, totalProcessed };
+      const payload = { totalProcessed };
       event.sender.send('batch-assist-tags-progress', payload);
       log.info('ai', `Assisted ${totalProcessed} tags.`);
+
+      // Move the cursor to the next page
+      nextCursor = newCursor;
+      if (!nextCursor) {
+        hasMore = false;
+      }
     }
 
+    // Send completion event to frontend
     event.sender.send('batch-assist-tags-complete', { totalProcessed });
     log.info('ai', `Assist completed with ${totalProcessed} tags.`);
   } catch (error) {
@@ -83,3 +97,4 @@ ipcMain.handle('batch-assist-tags', async (event, { filter, query }) => {
     throw new Error('Failed to assist.');
   }
 });
+

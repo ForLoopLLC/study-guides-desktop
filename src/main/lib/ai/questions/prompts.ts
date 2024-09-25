@@ -54,30 +54,31 @@ export const questionPrompt = {
         Generate a detailed explanation of the correct answer for the following question.
 
         Important requirements:
-                * Ensure that the output is formatted as plain text and follows the structure below.
-                * Make sure the distractors are separated clearly, without any punctuation at the end.
-                * Include a detailed explanation for why the correct answer is right.
-                * All LaTeX expressions must be properly escaped (e.g., \\ instead of \).
-                * Do NOT cut off sentences or expressions mid-way.
+        - **ALL LaTeX expressions MUST be enclosed in "<latex> ... </latex>" tags.** Do not use "\(\)" or "\[\]" to wrap LaTeX expressions. Only use the "<latex>" tags for LaTeX expressions.
+        - Ensure that the output is formatted as plain text and follows the structure below.
+        - Make sure the distractors are separated clearly, without any punctuation at the end.
+        - Include a detailed explanation for why the correct answer is right.
+        - Do NOT cut off sentences or expressions mid-way.
+
+        If the LaTeX expression appears inside distractors or LearnMore, use <latex> ... </latex>.
 
         Output Format:
-                Distractors:
-                - distractor1
-                - distractor2
-                - distractor3
+        Distractors:
+        - distractor1
+        - distractor2
+        - distractor3
 
-                LearnMore:
-                Explanation of why the correct answer is right.
+        LearnMore:
+        Explanation of why the correct answer is right.
 
         Output Example:
-                Distractors:
-                - The electron orbit is circular and stable due to constant speed
-                - The electron emits radiation while orbiting the nucleus
-                - The energy levels are continuous and not quantized
+        Distractors:
+        - The electron orbit is <latex>\frac{a}{b}</latex> and stable due to constant speed
+        - The electron emits radiation while orbiting the nucleus
+        - The energy levels are continuous and not quantized
 
-                LearnMore:
-                In the Bohr model of the hydrogen atom, the energy levels of the electron are quantized, meaning that the electron can only exist in specific orbits with fixed energies. The electron does not radiate energy while in these
-
+        LearnMore:
+        In the Bohr model of the hydrogen atom <latex>\frac{13.6}{n^2}</latex>, the energy levels of the electron are quantized, meaning that the electron can only exist in specific orbits with fixed energies.
 `,
 };
 

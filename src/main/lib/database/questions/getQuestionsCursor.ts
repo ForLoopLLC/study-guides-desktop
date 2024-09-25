@@ -3,8 +3,8 @@ import { environmentManager } from '../../environment';
 import { CursorResult } from '../../../../types'; // Assuming CursorResult is the new interface
 
 export const getQuestions = async (
-  limit: number = 1000,
   cursor: string | null = null, // Cursor for pagination
+  limit: number = 1000,
   filter: QuestionFilter = 'All',
   query: string = '',
 ): Promise<CursorResult<Question>> => {

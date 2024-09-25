@@ -132,7 +132,12 @@ const QuestionsManager: React.FC = () => {
       >
         <button
           onClick={handleUpdateIndexes}
-          disabled={questions.length === 0 || isLoading || publishProcessing || assistProcessing}
+          disabled={
+            questions.length === 0 ||
+            isLoading ||
+            publishProcessing ||
+            assistProcessing
+          }
           className="p-2 bg-blue-500 text-white rounded flex items-center justify-center disabled:opacity-50"
         >
           {publishProcessing ? (
@@ -142,7 +147,12 @@ const QuestionsManager: React.FC = () => {
         </button>
         <button
           onClick={handleAiAssist}
-          disabled={questions.length === 0 || isLoading || publishProcessing || assistProcessing}
+          disabled={
+            questions.length === 0 ||
+            isLoading ||
+            publishProcessing ||
+            assistProcessing
+          }
           className="p-2 bg-blue-500 text-white rounded flex items-center justify-center disabled:opacity-50"
         >
           {assistProcessing ? (
@@ -183,6 +193,7 @@ const QuestionsManager: React.FC = () => {
             query={query}
             setQuery={setQuery}
             onUpdate={() => setPage(1)}
+            loading={isLoading}
           />
         </div>
         <FilterSelect

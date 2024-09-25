@@ -5,6 +5,7 @@ export { default as FilterSelect } from './FilterSelect';
 export { default as Tabs } from './Tabs';
 export { default as SearchBar } from './SearchBar';
 export { default as LogViewer } from './LogViewer';
+export { default as Spinner } from './Spinner';
 export * from './tags';
 export * from './users';
 export * from './questions';

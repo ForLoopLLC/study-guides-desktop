@@ -15,6 +15,11 @@ const getContentRatingInput = async (
 
     const raw = await getLearnMore(question);
     const parsed = parseAILearnMoreResponse(raw);
+    log.info(
+      'ai',
+      `Parsed AI learn more response successfully for question ${question.id}.`,
+    );
+
     if (!parsed) {
       throw new Error('Failed to fetch assist.');
     }

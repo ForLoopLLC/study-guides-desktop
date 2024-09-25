@@ -7,11 +7,6 @@ import { log } from '../../../main';
 const getLearnMore = async (question: Question):Promise<string> => {
   const preparedQuestion = prepareQuestion(question);
   const result =  await generateChatCompletion(learnMorePrompt.text, preparedQuestion);
-
-  const defaultResonse = {
-    learnMore: '',
-  };
-
   return result;
 };
 

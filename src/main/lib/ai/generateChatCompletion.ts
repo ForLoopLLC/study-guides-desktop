@@ -1,7 +1,5 @@
 import { environmentManager } from '../environment';
-import { stripBackticks } from '../../util';
 import { log } from '../../main';
-import { env } from 'process';
 
 export const generateChatCompletion = async (
   promptText: string,
@@ -22,16 +20,21 @@ export const generateChatCompletion = async (
           content: userPrompt,
         },
       ],
-      temperature: 1,
-      max_tokens: 256,
+      temperature: 0.7,
+      max_tokens: 512,
       top_p: 1,
       frequency_penalty: 0,
       presence_penalty: 0,
     });
 
     const content = completion.choices[0].message?.content || '';
-    const cleanedResult = stripBackticks(content);
-    return cleanedResult;
+    log.silly('ai', '**********************************');
+    log.silly('ai', `model:    ${openAiModel || 'gpt-3.5-turbo'}`);
+    log.silly('ai', `prompt:   ${promptText}`);
+    log.silly('ai', `user:     ${userPrompt}`);
+    log.silly('ai', `response: ${content}`);
+    log.silly('ai', '**********************************');
+    return content;
   } catch (error) {
     throw error;
   }
