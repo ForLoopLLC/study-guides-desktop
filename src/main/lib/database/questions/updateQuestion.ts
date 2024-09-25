@@ -5,6 +5,7 @@ import {log} from '../../../main';
 
 const updateQuestion = async (input: UpdateQuestionInput): Promise<Question | null> => {
   const prisma = environmentManager.getPrismaClient();
+  let newHash: string = '';
 
   try {
     // Fetch the existing tag to get the current metadata
@@ -33,7 +34,9 @@ const updateQuestion = async (input: UpdateQuestionInput): Promise<Question | nu
     // Merge the existing metadata with the new metadata
     const mergedMetadata = { ...existingMetadata, ...inputMetadata };
 
-    const hash = getHash(input.questionText + input.answerText);
+    if (existingQuestion.answerText !== input.answerText || existingQuestion.questionText !== input.questionText) {
+      newHash = getHash(input.questionText + input.answerText);
+    } 
 
 
     // Perform the update with merged metadata
@@ -46,7 +49,7 @@ const updateQuestion = async (input: UpdateQuestionInput): Promise<Question | nu
         distractors: input.distractors,
         videoUrl: input.videoUrl,
         imageUrl: input.imageUrl,
-        hash: hash,
+        hash: newHash || existingQuestion.hash,
         metadata: mergedMetadata, // Update with merged metadata
         updatedAt: new Date(), // Update the updatedAt timestamp
       },
