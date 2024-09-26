@@ -6,9 +6,14 @@ import {
   getTagWithRelations,
   deleteTag,
   clearTagReports,
+  getTagAncestry,
 } from '../lib/database/tags';
 import { createTagIndex, deleteTagIndex } from '../lib/database/search';
-import { publishTagIndex, unpublishTagIndex } from '../lib/search/tags';
+import {
+  publishTagIndex,
+  unpublishTagIndex,
+
+} from '../lib/search/tags';
 
 ipcMain.handle('get-tags', async (_event, { page, limit, filter, query }) => {
   try {
@@ -38,7 +43,8 @@ ipcMain.handle('update-tag', async (_event, updatedTag) => {
     if (!tag) {
       throw new Error('Tag not found');
     }
-    const index = await createTagIndex(tag, []);
+    const tagInfos = await getTagAncestry(tag.id);
+    const index = await createTagIndex(tag, tagInfos);
     if (index) {
       await publishTagIndex([index]);
     }

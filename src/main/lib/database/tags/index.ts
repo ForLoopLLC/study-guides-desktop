@@ -6,3 +6,4 @@ export { default as deleteTag } from './deleteTag';
 export { default as getTagWithRelations } from './getTagWithRelations';
 export { default as getTagWithQuestions } from './getTagWithQuestions';
 export { default as clearTagReports } from './clearTagReports';
+export { default as getTagAncestry } from './getTagAncestry';

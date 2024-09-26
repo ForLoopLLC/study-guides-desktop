@@ -1,6 +1,6 @@
 import { ipcMain } from 'electron';
 import { log } from '../main';
-import { getTags, touchTag } from '../lib/database/tags';
+import { getTags, touchTag, getTagAncestry } from '../lib/database/tags';
 import { getQuestions, touchQuestion } from '../lib/database/questions';
 import { createTagIndex } from '../lib/database/search';
 import { publishTagIndex } from '../lib/search/tags';
@@ -33,7 +33,11 @@ ipcMain.handle('publish-tags-index', async (event, { filter, query }) => {
         tags.map((tag) => touchTag(tag.id)),
       );
       const indexes = await Promise.all(
-        touchedTags.map((tag) => createTagIndex(tag, [])),
+        touchedTags.map(async (tag) => {
+          const tagInfos = await getTagAncestry(tag.id);
+          const t = createTagIndex(tag, tagInfos);
+          return t;
+        }),
       );
       await publishTagIndex(indexes.filter((index) => index !== null));
 
