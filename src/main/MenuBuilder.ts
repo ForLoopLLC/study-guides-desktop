@@ -5,7 +5,7 @@ import { createHelpMenu } from './menus/helpMenu';
 import { createScreensMenu } from './menus/screensMenu';
 import { createConnectionsMenu } from './menus/connectionsMenu';
 import {createEditMenu} from './menus/editMenu';
-import { create } from 'domain';
+import {createImportMenu } from './menus/importMenu';
 
 export default class MenuBuilder {
   mainWindow: BrowserWindow;
@@ -27,6 +27,7 @@ export default class MenuBuilder {
       createFileMenu(this.mainWindow),
       createEditMenu(this.mainWindow),
       createConnectionsMenu(this.mainWindow),
+      createImportMenu(this.mainWindow),
       createScreensMenu(this.mainWindow),
       createViewMenu(this.mainWindow, isDev),
       createHelpMenu(),

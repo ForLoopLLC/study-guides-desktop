@@ -3,8 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import 'tailwindcss/tailwind.css';
 import './App.css';
 import { Route, Routes } from 'react-router-dom';
-import { Questions, Tags, Users } from './pages/database';
-import { Home } from './pages';
+import { Questions, Tags, Users, Certifications, Colleges, Home } from './pages';
 import { useAppContext } from './contexts/AppContext';
 
 const App = () => {
@@ -43,6 +42,8 @@ const App = () => {
       <Route path="/users" element={<Users />} />
       <Route path="/tags" element={<Tags />} />
       <Route path="/questions" element={<Questions />} />
+      <Route path="/colleges" element={<Colleges />} />
+      <Route path="/certifications" element={<Certifications/>} />
       <Route path="/" element={<Home />} />
       <Route path="*" element={<Home />} />
     </Routes>
