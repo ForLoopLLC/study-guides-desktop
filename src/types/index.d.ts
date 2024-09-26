@@ -6,6 +6,7 @@ export * from './user';
 export * from './tag';
 export * from './search';
 export * from './ai';
+export * from './import';
 
 export type Channels =
   | 'navigate'
@@ -37,7 +38,13 @@ export type Channels =
   | 'publish-questions-index-error'
   | 'batch-assist-questions-progress'
   | 'batch-assist-questions-complete'
-  | 'batch-assist-questions-error';
+  | 'batch-assist-questions-error'
+  | 'import-file-to-local'
+  | 'file-import-feedback'
+  | 'import-delete-file'
+  | 'file-delete-feedback'
+  | 'import-list-files'
+  | 'file-list-feedback';
 
 export interface Environment {
   env: 'development' | 'test' | 'production' | null;
@@ -69,10 +76,13 @@ export interface CursorResult<T> {
   data: T[];
 }
 
-
 export type TagFilter = PrismaTagType | 'All' | 'Reported';
 export type UserFilter = 'All' | 'Admin' | 'User' | 'Tester' | 'Freelancer';
-export type QuestionFilter = 'All' | 'Reported' | 'MissingLearnMore' | 'MissingDistractors';
+export type QuestionFilter =
+  | 'All'
+  | 'Reported'
+  | 'MissingLearnMore'
+  | 'MissingDistractors';
 
 export type LogLevel =
   | 'info'

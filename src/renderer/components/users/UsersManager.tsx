@@ -7,7 +7,7 @@ import {
 import { FaSpinner } from 'react-icons/fa';
 import { useAppContext } from '../../contexts/AppContext';
 import { UserFilter, User } from '../../../types';
-import { UserFilterType } from '../../enums';
+import { UserFilterType } from '../../../enums';
 import {
   UserUpdate,
   PaginationControls,

@@ -18,7 +18,7 @@ import {
 } from '..';
 import Search from '../SearchBar';
 import QuestionList from './QuestionList';
-import { QuestionFilterType } from '../../enums';
+import { QuestionFilterType } from '../../../enums';
 const QuestionsManager: React.FC = () => {
   const [filter, setFilter] = useState<QuestionFilter>('All');
   const appContext = useAppContext();
