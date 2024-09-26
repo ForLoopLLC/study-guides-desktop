@@ -1,6 +1,8 @@
 import { useEffect } from 'react';
 import { useFileUpload, useManageFiles } from '../../hooks';
 import { ParserType } from '../../../enums';
+import FileList from './FileList';
+import { ImportFile } from '../../../types';
 
 interface FileUploadProps {
   parserType: ParserType;
@@ -13,6 +15,10 @@ const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
   useEffect(() => {
     listFiles();
   }, [feedback]);
+
+  const handleDeleteFile = (file: ImportFile) => {
+    deleteFile(file.path);
+  };
 
   return (
     <main>
@@ -27,21 +33,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
         )}
       </section>
       <section>
-        {files.length > 0 ? (
-          <div>
-            <h2>Files</h2>
-            <ul>
-              {files.map((file) => (
-                <li key={file.path}>
-                  <span>{file.name}</span>
-                  <button onClick={() => deleteFile(file.path)}>Delete</button>
-                </li>
-              ))}
-            </ul>
-          </div>
-        ) : (
-          <div>No files</div>
-        )}
+        <FileList files={files} onDelete={handleDeleteFile} />
       </section>
     </main>
   );
