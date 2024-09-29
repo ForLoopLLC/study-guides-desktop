@@ -54,10 +54,20 @@ const chunker = (lines: string[]): Chunk[] => {
 };
 
 const bodyParser = (chunk: Chunk): QuestionAndAnswer[] => {
-  // TODO: Implement bodyParser
-  // This function should take a chunk and return an array of QuestionAndAnswer objects derived from the chunk.data
   const body = chunk.data;
-  return [{ question: 'Question', answer: 'Answer' }];
+  
+  return body.map((line) => {
+    // Regular expression to remove list item decorators (45. or * or -)
+    const strippedLine = line.replace(/^\s*[\d*.-]+\s*/, '');
+
+    // Split the question and answer on ' - ' and trim them
+    const [question, answer] = strippedLine.split(' - ').map(part => part.trim());
+
+    return {
+      question: question || 'Unknown question', // Fallback in case of empty string
+      answer: answer || 'Unknown answer', // Fallback in case of empty string
+    };
+  });
 };
 
 const collegeHeaderParser: HeaderParser = (header: string): CollegeHeader => {

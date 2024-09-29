@@ -4,8 +4,8 @@ export enum ParserType {
 }
 
 export enum ParserOperationMode {
-  PreParse,
-  Parse,
+  PreParse = 'PreParse',
+  Parse = 'Parse',
 }
 
 export enum QuestionFilterType {

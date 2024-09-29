@@ -1,5 +1,5 @@
 import { app, ipcMain } from 'electron';
-import mammoth from "mammoth";
+import mammoth from 'mammoth';
 import fs from 'fs';
 import path from 'path';
 import { log } from '../main';
@@ -10,7 +10,7 @@ import {
   ImportFile,
   PreParserFeedback,
 } from '../../types';
-import { ParserType } from '../../enums';
+import { ParserType, ParserOperationMode } from '../../enums';
 import { fileParser } from '../lib/parsers';
 
 app.whenReady().then(() => {
@@ -83,63 +83,65 @@ app.whenReady().then(() => {
     return filesList;
   };
 
-  ipcMain.handle('import-file-to-local', async (event, { filePath, parserType }) => {
-    try {
-      const parser = parserType as ParserType;
-  
-      // Extract file name and create the folder name based on the file name (without extension)
-      const fileName = path.basename(filePath);
-      const fileNameWithoutExt = path.parse(filePath).name; // Remove extension
-      const workingDir = getWorkingDir(parser);
-  
-      // Create the parent folder with the same name as the file (without extension)
-      const parentFolder = path.join(workingDir, fileNameWithoutExt);
-      if (!fs.existsSync(parentFolder)) {
-        fs.mkdirSync(parentFolder);
-      }
-  
-      let destPath = path.join(parentFolder, fileName);
-  
-      // If the file is a docx file, convert it to a text file
-      if (path.extname(filePath) === '.docx') {
-        try {
-          const result = await mammoth.extractRawText({ path: filePath }); // Convert docx to text
-          const textContent = result.value;
-  
-          // Define the destination as a .txt file
-          destPath = path.join(parentFolder, `${fileNameWithoutExt}.txt`);
-  
-          // Write the extracted text to the .txt file
-          fs.writeFileSync(destPath, textContent, 'utf8');
-          log.info('Converted and saved DOCX file to text format:', destPath);
-        } catch (conversionError) {
-          throw conversionError;
+  ipcMain.handle(
+    'import-file-to-local',
+    async (event, { filePath, parserType }) => {
+      try {
+        const parser = parserType as ParserType;
+
+        // Extract file name and create the folder name based on the file name (without extension)
+        const fileName = path.basename(filePath);
+        const fileNameWithoutExt = path.parse(filePath).name; // Remove extension
+        const workingDir = getWorkingDir(parser);
+
+        // Create the parent folder with the same name as the file (without extension)
+        const parentFolder = path.join(workingDir, fileNameWithoutExt);
+        if (!fs.existsSync(parentFolder)) {
+          fs.mkdirSync(parentFolder);
         }
-      } else {
-        // For other files, copy them directly
-        fs.copyFileSync(filePath, destPath);
-        log.info('File imported to local directory:', destPath);
+
+        let destPath = path.join(parentFolder, fileName);
+
+        // If the file is a docx file, convert it to a text file
+        if (path.extname(filePath) === '.docx') {
+          try {
+            const result = await mammoth.extractRawText({ path: filePath }); // Convert docx to text
+            const textContent = result.value;
+
+            // Define the destination as a .txt file
+            destPath = path.join(parentFolder, `${fileNameWithoutExt}.txt`);
+
+            // Write the extracted text to the .txt file
+            fs.writeFileSync(destPath, textContent, 'utf8');
+            log.info('Converted and saved DOCX file to text format:', destPath);
+          } catch (conversionError) {
+            throw conversionError;
+          }
+        } else {
+          // For other files, copy them directly
+          fs.copyFileSync(filePath, destPath);
+          log.info('File imported to local directory:', destPath);
+        }
+
+        // Send success feedback
+        const feedback: Feedback = {
+          message: `Successfully imported file to local directory: ${destPath}`,
+          success: true,
+        };
+        event.sender.send('file-import-feedback', feedback);
+      } catch (error) {
+        const err = error as Error;
+        log.error('import', `File import error. ${err.message}`);
+
+        // Send error feedback
+        const feedback: Feedback = {
+          message: `An error occurred while importing the file. ${err.message}`,
+          success: false,
+        };
+        event.sender.send('file-import-feedback', feedback);
       }
-  
-      // Send success feedback
-      const feedback: Feedback = {
-        message: `Successfully imported file to local directory: ${destPath}`,
-        success: true,
-      };
-      event.sender.send('file-import-feedback', feedback);
-    } catch (error) {
-      const err = error as Error;
-      log.error('import', `File import error. ${err.message}`);
-  
-      // Send error feedback
-      const feedback: Feedback = {
-        message: `An error occurred while importing the file. ${err.message}`,
-        success: false,
-      };
-      event.sender.send('file-import-feedback', feedback);
-    }
-  });
-  
+    },
+  );
 
   ipcMain.handle('import-list-files', (event, { parserType }) => {
     try {
@@ -202,11 +204,14 @@ app.whenReady().then(() => {
         const file = fs.readFileSync(filePath, 'utf-8');
         result = fileParser(file, parserType, operationMode);
         const feedback: PreParserFeedback = {
-          message: `Successfully ${operationMode} file`,
+          message: `Successfully ran ${operationMode as ParserOperationMode} the file.`,
           success: true,
           result: result,
         };
-        log.info('import', `Successfully ${operationMode} file`);
+        log.info(
+          'import',
+          `Successfully ran ${operationMode as ParserOperationMode} the file.`,
+        );
         event.sender.send('file-parse-feedback', feedback);
       } catch (error) {
         const err = error as Error;
