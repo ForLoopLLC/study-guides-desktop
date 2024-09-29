@@ -10,6 +10,9 @@ const tagTypeColors: Record<TagType, string> = {
   [TagType.Course]: 'bg-teal-500',
   [TagType.Topic]: 'bg-pink-500',
   [TagType.UserFolder]: 'bg-orange-500',
+  [TagType.Organization]: 'bg-indigo-500',
+  [TagType.Certification]: 'bg-cyan-500',
+  [TagType.Module]: 'bg-rose-500',
 };
 
 // Helper function to get the first letter of the tag type
