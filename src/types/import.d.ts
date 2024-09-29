@@ -52,6 +52,7 @@ export interface Feedback {
 export interface ImportFile {
   name: string;
   path: string;
+  directory: string;
 }
 
 export interface FileListFeedback extends Feedback {

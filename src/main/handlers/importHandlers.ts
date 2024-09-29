@@ -47,24 +47,69 @@ app.whenReady().then(() => {
     return destPath;
   };
 
+  const listFilesRecursive = (dir: string): ImportFile[] => {
+    const filesList: ImportFile[] = [];
+  
+    // Read the directory contents
+    const files = fs.readdirSync(dir);
+  
+    files.forEach((file) => {
+      const filePath = path.join(dir, file);
+      const stat = fs.statSync(filePath);
+  
+      if (stat.isDirectory()) {
+        // If it's a directory, recursively list its contents
+        const subDirFiles = listFilesRecursive(filePath);
+        filesList.push(...subDirFiles);
+      } else {
+        // If it's a file, add it to the list
+        filesList.push({
+          name: file,
+          path: filePath,
+          directory: dir
+        });
+      }
+    });
+  
+    return filesList;
+  };
+  
+
   // Handle file import to local directory
   ipcMain.handle('import-file-to-local', (event, { filePath, parserType }) => {
     try {
       const parser = parserType as ParserType;
+      
+      // Extract file name and create the folder name based on the file name (without extension)
       const fileName = path.basename(filePath);
+      const fileNameWithoutExt = path.parse(filePath).name; // Remove extension
       const workingDir = getWorkingDir(parser);
-      const destPath = path.join(workingDir, fileName);
-
+      
+      // Create the parent folder with the same name as the file (without extension)
+      const parentFolder = path.join(workingDir, fileNameWithoutExt);
+      if (!fs.existsSync(parentFolder)) {
+        fs.mkdirSync(parentFolder);
+      }
+  
+      // Define destination path within the new folder
+      const destPath = path.join(parentFolder, fileName);
+  
+      // Copy file to the new folder
       fs.copyFileSync(filePath, destPath);
       log.info('File imported to local directory:', destPath);
+  
+      // Send success feedback
       const feedback: Feedback = {
         message: `Successfully imported file to local directory: ${destPath}`,
         success: true,
       };
       event.sender.send('file-import-feedback', feedback);
+  
     } catch (error) {
       const err = error as Error;
       log.error('import', `File import error. ${err.message}`);
+      
+      // Send error feedback
       const feedback: Feedback = {
         message: `An error occurred while importing the file. ${err.message}`,
         success: false,
@@ -73,22 +118,20 @@ app.whenReady().then(() => {
     }
   });
 
+
   ipcMain.handle('import-list-files', (event, { parserType }) => {
     try {
       const targetDir = getWorkingDir(parserType);
-
-      // Get list of files in the directory
-      const files = fs.readdirSync(targetDir).map((file) => ({
-        name: file,
-        path: path.join(targetDir, file),
-      })) as ImportFile[];
-
+  
+      // Recursively get list of files in the directory and subdirectories
+      const files = listFilesRecursive(targetDir);
+  
       const feedback: FileListFeedback = {
-        files: files,
+        files,
         message: 'Successfully listed files',
         success: true,
       };
-
+  
       event.sender.send('file-list-feedback', feedback);
     } catch (error) {
       const err = error as Error;
