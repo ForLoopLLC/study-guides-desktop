@@ -9,6 +9,9 @@ enum AlgoliaRecordType {
   Department
   Region
   University
+  Organization
+  Certification
+  Module
 }
 
 model AlgoliaRecord {

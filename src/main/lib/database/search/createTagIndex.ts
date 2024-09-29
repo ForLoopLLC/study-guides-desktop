@@ -19,6 +19,9 @@ const mapTagTypeToAlgoliaRecordType = (tagType: TagType): AlgoliaRecordType => {
     [TagType.Department]: AlgoliaRecordType.Department,
     [TagType.Course]: AlgoliaRecordType.Course,
     [TagType.UserFolder]: AlgoliaRecordType.SubCategory,
+    [TagType.Organization]: AlgoliaRecordType.Organization,
+    [TagType.Certification]: AlgoliaRecordType.Certification,
+    [TagType.Module]: AlgoliaRecordType.Module,
   };
 
   // Return the corresponding AlgoliaRecordType
