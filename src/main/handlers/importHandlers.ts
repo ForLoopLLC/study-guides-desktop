@@ -204,13 +204,13 @@ app.whenReady().then(() => {
         const file = fs.readFileSync(filePath, 'utf-8');
         result = fileParser(file, parserType, operationMode);
         const feedback: PreParserFeedback = {
-          message: `Successfully ran ${operationMode as ParserOperationMode} the file.`,
+          message: `Successfully ran ${operationMode as ParserOperationMode} on the file.`,
           success: true,
           result: result,
         };
         log.info(
           'import',
-          `Successfully ran ${operationMode as ParserOperationMode} the file.`,
+          `Successfully ran ${operationMode as ParserOperationMode} on the file.`,
         );
         event.sender.send('file-parse-feedback', feedback);
       } catch (error) {
