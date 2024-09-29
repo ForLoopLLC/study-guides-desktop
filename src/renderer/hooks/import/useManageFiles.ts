@@ -12,7 +12,12 @@ import { ParserOperationMode, ParserType } from '../../../enums';
 const useManageFiles = (parserType: ParserType) => {
   const [files, setFiles] = useState<ImportFile[]>([]);
   const [feedback, setFeedback] = useState<
-    FileListFeedback | DeleteFileFeedback | PreParserFeedback | PreParserFolderFeedback | DeleteFolderFeedback | null
+    | FileListFeedback
+    | DeleteFileFeedback
+    | PreParserFeedback
+    | PreParserFolderFeedback
+    | DeleteFolderFeedback
+    | null
   >(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -41,20 +46,23 @@ const useManageFiles = (parserType: ParserType) => {
     });
   };
 
-  const deleteFolder = (folder: string) => {
+  const deleteFolder = (folderName: string) => {
     setLoading(true);
-    window.electron.ipcRenderer.invoke('import-delete-folder', { folder });
+    window.electron.ipcRenderer.invoke('import-delete-folder', {
+      folderName,
+      parserType,
+    });
   };
 
   const preParseFolder = (
-    folder: string,
+    folderName: string,
     parserType: ParserType,
     operationMode: ParserOperationMode,
   ) => {
     setLoading(true);
     window.electron.ipcRenderer.invoke('import-parse-folder', {
       parserType,
-      folder,
+      folderName,
       operationMode,
     });
   };
@@ -90,9 +98,7 @@ const useManageFiles = (parserType: ParserType) => {
   const handleDeleteFolderFeedback = (payload: any) => {
     const response = payload as DeleteFolderFeedback;
     if (response.success) {
-      setFiles((prevFiles) =>
-        prevFiles.filter((file) => !response.filePaths.includes(file.path)),
-      );
+      listFiles();
     }
     setFeedback(response);
     setLoading(false);
@@ -140,7 +146,7 @@ const useManageFiles = (parserType: ParserType) => {
       unsubscribeFileListFeedback();
       unsubscribeDeleteFileFeedback();
       unsubscribePreParseFeedback();
-      unsubscribeDeleteFileFeedback();
+      unsubscribeDeleteFolderFeedback();
       unsubscribePreParseFolderFeedback();
     };
   }, [parserType]);

@@ -32,10 +32,12 @@ const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
     preParseFile(file.path, parserType, ParserOperationMode.PreParse);
   };
 
-  const handlePreParseFolder = (folder: string) => {
+  const handlePreParseFolder = (folderName: string) => {
+    preParseFolder(folderName, parserType, ParserOperationMode.PreParse);
   };
 
-  const handleDeleteFolder = (folder: string) => {
+  const handleDeleteFolder = (folderName: string) => {
+    deleteFolder(folderName);
   };
 
   const isPreParserFeedback = (

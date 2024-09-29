@@ -2,13 +2,13 @@ import { useState, useEffect, useRef } from 'react';
 import { FaEllipsisV } from 'react-icons/fa';
 
 interface FolderMoreButtonProps {
-  folder: string; // Adjust the type as needed for your folder object
+  folderName: string; // Adjust the type as needed for your folder object
   handleDelete: (folder: string) => void;
   handlePreParse: (folder: string) => void;
 }
 
 const FolderMoreButton: React.FC<FolderMoreButtonProps> = ({
-  folder,
+  folderName,
   handleDelete,
   handlePreParse,
 }) => {
@@ -39,17 +39,17 @@ const FolderMoreButton: React.FC<FolderMoreButtonProps> = ({
   return (
     <div className="relative" ref={menuRef}>
       <button
-        onClick={() => toggleMenu(folder)}
+        onClick={() => toggleMenu(folderName)}
         className="ml-2 text-slate-700"
       >
         <FaEllipsisV />
       </button>
-      {openMenu === folder && (
+      {openMenu === folderName && (
         <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-10">
           <ul>
             <li
               onClick={() => {
-                handlePreParse(folder);
+                handlePreParse(folderName);
                 setOpenMenu(null);
               }}
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -58,7 +58,7 @@ const FolderMoreButton: React.FC<FolderMoreButtonProps> = ({
             </li>
             <li
               onClick={() => {
-                handleDelete(folder);
+                handleDelete(folderName);
                 setOpenMenu(null);
               }}
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -70,7 +70,6 @@ const FolderMoreButton: React.FC<FolderMoreButtonProps> = ({
       )}
     </div>
   );
-  
 };
 
 export default FolderMoreButton;

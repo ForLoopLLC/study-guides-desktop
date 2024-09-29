@@ -43,12 +43,10 @@ const FileList: React.FC<FileListProps> = ({
         <div key={folder} className="folder-container mb-4">
           {/* Folder header */}
           <div className="flex justify-between items-center bg-gray-200 p-2 rounded-t">
-            <span className="folder-name font-bold text-lg">
-              {folder}
-            </span>
+            <span className="folder-name font-bold text-lg">{folder}</span>
             {/* FolderMoreButton aligned to the far right */}
             <FolderMoreButton
-              folder={folder}
+              folderName={folder}
               handleDelete={onDeleteFolder}
               handlePreParse={onPreParseFolder}
             />

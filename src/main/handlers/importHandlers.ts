@@ -8,8 +8,10 @@ import {
   Feedback,
   FileListFeedback,
   DeleteFileFeedback,
+  DeleteFolderFeedback,
   ImportFile,
   PreParserFeedback,
+  PreParserFolderFeedback,
 } from '../../types';
 import { ParserType, ParserOperationMode } from '../../enums';
 import { fileParser } from '../lib/parsers';
@@ -270,6 +272,87 @@ app.whenReady().then(() => {
         };
         event.sender.send('file-parse-feedback', feedback);
         log.error('import', `Error ${operationMode} file. ${err.message}`);
+      }
+    },
+  );
+
+  ipcMain.handle(
+    'import-parse-folder',
+    (event, { parserType, folderName, operationMode }) => {
+      const workingDir = getWorkingDir(parserType);
+      const folderPath = path.join(workingDir, folderName);
+      console.log('parse folder', folderPath);
+      try {
+        // Ensure the folder exists
+        if (!fs.existsSync(folderPath)) {
+          throw new Error('Folder does not exist');
+        }
+
+        // Recursively get all files in the folder
+        const files = listFilesRecursive(folderPath);
+
+        const results = files.map((file) => {
+          const fileContent = fs.readFileSync(file.path, 'utf-8');
+          return fileParser(fileContent, parserType, operationMode);
+        });
+
+        const feedback: PreParserFolderFeedback = {
+          message: `Successfully ran ${operationMode as ParserOperationMode} on the folder.`,
+          success: true,
+          results: results, // Return the results for each file
+        };
+        log.info(
+          'import',
+          `Successfully ran ${operationMode as ParserOperationMode} on the folder.`,
+        );
+        event.sender.send('folder-parse-feedback', feedback);
+      } catch (error) {
+        const err = error as Error;
+        const feedback: PreParserFolderFeedback = {
+          message: `An error occurred while ${operationMode} the folder. ${err.message}`,
+          success: false,
+          results: [],
+        };
+        event.sender.send('folder-parse-feedback', feedback);
+        log.error('import', `Error ${operationMode} folder. ${err.message}`);
+      }
+    },
+  );
+
+  ipcMain.handle(
+    'import-delete-folder',
+    (event, { folderName, parserType }) => {
+      const workingDir = getWorkingDir(parserType);
+      const folderPath = path.join(workingDir, folderName);
+      console.log('delete folder', folderPath);
+      try {
+        // Ensure the folder exists
+        if (!fs.existsSync(folderPath)) {
+          throw new Error('Folder does not exist');
+        }
+
+        // Recursively remove the folder and its contents
+        fs.rmSync(folderPath, { recursive: true, force: true });
+        log.info('Folder deleted:', folderPath);
+
+        // Send success feedback
+        const feedback: DeleteFolderFeedback = {
+          message: `Successfully deleted folder: ${folderPath}`,
+          success: true,
+          filePath: folderPath,
+        };
+        event.sender.send('folder-delete-feedback', feedback);
+      } catch (error) {
+        const err = error as Error;
+        log.error('delete', `Error deleting folder. ${err.message}`);
+
+        // Send error feedback
+        const feedback: DeleteFolderFeedback = {
+          message: `An error occurred while deleting the folder. ${err.message}`,
+          success: false,
+          filePath: folderPath,
+        };
+        event.sender.send('folder-delete-feedback', feedback);
       }
     },
   );

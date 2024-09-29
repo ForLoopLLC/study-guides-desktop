@@ -77,9 +77,12 @@ const bodyParser = (chunk: Chunk, header: Header): QuestionAndAnswer[] => {
 };
 
 const collegeHeaderParser: HeaderParser = (header: string): CollegeHeader => {
+  const requiredItems = 6;
   const items = header.split(':').map((item) => item.trim());
-  if (items.length !== 6) {
-    throw new Error(`Invalid College header format. Data: ${header}`);
+  if (items.length !== requiredItems) {
+    throw new Error(
+      `Invalid College header format. ${requiredItems} items required. Found ${items.length}. Header: ${header}`,
+    );
   }
   const newHeader = {
     root: { name: items[0], type: TagType.Category, hash: getHash(items[0]) },
@@ -115,9 +118,12 @@ const collegeHeaderParser: HeaderParser = (header: string): CollegeHeader => {
 const certificationHeaderParser: HeaderParser = (
   header: string,
 ): CertificationHeader => {
+  const requiredItems = 5;
   const items = header.split(':').map((item) => item.trim());
-  if (items.length !== 5) {
-    throw new Error(`Invalid Certification header format. Data: ${header}`);
+  if (items.length !== requiredItems) {
+    throw new Error(
+      `Invalid Certification header format. ${requiredItems} items required. Found ${items.length}. Header: ${header}`,
+    );
   }
   const newHeader = {
     root: { name: items[0], type: TagType.Category, hash: getHash(items[0]) },
@@ -174,8 +180,8 @@ const rootParser = (
     const questions = bodyParser(chunk, header);
     return {
       header,
-      questions
-    }
+      questions,
+    };
   });
   return { chunks, blocks };
 };

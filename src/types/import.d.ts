@@ -70,7 +70,7 @@ export interface PreParserFeedback extends Feedback {
 }
 
 export interface DeleteFolderFeedback extends Feedback {
-  filePaths: string[];
+  filePath: string;
 }
 
 export interface PreParserFolderFeedback extends Feedback {
