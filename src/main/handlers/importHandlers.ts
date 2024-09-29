@@ -138,7 +138,7 @@ app.whenReady().then(() => {
         success: true,
       };
       log.info('import', `Successfully ${operationMode} file`);
-      event.sender.send('file-preparse-feedback', feedback);
+      event.sender.send('file-parse-feedback', feedback);
     } catch (error) {
       const err = error as Error;
       const feedback: PreParserFeedback = {
@@ -146,7 +146,7 @@ app.whenReady().then(() => {
         success: false,
         result: { chunks: [] },
       };
-      event.sender.send('file-preparse-feedback', feedback);
+      event.sender.send('file-parse-feedback', feedback);
       log.error('import', `Error ${operationMode} file. ${err.message}`);
     }
   });

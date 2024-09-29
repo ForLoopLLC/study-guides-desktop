@@ -44,7 +44,9 @@ export type Channels =
   | 'import-delete-file'
   | 'file-delete-feedback'
   | 'import-list-files'
-  | 'file-list-feedback';
+  | 'file-list-feedback'
+  | 'import-parse-file'
+  | 'file-parse-feedback';
 
 export interface Environment {
   env: 'development' | 'test' | 'production' | null;
