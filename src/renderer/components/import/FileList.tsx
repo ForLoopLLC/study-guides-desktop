@@ -5,11 +5,13 @@ import FileListMoreButton from './FileListMoreButton';
 interface FileListProps {
   files: ImportFile[]; // Adjust the type as needed for your tag object
   onDelete: (file: ImportFile) => void;
+  onPreParse: (file: ImportFile) => void;
 }
 
 const FileList: React.FC<FileListProps> = ({
   files,
   onDelete,
+  onPreParse,
 }) => {
   return (
     <ul id="files">
@@ -26,6 +28,7 @@ const FileList: React.FC<FileListProps> = ({
           <FileListMoreButton
             file={file}
             handleDelete={onDelete}
+            handlePreParse={onPreParse}
           />
         </li>
       ))}

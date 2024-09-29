@@ -1,6 +1,6 @@
 import { useEffect } from 'react';
 import { useFileUpload, useManageFiles } from '../../hooks';
-import { ParserType } from '../../../enums';
+import { ParserOperationMode, ParserType } from '../../../enums';
 import FileList from './FileList';
 import { ImportFile } from '../../../types';
 
@@ -10,7 +10,7 @@ interface FileUploadProps {
 
 const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
   const { feedback, handleFileChange } = useFileUpload(parserType);
-  const { files, listFiles, deleteFile } = useManageFiles(parserType);
+  const { feedback: fileManagementFeedback, files, listFiles, deleteFile, preParseFile } = useManageFiles(parserType);
 
   useEffect(() => {
     listFiles();
@@ -18,6 +18,10 @@ const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
 
   const handleDeleteFile = (file: ImportFile) => {
     deleteFile(file.path);
+  };
+
+  const handlePreParse = (file: ImportFile) => {
+    preParseFile(file.path, parserType, ParserOperationMode.PreParse);
   };
 
   return (
@@ -32,8 +36,16 @@ const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
           <p className="text-lg text-red-500">{feedback.message}</p>
         )}
       </section>
+      <section className="p-4">
+        {fileManagementFeedback && fileManagementFeedback.success && (
+          <p className="text-lg text-green-500">{fileManagementFeedback.message}</p>
+        )}
+        {fileManagementFeedback && !fileManagementFeedback.success && (
+          <p className="text-lg text-red-500">{fileManagementFeedback.message}</p>
+        )}
+      </section>
       <section>
-        <FileList files={files} onDelete={handleDeleteFile} />
+        <FileList files={files} onDelete={handleDeleteFile} onPreParse={handlePreParse} />
       </section>
     </main>
   );

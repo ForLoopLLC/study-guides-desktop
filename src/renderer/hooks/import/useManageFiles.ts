@@ -3,13 +3,14 @@ import {
   ImportFile,
   FileListFeedback,
   DeleteFileFeedback,
+  PreParserFeedback
 } from '../../../types';
-import { ParserType } from '../../../enums';
+import { ParserOperationMode, ParserType } from '../../../enums';
 
 const useManageFiles = (parserType: ParserType) => {
   const [files, setFiles] = useState<ImportFile[]>([]);
   const [feedback, setFeedback] = useState<
-    FileListFeedback | DeleteFileFeedback | null
+    FileListFeedback | DeleteFileFeedback | PreParserFeedback | null
   >(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -23,6 +24,11 @@ const useManageFiles = (parserType: ParserType) => {
   const deleteFile = (filePath: string) => {
     setLoading(true);
     window.electron.ipcRenderer.invoke('import-delete-file', { filePath });
+  };
+
+  const preParseFile = (filePath: string, parserType: ParserType, operationMode: ParserOperationMode) => {
+    setLoading(true);
+    window.electron.ipcRenderer.invoke('import-parse-file', { parserType, filePath, operationMode });
   };
 
   // Handle feedback from the main process
@@ -44,6 +50,13 @@ const useManageFiles = (parserType: ParserType) => {
     setLoading(false);
   };
 
+  const handlePreParseFeedback = (payload: any) => {
+    const response = payload as PreParserFeedback;
+    console.log(response);
+    setFeedback(response);
+    setLoading
+  }
+
   useEffect(() => {
     // Subscribe to feedback events when component mounts
     const unsubscribeFileListFeedback = window.electron.ipcRenderer.on(
@@ -56,6 +69,11 @@ const useManageFiles = (parserType: ParserType) => {
       handleDeleteFileFeedback,
     );
 
+    const unsubscribePreParseFeedback = window.electron.ipcRenderer.on(
+      'file-parse-feedback',
+      handlePreParseFeedback,
+    );
+
     // Initial file listing
     listFiles();
 
@@ -63,6 +81,7 @@ const useManageFiles = (parserType: ParserType) => {
     return () => {
       unsubscribeFileListFeedback();
       unsubscribeDeleteFileFeedback();
+      unsubscribePreParseFeedback();
     };
   }, [parserType]);
 
@@ -72,6 +91,7 @@ const useManageFiles = (parserType: ParserType) => {
     loading,
     listFiles,
     deleteFile,
+    preParseFile
   };
 };
 
