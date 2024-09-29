@@ -8,6 +8,7 @@ import {
   CertificationHeader,
   QuestionAndAnswer,
 } from '../../../types';
+import { getHash } from '../../util';
 
 interface Chunk {
   header: string;
@@ -55,17 +56,20 @@ const chunker = (lines: string[]): Chunk[] => {
 
 const bodyParser = (chunk: Chunk): QuestionAndAnswer[] => {
   const body = chunk.data;
-  
+
   return body.map((line) => {
     // Regular expression to remove list item decorators (45. or * or -)
     const strippedLine = line.replace(/^\s*[\d*.-]+\s*/, '');
 
     // Split the question and answer on ' - ' and trim them
-    const [question, answer] = strippedLine.split(' - ').map(part => part.trim());
+    const [question, answer] = strippedLine
+      .split(' - ')
+      .map((part) => part.trim());
 
     return {
       question: question || 'Unknown question', // Fallback in case of empty string
       answer: answer || 'Unknown answer', // Fallback in case of empty string
+      hash: getHash(question + answer),
     };
   });
 };
@@ -76,12 +80,32 @@ const collegeHeaderParser: HeaderParser = (header: string): CollegeHeader => {
     throw new Error(`Invalid College header format. Data: ${header}`);
   }
   const newHeader = {
-    root: { name: items[0], type: TagType.Category },
-    region: { name: items[1], type: TagType.Region },
-    university: { name: items[2], type: TagType.University },
-    department: { name: items[3], type: TagType.Department },
-    course: { name: items[4], type: TagType.Course },
-    topic: { name: items[5], type: TagType.Topic },
+    root: { name: items[0], type: TagType.Category, hash: getHash(items[0]) },
+    region: {
+      name: items[1],
+      type: TagType.Region,
+      hash: getHash(items[0] + items[1]),
+    },
+    university: {
+      name: items[2],
+      type: TagType.University,
+      hash: getHash(items[1] + items[2]),
+    },
+    department: {
+      name: items[3],
+      type: TagType.Department,
+      hash: getHash(items[2] + items[3]),
+    },
+    course: {
+      name: items[4],
+      type: TagType.Course,
+      hash: getHash(items[3] + items[4]),
+    },
+    topic: {
+      name: items[5],
+      type: TagType.Topic,
+      hash: getHash(items[4] + items[5]),
+    },
   };
   return newHeader;
 };
@@ -94,11 +118,27 @@ const certificationHeaderParser: HeaderParser = (
     throw new Error(`Invalid Certification header format. Data: ${header}`);
   }
   const newHeader = {
-    root: { name: items[0], type: TagType.Category },
-    organization: { name: items[1], type: TagType.Organization },
-    certification: { name: items[2], type: TagType.Certification },
-    module: { name: items[3], type: TagType.Module },
-    topic: { name: items[4], type: TagType.Topic },
+    root: { name: items[0], type: TagType.Category, hash: getHash(items[0]) },
+    organization: {
+      name: items[1],
+      type: TagType.Organization,
+      hash: getHash(items[0] + items[1]),
+    },
+    certification: {
+      name: items[2],
+      type: TagType.Certification,
+      hash: getHash(items[1] + items[2]),
+    },
+    module: {
+      name: items[3],
+      type: TagType.Module,
+      hash: getHash(items[2] + items[3]),
+    },
+    topic: {
+      name: items[4],
+      type: TagType.Topic,
+      hash: getHash(items[3] + items[4]),
+    },
   };
   return newHeader;
 };

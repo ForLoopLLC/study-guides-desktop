@@ -3,11 +3,13 @@ import { TagType } from '@prisma/client';
 export interface QuestionAndAnswer {
   question: string;
   answer: string;
+  hash: string;
 }
 
 export interface HeaderSection {
   name: string;
   type: TagType;
+  hash: string;
 }
 
 export interface Header {
