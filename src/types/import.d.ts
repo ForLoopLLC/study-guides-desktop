@@ -4,6 +4,7 @@ export interface QuestionAndAnswer {
   question: string;
   answer: string;
   hash: string;
+  parentHash: string;
 }
 
 export interface HeaderSection {
@@ -14,6 +15,7 @@ export interface HeaderSection {
 
 export interface Header {
   root: HeaderSection;
+  topic: HeaderSection;
 }
 
 export interface CollegeHeader extends Header {
@@ -21,14 +23,12 @@ export interface CollegeHeader extends Header {
   university: HeaderSection;
   department: HeaderSection;
   course: HeaderSection;
-  topic: HeaderSection;
 }
 
 export interface CertificationHeader extends Header {
   organization: HeaderSection;
   certification: HeaderSection;
   module: HeaderSection;
-  topic: HeaderSection;
 }
 
 export interface Chunk {
@@ -37,7 +37,7 @@ export interface Chunk {
 }
 
 export interface Block {
-  headers?: CollegeHeader | CertificationHeader;
+  header?: CollegeHeader | CertificationHeader;
   questions?: QuestionAndAnswer[];
 }
 
@@ -67,6 +67,14 @@ export interface DeleteFileFeedback extends Feedback {
 
 export interface PreParserFeedback extends Feedback {
   result: ParserResult;
+}
+
+export interface DeleteFolderFeedback extends Feedback {
+  filePaths: string[];
+}
+
+export interface PreParserFolderFeedback extends Feedback {
+  results: ParserResult[];
 }
 
 export type HeaderParser = (

@@ -46,7 +46,11 @@ export type Channels =
   | 'import-list-files'
   | 'file-list-feedback'
   | 'import-parse-file'
-  | 'file-parse-feedback';
+  | 'import-parse-folder'
+  | 'import-delete-folder'
+  | 'file-parse-feedback'
+  | 'folder-delete-feedback'
+  | 'folder-parse-feedback';
 
 export interface Environment {
   env: 'development' | 'test' | 'production' | null;

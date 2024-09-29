@@ -1,5 +1,6 @@
 import { app, ipcMain } from 'electron';
 import mammoth from 'mammoth';
+import AdmZip from 'adm-zip';
 import fs from 'fs';
 import path from 'path';
 import { log } from '../main';
@@ -94,38 +95,85 @@ app.whenReady().then(() => {
         const fileNameWithoutExt = path.parse(filePath).name; // Remove extension
         const workingDir = getWorkingDir(parser);
 
-        // Create the parent folder with the same name as the file (without extension)
-        const parentFolder = path.join(workingDir, fileNameWithoutExt);
-        if (!fs.existsSync(parentFolder)) {
-          fs.mkdirSync(parentFolder);
-        }
+        if (path.extname(filePath) === '.zip') {
+          // Handle ZIP files
+          const zip = new AdmZip(filePath);
+          const zipEntries = zip.getEntries(); // Get all entries in the ZIP file
 
-        let destPath = path.join(parentFolder, fileName);
+          for (const zipEntry of zipEntries) {
+            if (!zipEntry.isDirectory) {
+              const entryPathParts = zipEntry.entryName.split(path.sep);
+              const folderName =
+                entryPathParts.length > 1
+                  ? entryPathParts[0]
+                  : fileNameWithoutExt; // Folder name from ZIP structure or fallback
+              const extractedFileName = path.basename(zipEntry.entryName);
+              const destFolder = path.join(workingDir, folderName);
 
-        // If the file is a docx file, convert it to a text file
-        if (path.extname(filePath) === '.docx') {
-          try {
-            const result = await mammoth.extractRawText({ path: filePath }); // Convert docx to text
-            const textContent = result.value;
+              // Create the destination folder if it doesn't exist
+              if (!fs.existsSync(destFolder)) {
+                fs.mkdirSync(destFolder, { recursive: true });
+              }
 
-            // Define the destination as a .txt file
-            destPath = path.join(parentFolder, `${fileNameWithoutExt}.txt`);
+              const extractedFilePath = path.join(
+                destFolder,
+                extractedFileName,
+              );
+              const extractedFileExt = path.extname(extractedFileName);
 
-            // Write the extracted text to the .txt file
-            fs.writeFileSync(destPath, textContent, 'utf8');
-            log.info('Converted and saved DOCX file to text format:', destPath);
-          } catch (conversionError) {
-            throw conversionError;
+              if (extractedFileExt === '.docx') {
+                // Convert DOCX to text
+                const result = await mammoth.extractRawText({
+                  buffer: zipEntry.getData(),
+                });
+                const textContent = result.value;
+
+                const textFilePath = path.join(
+                  destFolder,
+                  `${path.parse(extractedFileName).name}.txt`,
+                );
+
+                fs.writeFileSync(textFilePath, textContent, 'utf8');
+                log.info(
+                  'Converted and saved DOCX file to text format:',
+                  textFilePath,
+                );
+              } else {
+                // Extract other files (e.g., .txt)
+                fs.writeFileSync(extractedFilePath, zipEntry.getData());
+                log.info('File extracted:', extractedFilePath);
+              }
+            }
           }
+        } else if (path.extname(filePath) === '.docx') {
+          // Handle DOCX files
+          const parentFolder = path.join(workingDir, fileNameWithoutExt);
+          if (!fs.existsSync(parentFolder)) {
+            fs.mkdirSync(parentFolder);
+          }
+
+          const result = await mammoth.extractRawText({ path: filePath });
+          const textContent = result.value;
+
+          const destPath = path.join(parentFolder, `${fileNameWithoutExt}.txt`);
+
+          fs.writeFileSync(destPath, textContent, 'utf8');
+          log.info('Converted and saved DOCX file to text format:', destPath);
         } else {
-          // For other files, copy them directly
+          // Handle other files
+          const parentFolder = path.join(workingDir, fileNameWithoutExt);
+          if (!fs.existsSync(parentFolder)) {
+            fs.mkdirSync(parentFolder);
+          }
+
+          const destPath = path.join(parentFolder, fileName);
           fs.copyFileSync(filePath, destPath);
           log.info('File imported to local directory:', destPath);
         }
 
         // Send success feedback
         const feedback: Feedback = {
-          message: `Successfully imported file to local directory: ${destPath}`,
+          message: `Successfully imported file to local directory`,
           success: true,
         };
         event.sender.send('file-import-feedback', feedback);

@@ -15,7 +15,9 @@ const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
     files,
     listFiles,
     deleteFile,
+    deleteFolder,
     preParseFile,
+    preParseFolder,
   } = useManageFiles(parserType);
 
   useEffect(() => {
@@ -28,6 +30,12 @@ const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
 
   const handlePreParse = (file: ImportFile) => {
     preParseFile(file.path, parserType, ParserOperationMode.PreParse);
+  };
+
+  const handlePreParseFolder = (folder: string) => {
+  };
+
+  const handleDeleteFolder = (folder: string) => {
   };
 
   const isPreParserFeedback = (
@@ -73,6 +81,8 @@ const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
           files={files}
           onDelete={handleDeleteFile}
           onPreParse={handlePreParse}
+          onDeleteFolder={handleDeleteFolder}
+          onPreParseFolder={handlePreParseFolder}
         />
       </section>
     </main>

@@ -7,6 +7,7 @@ import {
   CollegeHeader,
   CertificationHeader,
   QuestionAndAnswer,
+  Header,
 } from '../../../types';
 import { getHash } from '../../util';
 
@@ -54,7 +55,7 @@ const chunker = (lines: string[]): Chunk[] => {
   return chunks;
 };
 
-const bodyParser = (chunk: Chunk): QuestionAndAnswer[] => {
+const bodyParser = (chunk: Chunk, header: Header): QuestionAndAnswer[] => {
   const body = chunk.data;
 
   return body.map((line) => {
@@ -70,6 +71,7 @@ const bodyParser = (chunk: Chunk): QuestionAndAnswer[] => {
       question: question || 'Unknown question', // Fallback in case of empty string
       answer: answer || 'Unknown answer', // Fallback in case of empty string
       hash: getHash(question + answer),
+      parentHash: header.topic.hash,
     };
   });
 };
@@ -167,10 +169,14 @@ const rootParser = (
   headerParser: HeaderParser,
 ): ParserResult => {
   const chunks: Chunk[] = chunker(lines);
-  const blocks: Block[] = chunks.map((chunk) => ({
-    header: headerParser(chunk.header),
-    questions: bodyParser(chunk),
-  }));
+  const blocks: Block[] = chunks.map((chunk) => {
+    const header = headerParser(chunk.header);
+    const questions = bodyParser(chunk, header);
+    return {
+      header,
+      questions
+    }
+  });
   return { chunks, blocks };
 };
 

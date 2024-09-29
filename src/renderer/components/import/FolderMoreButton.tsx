@@ -1,23 +1,22 @@
 import { useState, useEffect, useRef } from 'react';
 import { FaEllipsisV } from 'react-icons/fa';
-import { ImportFile } from '../../../types';
 
-interface FileListMoreButtonProps {
-  file: ImportFile; // Adjust the type as needed for your file object
-  handleDelete: (file: ImportFile) => void;
-  handlePreParse: (file: ImportFile) => void;
+interface FolderMoreButtonProps {
+  folder: string; // Adjust the type as needed for your folder object
+  handleDelete: (folder: string) => void;
+  handlePreParse: (folder: string) => void;
 }
 
-const FileListMoreButton: React.FC<FileListMoreButtonProps> = ({
-  file,
+const FolderMoreButton: React.FC<FolderMoreButtonProps> = ({
+  folder,
   handleDelete,
   handlePreParse,
 }) => {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null); // Ref to track the menu element
 
-  const toggleMenu = (fileName: string) => {
-    setOpenMenu(openMenu === fileName ? null : fileName);
+  const toggleMenu = (folderName: string) => {
+    setOpenMenu(openMenu === folderName ? null : folderName);
   };
 
   // Function to detect clicks outside the menu
@@ -40,17 +39,17 @@ const FileListMoreButton: React.FC<FileListMoreButtonProps> = ({
   return (
     <div className="relative" ref={menuRef}>
       <button
-        onClick={() => toggleMenu(file.name)}
+        onClick={() => toggleMenu(folder)}
         className="ml-2 text-slate-700"
       >
         <FaEllipsisV />
       </button>
-      {openMenu === file.name && (
+      {openMenu === folder && (
         <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-10">
           <ul>
             <li
               onClick={() => {
-                handlePreParse(file);
+                handlePreParse(folder);
                 setOpenMenu(null);
               }}
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -59,7 +58,7 @@ const FileListMoreButton: React.FC<FileListMoreButtonProps> = ({
             </li>
             <li
               onClick={() => {
-                handleDelete(file);
+                handleDelete(folder);
                 setOpenMenu(null);
               }}
               className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
@@ -74,4 +73,4 @@ const FileListMoreButton: React.FC<FileListMoreButtonProps> = ({
   
 };
 
-export default FileListMoreButton;
+export default FolderMoreButton;

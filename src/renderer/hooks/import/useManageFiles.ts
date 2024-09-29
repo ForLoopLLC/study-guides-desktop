@@ -3,14 +3,16 @@ import {
   ImportFile,
   FileListFeedback,
   DeleteFileFeedback,
-  PreParserFeedback
+  PreParserFeedback,
+  PreParserFolderFeedback,
+  DeleteFolderFeedback,
 } from '../../../types';
 import { ParserOperationMode, ParserType } from '../../../enums';
 
 const useManageFiles = (parserType: ParserType) => {
   const [files, setFiles] = useState<ImportFile[]>([]);
   const [feedback, setFeedback] = useState<
-    FileListFeedback | DeleteFileFeedback | PreParserFeedback | null
+    FileListFeedback | DeleteFileFeedback | PreParserFeedback | PreParserFolderFeedback | DeleteFolderFeedback | null
   >(null);
   const [loading, setLoading] = useState<boolean>(false);
 
@@ -26,9 +28,35 @@ const useManageFiles = (parserType: ParserType) => {
     window.electron.ipcRenderer.invoke('import-delete-file', { filePath });
   };
 
-  const preParseFile = (filePath: string, parserType: ParserType, operationMode: ParserOperationMode) => {
+  const preParseFile = (
+    filePath: string,
+    parserType: ParserType,
+    operationMode: ParserOperationMode,
+  ) => {
     setLoading(true);
-    window.electron.ipcRenderer.invoke('import-parse-file', { parserType, filePath, operationMode });
+    window.electron.ipcRenderer.invoke('import-parse-file', {
+      parserType,
+      filePath,
+      operationMode,
+    });
+  };
+
+  const deleteFolder = (folder: string) => {
+    setLoading(true);
+    window.electron.ipcRenderer.invoke('import-delete-folder', { folder });
+  };
+
+  const preParseFolder = (
+    folder: string,
+    parserType: ParserType,
+    operationMode: ParserOperationMode,
+  ) => {
+    setLoading(true);
+    window.electron.ipcRenderer.invoke('import-parse-folder', {
+      parserType,
+      folder,
+      operationMode,
+    });
   };
 
   // Handle feedback from the main process
@@ -44,7 +72,9 @@ const useManageFiles = (parserType: ParserType) => {
   const handleDeleteFileFeedback = (payload: any) => {
     const response = payload as DeleteFileFeedback;
     if (response.success) {
-      setFiles((prevFiles) => prevFiles.filter((file) => file.path !== response.filePath));
+      setFiles((prevFiles) =>
+        prevFiles.filter((file) => file.path !== response.filePath),
+      );
     }
     setFeedback(response);
     setLoading(false);
@@ -54,8 +84,26 @@ const useManageFiles = (parserType: ParserType) => {
     const response = payload as PreParserFeedback;
     console.log(response);
     setFeedback(response);
-    setLoading
-  }
+    setLoading;
+  };
+
+  const handleDeleteFolderFeedback = (payload: any) => {
+    const response = payload as DeleteFolderFeedback;
+    if (response.success) {
+      setFiles((prevFiles) =>
+        prevFiles.filter((file) => !response.filePaths.includes(file.path)),
+      );
+    }
+    setFeedback(response);
+    setLoading(false);
+  };
+
+  const handlePreParseFolderFeedback = (payload: any) => {
+    const response = payload as PreParserFeedback;
+    console.log(response);
+    setFeedback(response);
+    setLoading;
+  };
 
   useEffect(() => {
     // Subscribe to feedback events when component mounts
@@ -74,6 +122,16 @@ const useManageFiles = (parserType: ParserType) => {
       handlePreParseFeedback,
     );
 
+    const unsubscribeDeleteFolderFeedback = window.electron.ipcRenderer.on(
+      'folder-delete-feedback',
+      handleDeleteFolderFeedback,
+    );
+
+    const unsubscribePreParseFolderFeedback = window.electron.ipcRenderer.on(
+      'folder-parse-feedback',
+      handlePreParseFolderFeedback,
+    );
+
     // Initial file listing
     listFiles();
 
@@ -82,6 +140,8 @@ const useManageFiles = (parserType: ParserType) => {
       unsubscribeFileListFeedback();
       unsubscribeDeleteFileFeedback();
       unsubscribePreParseFeedback();
+      unsubscribeDeleteFileFeedback();
+      unsubscribePreParseFolderFeedback();
     };
   }, [parserType]);
 
@@ -91,7 +151,9 @@ const useManageFiles = (parserType: ParserType) => {
     loading,
     listFiles,
     deleteFile,
-    preParseFile
+    deleteFolder,
+    preParseFile,
+    preParseFolder,
   };
 };
 
