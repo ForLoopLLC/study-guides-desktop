@@ -2,7 +2,7 @@ import { useEffect } from 'react';
 import { useFileUpload, useManageFiles } from '../../hooks';
 import { ParserOperationMode, ParserType } from '../../../enums';
 import FileList from './FileList';
-import { ImportFile } from '../../../types';
+import { ImportFile, PreParserFeedback } from '../../../types';
 
 interface FileUploadProps {
   parserType: ParserType;
@@ -10,7 +10,13 @@ interface FileUploadProps {
 
 const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
   const { feedback, handleFileChange } = useFileUpload(parserType);
-  const { feedback: fileManagementFeedback, files, listFiles, deleteFile, preParseFile } = useManageFiles(parserType);
+  const {
+    feedback: fileManagementFeedback,
+    files,
+    listFiles,
+    deleteFile,
+    preParseFile,
+  } = useManageFiles(parserType);
 
   useEffect(() => {
     listFiles();
@@ -23,6 +29,20 @@ const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
   const handlePreParse = (file: ImportFile) => {
     preParseFile(file.path, parserType, ParserOperationMode.PreParse);
   };
+
+  const isPreParserFeedback = (
+    feedback: any,
+  ): feedback is PreParserFeedback => {
+    return feedback && Array.isArray(feedback.blocks);
+  };
+
+  useEffect(() => {
+    if (isPreParserFeedback(fileManagementFeedback)) {
+      console.log(
+        JSON.stringify(fileManagementFeedback.result.blocks, null, 2),
+      );
+    }
+  }, [fileManagementFeedback]);
 
   return (
     <main>
@@ -38,14 +58,22 @@ const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
       </section>
       <section className="p-4">
         {fileManagementFeedback && fileManagementFeedback.success && (
-          <p className="text-lg text-green-500">{fileManagementFeedback.message}</p>
+          <p className="text-lg text-green-500">
+            {fileManagementFeedback.message}
+          </p>
         )}
         {fileManagementFeedback && !fileManagementFeedback.success && (
-          <p className="text-lg text-red-500">{fileManagementFeedback.message}</p>
+          <p className="text-lg text-red-500">
+            {fileManagementFeedback.message}
+          </p>
         )}
       </section>
       <section>
-        <FileList files={files} onDelete={handleDeleteFile} onPreParse={handlePreParse} />
+        <FileList
+          files={files}
+          onDelete={handleDeleteFile}
+          onPreParse={handlePreParse}
+        />
       </section>
     </main>
   );

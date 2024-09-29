@@ -129,13 +129,14 @@ app.whenReady().then(() => {
   });
 
   ipcMain.handle('import-parse-file', (event, { parserType, filePath, operationMode }) => {
+    let result: any;
     try {
       const file = fs.readFileSync(filePath, 'utf-8');
-      const result = fileParser(file, parserType, operationMode);
-      console.log(result);
-      const feedback: Feedback = {
+      result = fileParser(file, parserType, operationMode);
+      const feedback: PreParserFeedback = {
         message: `Successfully ${operationMode} file`,
         success: true,
+        result: result,
       };
       log.info('import', `Successfully ${operationMode} file`);
       event.sender.send('file-parse-feedback', feedback);
@@ -144,7 +145,7 @@ app.whenReady().then(() => {
       const feedback: PreParserFeedback = {
         message: `An error occurred while ${operationMode} the file. ${err.message}`,
         success: false,
-        result: { chunks: [] },
+        result: result,
       };
       event.sender.send('file-parse-feedback', feedback);
       log.error('import', `Error ${operationMode} file. ${err.message}`);

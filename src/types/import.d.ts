@@ -5,20 +5,28 @@ export interface QuestionAndAnswer {
   answer: string;
 }
 
-export interface HeaderSection { name: string; type: TagType }
-
-export interface CollegeHeader {
-  University: HeaderSection;
-  Department: HeaderSection;
-  Course: HeaderSection;
-  Topic: HeaderSection;
+export interface HeaderSection {
+  name: string;
+  type: TagType;
 }
 
-export interface CertificationHeader {
-  Organization: HeaderSection;
-  Certification: HeaderSection;
-  Module: HeaderSection;
-  Topic: HeaderSection;
+export interface Header {
+  root: HeaderSection;
+}
+
+export interface CollegeHeader extends Header {
+  region: HeaderSection;
+  university: HeaderSection;
+  department: HeaderSection;
+  course: HeaderSection;
+  topic: HeaderSection;
+}
+
+export interface CertificationHeader extends Header {
+  organization: HeaderSection;
+  certification: HeaderSection;
+  module: HeaderSection;
+  topic: HeaderSection;
 }
 
 export interface Chunk {
@@ -58,4 +66,6 @@ export interface PreParserFeedback extends Feedback {
   result: ParserResult;
 }
 
-export type HeaderParser = (header: string) => CollegeHeader | CertificationHeader;
+export type HeaderParser = (
+  header: string,
+) => CollegeHeader | CertificationHeader;
