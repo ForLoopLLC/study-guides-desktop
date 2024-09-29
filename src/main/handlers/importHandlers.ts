@@ -7,8 +7,10 @@ import {
   FileListFeedback,
   DeleteFileFeedback,
   ImportFile,
+  PreParserFeedback
 } from '../../types';
 import { ParserType } from '../../enums';
+import { fileParser } from '../lib/parsers';
 
 app.whenReady().then(() => {
   const tempCollegesDir = path.join(
@@ -30,23 +32,28 @@ app.whenReady().then(() => {
     }
   });
 
+  const getWorkingDir = (parserType: ParserType) => {
+    let destPath = '';
+    switch (parserType) {
+      case ParserType.Colleges:
+        destPath = tempCollegesDir;
+        break;
+      case ParserType.Certifications:
+        destPath = tempCertificationsDir;
+        break;
+      default:
+        throw new Error('Invalid parser type');
+    }
+    return destPath;
+  };
+
   // Handle file import to local directory
   ipcMain.handle('import-file-to-local', (event, { filePath, parserType }) => {
     try {
       const parser = parserType as ParserType;
       const fileName = path.basename(filePath);
-      let destPath = '';
-
-      switch (parser) {
-        case ParserType.Colleges:
-          destPath = path.join(tempCollegesDir, fileName);
-          break;
-        case ParserType.Certifications:
-          destPath = path.join(tempCertificationsDir, fileName);
-          break;
-        default:
-          throw new Error('Invalid parser type');
-      }
+      const workingDir = getWorkingDir(parser);
+      const destPath = path.join(workingDir, fileName);
 
       fs.copyFileSync(filePath, destPath);
       log.info('File imported to local directory:', destPath);
@@ -68,27 +75,13 @@ app.whenReady().then(() => {
 
   ipcMain.handle('import-list-files', (event, { parserType }) => {
     try {
-      const parser = parserType as ParserType;
-      let targetDir = '';
-
-      switch (parser) {
-        case ParserType.Colleges:
-          targetDir = tempCollegesDir;
-          break;
-        case ParserType.Certifications:
-          targetDir = tempCertificationsDir;
-          break;
-        default:
-          throw new Error('Invalid parser type');
-      }
+      const targetDir = getWorkingDir(parserType);
 
       // Get list of files in the directory
       const files = fs.readdirSync(targetDir).map((file) => ({
         name: file,
         path: path.join(targetDir, file),
       })) as ImportFile[];
-
-      console.log(files);
 
       const feedback: FileListFeedback = {
         files: files,
@@ -132,6 +125,29 @@ app.whenReady().then(() => {
         filePath: filePath,
       };
       event.sender.send('file-delete-feedback', feedback);
+    }
+  });
+
+  ipcMain.handle('import-parse-file', (event, { parserType, filePath, operationMode }) => {
+    try {
+      const file = fs.readFileSync(filePath, 'utf-8');
+      const result = fileParser(file, parserType, operationMode);
+      console.log(result);
+      const feedback: Feedback = {
+        message: `Successfully ${operationMode} file`,
+        success: true,
+      };
+      log.info('import', `Successfully ${operationMode} file`);
+      event.sender.send('file-preparse-feedback', feedback);
+    } catch (error) {
+      const err = error as Error;
+      const feedback: PreParserFeedback = {
+        message: `An error occurred while ${operationMode} the file. ${err.message}`,
+        success: false,
+        result: { chunks: [] },
+      };
+      event.sender.send('file-preparse-feedback', feedback);
+      log.error('import', `Error ${operationMode} file. ${err.message}`);
     }
   });
 });

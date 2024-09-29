@@ -3,6 +3,11 @@ export enum ParserType {
   Certifications,
 }
 
+export enum ParserOperationMode {
+  PreParse,
+  Parse,
+}
+
 export enum QuestionFilterType {
   All = 'All',
   Reported = 'Reported',
