@@ -14,7 +14,7 @@ import {
   PreParserFolderFeedback,
 } from '../../types';
 import { ParserType, ParserOperationMode } from '../../enums';
-import { fileParser } from '../lib/parsers';
+import { fileParser } from '../lib/parse';
 
 app.whenReady().then(() => {
   const tempCollegesDir = path.join(

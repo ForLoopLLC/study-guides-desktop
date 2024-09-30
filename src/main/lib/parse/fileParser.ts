@@ -1,12 +1,12 @@
 import { TagType } from '@prisma/client';
 import { ParserType, ParserOperationMode } from '../../../enums';
 import {
-  Block,
+  RawTopic,
   HeaderParser,
   ParserResult,
   CollegeHeader,
   CertificationHeader,
-  QuestionAndAnswer,
+  RawQuestion,
   Header,
 } from '../../../types';
 import { getHash } from '../../util';
@@ -63,7 +63,7 @@ const chunker = (lines: string[], filePath: string): Chunk[] => {
   return chunks;
 };
 
-const bodyParser = (chunk: Chunk, header: Header): QuestionAndAnswer[] => {
+const bodyParser = (chunk: Chunk, header: Header): RawQuestion[] => {
   const body = chunk.data;
 
   return body.map((line) => {
@@ -196,7 +196,7 @@ const rootParser = (
   headerParser: HeaderParser,
 ): ParserResult => {
   const chunks: Chunk[] = chunker(lines, filePath);
-  const blocks: Block[] = chunks.map((chunk) => {
+  const blocks: RawTopic[] = chunks.map((chunk) => {
     const header = headerParser(chunk.header, chunk.filePath);
     const questions = bodyParser(chunk, header);
     return {
@@ -205,7 +205,7 @@ const rootParser = (
       filePath: chunk.filePath,
     };
   });
-  return { chunks, blocks };
+  return { chunks, topics: blocks };
 };
 
 const fileParser = (

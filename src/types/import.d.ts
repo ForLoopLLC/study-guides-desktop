@@ -1,12 +1,67 @@
 import { TagType } from '@prisma/client';
 
-export interface QuestionAndAnswer {
+export interface Chunk {
+  header: string;
+  data: string[];
+}
+
+export interface RawQuestion {
   question: string;
   answer: string;
   hash: string;
   parentHash: string;
 }
+export interface RawTopic {
+  header: CollegeHeader | CertificationHeader;
+  questions: RawQuestion[];
+  filePath: string;
+}
 
+//output types from the parser
+export interface ParsedQuestion extends RawQuestion {
+  metaTags: string[];
+  distractors: string[];
+}
+
+export interface ParsedTag {
+  name: string;
+  type: TagType;
+  hash: string;
+}
+
+export interface ParsedTopic extends ParsedTag {
+  parent: ParsedTag;
+  questions: ParsedQuestion[];
+}
+
+export interface ParsedCollegeTopic extends ParsedTopic {
+  region: ParsedTag;
+  university: ParsedTag;
+  department: ParsedTag;
+  course: ParsedTag;
+  toJson: () => string;
+}
+
+export interface ParsedCertificationTopic extends ParsedTopic {
+  organization: ParsedTag;
+  certification: ParsedTag;
+  module: ParsedTag;
+  toJson: () => string;
+}
+
+//types for the parser
+export interface ParserResult {
+  chunks: Chunk[];
+  topics: RawTopic[];
+}
+
+export interface ImportFile {
+  name: string;
+  path: string;
+  directory: string;
+}
+
+// Types for the headers
 export interface HeaderSection {
   name: string;
   type: TagType;
@@ -31,33 +86,17 @@ export interface CertificationHeader extends Header {
   module: HeaderSection;
 }
 
-export interface Chunk {
-  header: string;
-  data: string[];
-}
+export type HeaderParser = (
+  header: string,
+  filePath: string,
+) => CollegeHeader | CertificationHeader;
 
-export interface Block {
-  header: CollegeHeader | CertificationHeader;
-  questions: QuestionAndAnswer[];
-  filePath: string;
-}
-
-export interface ParserResult {
-  chunks: Chunk[];
-  blocks: Block[];
-}
-
+// Types for feedback
 export interface Feedback {
   message: string;
   success: boolean;
   level: 'info' | 'error' | 'warning' | 'trace';
   dateTime: Date;
-}
-
-export interface ImportFile {
-  name: string;
-  path: string;
-  directory: string;
 }
 
 export interface FileListFeedback extends Feedback {
@@ -79,9 +118,3 @@ export interface DeleteFolderFeedback extends Feedback {
 export interface PreParserFolderFeedback extends Feedback {
   results: ParserResult[];
 }
-
-export type HeaderParser = (
-  header: string,
-  filePath: string,
-
-) => CollegeHeader | CertificationHeader;
