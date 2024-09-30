@@ -265,6 +265,25 @@ app.whenReady().then(() => {
       try {
         const file = fs.readFileSync(filePath, 'utf-8');
         result = fileParser(file, filePath, parserType, operationMode);
+
+        // Get the file name without the extension and create the .json file path
+        const fileNameWithoutExt = path.basename(
+          filePath,
+          path.extname(filePath),
+        );
+        const jsonFilePath = path.join(
+          path.dirname(filePath),
+          `${fileNameWithoutExt}.json`,
+        );
+
+        // Write the JSON content to the .json file
+        fs.writeFileSync(
+          jsonFilePath,
+          JSON.stringify({ blocks: result.blocks }, null, 2),
+          'utf8',
+        );
+        log.info('Saved JSON result to:', jsonFilePath);
+
         const feedback: PreParserFeedback = {
           message: `${operationMode as ParserOperationMode} succeeded: ${path.basename(filePath)}`,
           success: true,
@@ -310,6 +329,26 @@ app.whenReady().then(() => {
         const results = files.map((file) => {
           const fileContent = fs.readFileSync(file.path, 'utf-8');
           return fileParser(fileContent, file.path, parserType, operationMode);
+        });
+
+        results.forEach((result) => {
+          if (result.blocks.length > 0) {
+            const originalFilePath = result.blocks[0].filePath; // Get the original file path
+            const originalFileName = path.basename(
+              originalFilePath,
+              path.extname(originalFilePath),
+            ); // Remove extension from original file name
+            const jsonFileName = `${originalFileName}.json`; // Add .json extension
+            const jsonFilePath = path.join(folderPath, jsonFileName); // Construct the path for the JSON file
+
+            // Write the JSON content to the new .json file
+            fs.writeFileSync(
+              jsonFilePath,
+              JSON.stringify({ blocks: result.blocks }, null, 2),
+              'utf8',
+            );
+            log.info('Saved JSON result to:', jsonFilePath);
+          }
         });
 
         const feedback: PreParserFolderFeedback = {
