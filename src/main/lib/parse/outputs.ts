@@ -7,6 +7,7 @@ import {
 } from '../../../types';
 
 import { ParserType } from '../../../enums';
+import { ContentRatingType } from '@prisma/client';
 
 function isCollegeHeader(header: any): header is CollegeHeader {
   return (header as CollegeHeader).region !== undefined;
@@ -48,33 +49,54 @@ const outputParsedCollegeTopic = (rawTopic: RawTopic): ParsedCollegeTopic => {
         name: header.root.name,
         type: header.root.type,
         hash: header.root.hash,
+        contentRating: ContentRatingType.RatingPending,
+        contentDescriptors: [],
+        metaTags: [],
       },
       region: {
         name: header.region.name,
         type: header.region.type,
         hash: header.region.hash,
+        contentRating: ContentRatingType.RatingPending,
+        contentDescriptors: [],
+        metaTags: [],
       },
       university: {
         name: header.university.name,
         type: header.university.type,
         hash: header.university.hash,
+        contentRating: ContentRatingType.RatingPending,
+        contentDescriptors: [],
+        metaTags: [],
       },
       department: {
         name: header.department.name,
         type: header.department.type,
         hash: header.department.hash,
+        contentRating: ContentRatingType.RatingPending,
+        contentDescriptors: [],
+        metaTags: [],
       },
       course: {
         name: header.course.name,
         type: header.course.type,
         hash: header.course.hash,
+        contentRating: ContentRatingType.RatingPending,
+        contentDescriptors: [],
+        metaTags: [],
       },
       topic: {
         name: header.topic.name,
         type: header.topic.type,
         hash: header.topic.hash,
+        contentRating: ContentRatingType.RatingPending,
+        contentDescriptors: [],
+        metaTags: [],
       },
       questions: rawTopic.questions.map(toParsedQuestion),
+      contentRating: ContentRatingType.RatingPending,
+      contentDescriptors: [],
+      metaTags: [],
       toJson() {
         return formatAsJSON(this);
       },
@@ -101,28 +123,46 @@ const outputParsedCertificationTopic = (
         name: header.root.name,
         type: header.root.type,
         hash: header.root.hash,
+        contentRating: ContentRatingType.RatingPending,
+        contentDescriptors: [],
+        metaTags: [],
       },
       organization: {
         name: header.organization.name,
         type: header.organization.type,
         hash: header.organization.hash,
+        contentRating: ContentRatingType.RatingPending,
+        contentDescriptors: [],
+        metaTags: [],
       },
       certification: {
         name: header.certification.name,
         type: header.certification.type,
         hash: header.certification.hash,
+        contentRating: ContentRatingType.RatingPending,
+        contentDescriptors: [],
+        metaTags: [],
       },
       module: {
         name: header.module.name,
         type: header.module.type,
         hash: header.module.hash,
+        contentRating: ContentRatingType.RatingPending,
+        contentDescriptors: [],
+        metaTags: [],
       },
       topic: {
         name: header.topic.name,
         type: header.topic.type,
         hash: header.topic.hash,
+        contentRating: ContentRatingType.RatingPending,
+        contentDescriptors: [],
+        metaTags: [],
       },
       questions: rawTopic.questions.map(toParsedQuestion),
+      contentRating: ContentRatingType.RatingPending,
+      contentDescriptors: [],
+      metaTags: [],
       toJson() {
         return formatAsJSON(this);
       },

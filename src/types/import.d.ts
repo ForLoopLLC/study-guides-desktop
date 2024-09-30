@@ -1,4 +1,5 @@
 import { TagType } from '@prisma/client';
+import { ContentRatingType } from '@prisma/client';
 
 export interface Chunk {
   header: string;
@@ -28,6 +29,9 @@ export interface ParsedTag {
   name: string;
   type: TagType;
   hash: string;
+  contentRating: ContentRatingType;
+  contentDescriptors: string[];
+  metaTags: string[];
 }
 
 export interface ParsedTopic extends ParsedTag {
