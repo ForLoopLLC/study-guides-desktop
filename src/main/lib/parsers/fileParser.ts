@@ -10,6 +10,7 @@ import {
   Header,
 } from '../../../types';
 import { getHash } from '../../util';
+import path from 'path';
 
 interface Chunk {
   filePath: string;
@@ -21,7 +22,7 @@ const wrappedHeader = (header: string): string =>
   header
     .split(':')
     .map((item) => `[${item}]`)
-    .join(',');
+    .join('\n');
 
 const chunker = (lines: string[], filePath: string): Chunk[] => {
   const chunks: Chunk[] = [];
@@ -83,12 +84,15 @@ const bodyParser = (chunk: Chunk, header: Header): QuestionAndAnswer[] => {
   });
 };
 
-const collegeHeaderParser: HeaderParser = (header: string): CollegeHeader => {
+const collegeHeaderParser: HeaderParser = (
+  header: string,
+  filePath: string,
+): CollegeHeader => {
   const requiredItems = 6;
   const items = header.split(':').map((item) => item.trim());
   if (items.length !== requiredItems) {
     throw new Error(
-      `Invalid College header format. ${requiredItems} items required. Found ${items.length}. ${wrappedHeader(header)}`,
+      `Invalid College header format. ${requiredItems} items required. Found ${items.length}.\n\n${wrappedHeader(header)}\n\nFile: ${path.basename(filePath)}`,
     );
   }
   const newHeader = {
@@ -124,12 +128,13 @@ const collegeHeaderParser: HeaderParser = (header: string): CollegeHeader => {
 
 const certificationHeaderParser: HeaderParser = (
   header: string,
+  filePath: string,
 ): CertificationHeader => {
   const requiredItems = 5;
   const items = header.split(':').map((item) => item.trim());
   if (items.length !== requiredItems) {
     throw new Error(
-      `Invalid Certification header format. ${requiredItems} items required. Found ${items.length}. ${wrappedHeader(header)}`,
+      `Invalid Certification header format. ${requiredItems} items required. Found ${items.length}.\n\n${wrappedHeader(header)}\n\nFile: ${path.basename(filePath)}`,
     );
   }
   const newHeader = {
@@ -192,7 +197,7 @@ const rootParser = (
 ): ParserResult => {
   const chunks: Chunk[] = chunker(lines, filePath);
   const blocks: Block[] = chunks.map((chunk) => {
-    const header = headerParser(chunk.header);
+    const header = headerParser(chunk.header, chunk.filePath);
     const questions = bodyParser(chunk, header);
     return {
       header,

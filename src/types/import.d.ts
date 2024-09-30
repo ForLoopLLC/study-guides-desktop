@@ -82,4 +82,6 @@ export interface PreParserFolderFeedback extends Feedback {
 
 export type HeaderParser = (
   header: string,
+  filePath: string,
+
 ) => CollegeHeader | CertificationHeader;

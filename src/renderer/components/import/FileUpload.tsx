@@ -3,13 +3,14 @@ import { useFileUpload, useManageFiles } from '../../hooks';
 import { ParserOperationMode, ParserType } from '../../../enums';
 import FileList from './FileList';
 import { ImportFile, Feedback } from '../../../types';
-import { FaFileImport, FaSpinner } from 'react-icons/fa';
+import { FaFileImport, FaSpinner, FaClipboard } from 'react-icons/fa';
 
 interface FileUploadProps {
   parserType: ParserType;
 }
 
 const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
+  const [copySuccess, setCopySuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null); // Ref for the file input element
   const {
     feedback: uploadFeedback,
@@ -100,6 +101,19 @@ const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
     isProcessingDeleteFolder ||
     isProcessingPreParseFolder;
 
+  const handleCopyToClipboard = (text: string) => {
+    navigator.clipboard.writeText(text).then(
+      () => {
+        setCopySuccess('Copied!');
+        setTimeout(() => setCopySuccess(null), 2000); // Reset message after 2 seconds
+      },
+      () => {
+        setCopySuccess('Failed to copy!');
+        setTimeout(() => setCopySuccess(null), 2000); // Reset message after 2 seconds
+      },
+    );
+  };
+
   return (
     <main className="p-6">
       <h2 className="text-xl font-bold mb-4">Select Your File</h2>
@@ -120,25 +134,38 @@ const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
       {/* Combined Feedback Section */}
       <section>
         {combinedFeedback && (
-          <p
-            className={`text-lg p-4 ${
-              combinedFeedback.success
-                ? 'text-black bg-green-300'
-                : 'text-black bg-red-300'
-            }`}
-          >
-            {combinedFeedback.message}
-          </p>
+          <div className="relative">
+            <p
+              className={`text-lg p-4 ${
+                combinedFeedback.success
+                  ? 'text-black bg-green-300'
+                  : 'text-black bg-red-300'
+              }`}
+              dangerouslySetInnerHTML={{
+                __html: combinedFeedback.message.replace(/\n/g, '<br />'),
+              }}
+            />
+            {/* Clipboard Icon Button */}
+            <button
+              onClick={() => handleCopyToClipboard(combinedFeedback.message)}
+              className="absolute top-2 right-2 text-gray-600 hover:text-gray-800"
+              title="Copy to clipboard"
+            >
+              <FaClipboard className="text-xl" />
+            </button>
+          </div>
         )}
+        {copySuccess && <p className="text-sm text-green-500">{copySuccess}</p>}
       </section>
 
       <section className="mt-6">
         <div className="flex items-center space-x-2">
-          <h3 className="text-lg font-bold">Files</h3>
+          <h3 className="text-lg font-bold border-b w-full mb-2">Files</h3>
           {isAnyProcessing && (
             <FaSpinner className="text-lg text-gray-500 animate-spin" />
           )}
         </div>
+        {files.length === 0 && <p>No files available</p>}
         <FileList
           files={files}
           onDelete={handleDeleteFile}

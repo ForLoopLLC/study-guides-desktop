@@ -234,7 +234,7 @@ app.whenReady().then(() => {
         fs.unlinkSync(filePath);
         log.info('File deleted:', filePath);
         const feedback: DeleteFileFeedback = {
-          message: `Deleted file: ${filePath}`,
+          message: `Deleted file: ${path.basename(filePath)}`,
           success: true,
           filePath: filePath,
           level: 'info',
@@ -266,7 +266,7 @@ app.whenReady().then(() => {
         const file = fs.readFileSync(filePath, 'utf-8');
         result = fileParser(file, filePath, parserType, operationMode);
         const feedback: PreParserFeedback = {
-          message: `Ran ${operationMode as ParserOperationMode} on the file.`,
+          message: `${operationMode as ParserOperationMode} succeeded: ${path.basename(filePath)}`,
           success: true,
           result: result,
           level: 'info',
@@ -274,13 +274,13 @@ app.whenReady().then(() => {
         };
         log.info(
           'import',
-          `Successfully ran ${operationMode as ParserOperationMode} on the file.`,
+          `File ${operationMode as ParserOperationMode} succeeded.`,
         );
         event.sender.send('file-parse-feedback', feedback);
       } catch (error) {
         const err = error as Error;
         const feedback: PreParserFeedback = {
-          message: `Error running ${operationMode} on the file. ${err.message}`,
+          message: `Error running ${operationMode}\n\n${err.message}`,
           success: false,
           result: result,
           level: 'error',
@@ -313,7 +313,7 @@ app.whenReady().then(() => {
         });
 
         const feedback: PreParserFolderFeedback = {
-          message: `Ran ${operationMode as ParserOperationMode} on the folder.`,
+          message: `${operationMode as ParserOperationMode} succeeded: ${folderName}`,
           success: true,
           results: results, // Return the results for each file
           level: 'info',
@@ -321,13 +321,13 @@ app.whenReady().then(() => {
         };
         log.info(
           'import',
-          `Successfully ran ${operationMode as ParserOperationMode} on the folder.`,
+          `Folder ${operationMode as ParserOperationMode} succeeded.`,
         );
         event.sender.send('folder-parse-feedback', feedback);
       } catch (error) {
         const err = error as Error;
         const feedback: PreParserFolderFeedback = {
-          message: `Error running ${operationMode} on the folder. ${err.message}`,
+          message: `Error running ${operationMode}\n\n${err.message}`,
           success: false,
           results: [],
           level: 'error',
@@ -356,12 +356,11 @@ app.whenReady().then(() => {
 
         // Send success feedback
         const feedback: DeleteFolderFeedback = {
-          message: `Deleted folder: ${folderPath}`,
+          message: `Deleted folder: ${folderName}`,
           success: true,
           filePath: folderPath,
           level: 'info',
           dateTime: new Date(),
-
         };
         event.sender.send('folder-delete-feedback', feedback);
       } catch (error) {
