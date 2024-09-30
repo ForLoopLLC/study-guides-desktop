@@ -4,16 +4,11 @@ import { topicPrompt } from '../tags/prompts';
 import prepareQuestions from './prepareQuestions';
 import { generateChatCompletion } from '../generateChatCompletion';
 import { ContentRatingType } from '@prisma/client';
-
-export const defaultResponse = {
-  contentRating: ContentRatingType.RatingPending,
-  contentDescriptors: [],
-  metaTags: [],
-};
+import { mergeTopicWithAssist } from '.';
 
 const getParsedTopicAssist = async (
   topic: ParsedCertificationTopic | ParsedCollegeTopic,
-): Promise<AITopicResponse> => {
+): Promise<ParsedCertificationTopic | ParsedCollegeTopic> => {
   const preparedQuestions = prepareQuestions(topic);
   const result = await generateChatCompletion(
     topicPrompt.text,
@@ -22,13 +17,13 @@ const getParsedTopicAssist = async (
 
   try {
     const parsedResult = JSON.parse(result);
-    log.info('ai', `Parsed AI response successfully for tag ${topic.name}.`);
-    return parsedResult as AITopicResponse;
+    log.info('ai', `Parsed AI response successfully for topic ${topic.name}.`);
+    return mergeTopicWithAssist(topic, parsedResult as AITopicResponse);
   } catch (error) {
     const err = error as Error;
     log.error('ai', `The result is not a valid JSON string ${result}. ${err.message}.`);
     log.error('ai', `Bad result. ${JSON.stringify(result)}.`);
-    return defaultResponse;
+    throw new Error('Failed to parse AI response.');
   }
 };
 

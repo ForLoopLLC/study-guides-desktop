@@ -16,9 +16,11 @@ import {
   PreParserFolderFeedback,
   ParsedCertificationTopic,
   ParsedCollegeTopic,
+  AITopicResponse,
 } from '../../types';
 import { ParserType } from '../../enums';
 import { fileParser, toParsedTopic } from '../lib/parse';
+import { getParsedTopicAssist, mergeTopicWithAssist } from '../lib/ai/parse';
 
 const ignorelist = ['.DS_Store', 'Thumbs.db', 'parsed'];
 
@@ -96,14 +98,14 @@ app.whenReady().then(() => {
   };
 
   // Output results
-  const outputResult = (
+  const outputParserResult = (
     topic: RawTopic[],
     parserType: ParserType,
   ): (ParsedCollegeTopic | ParsedCertificationTopic)[] => {
     return topic.map((topic) => toParsedTopic(topic, parserType));
   };
 
-  const outputResults = (
+  const outputParserResults = (
     results: ParserResult[],
     parserType: ParserType,
     outputFolder: string,
@@ -114,7 +116,9 @@ app.whenReady().then(() => {
 
     // Iterate over each result and output each parsed topic to its own JSON file
     const parsedTopics: (ParsedCollegeTopic | ParsedCertificationTopic)[] =
-      results.map((result) => outputResult(result.topics, parserType)).flat();
+      results
+        .map((result) => outputParserResult(result.topics, parserType))
+        .flat();
 
     parsedTopics.forEach((parsedTopic) => {
       const fileName = `${parsedTopic.hash}.json`; // Replace any invalid characters in the name
@@ -124,6 +128,41 @@ app.whenReady().then(() => {
       fs.writeFileSync(filePath, parsedTopic.toJson(), 'utf8');
       console.log(`Saved ${parsedTopic.name} to ${filePath}`);
     });
+  };
+
+  const outputAssistResults = (
+    topics: (ParsedCollegeTopic | ParsedCertificationTopic)[],
+    outputFolder: string,
+  ) => {
+    // Create the `parsed` folder inside the output folder
+    const parsedFolder = path.join(outputFolder, 'parsed');
+    ensureDirectoryExists(parsedFolder);
+
+    topics.forEach((topic) => {
+      const fileName = `${topic.hash}.json`; // Replace any invalid characters in the name
+      const filePath = path.join(parsedFolder, fileName);
+
+      // Write the JSON string to the file
+      fs.writeFileSync(filePath, topic.toJson(), 'utf8');
+      console.log(`Saved ${topic.name} to ${filePath}`);
+    });
+  };
+
+  const processAIAssist = async <
+    T extends ParsedCertificationTopic | ParsedCollegeTopic,
+  >({
+    topics,
+  }: {
+    topics: T[];
+  }) => {
+    const results = await Promise.all(
+      topics.map(async (topic: T) => {
+        const updatedTopic = await getParsedTopicAssist(topic);
+        return updatedTopic;
+      }),
+    );
+
+    return results;
   };
 
   // Handle file import
@@ -306,7 +345,7 @@ app.whenReady().then(() => {
       result = fileParser(file, filePath, parserType);
 
       const folderPath = path.dirname(filePath);
-      outputResults([result], parserType, folderPath);
+      outputParserResults([result], parserType, folderPath);
 
       const feedback: PreParserFeedback = {
         message: `Preparse succeeded: ${path.basename(filePath)}`,
@@ -350,7 +389,7 @@ app.whenReady().then(() => {
         return fileParser(fileContent, file.path, parserType);
       });
 
-      outputResults(results, parserType, folderPath);
+      outputParserResults(results, parserType, folderPath);
 
       const feedback: PreParserFolderFeedback = {
         message: `Preparse succeeded: ${folderName}`,
@@ -413,6 +452,70 @@ app.whenReady().then(() => {
           dateTime: new Date(),
         };
         event.sender.send('folder-delete-feedback', feedback);
+      }
+    },
+  );
+
+  // Handle AI updates
+  ipcMain.handle(
+    'import-ai-update-folder',
+    async (event, { parserType, folderName }) => {
+      try {
+        const workingDir = getWorkingDir(parserType);
+        const folderPath = path.join(workingDir, folderName);
+        let topicsLength = 0;
+
+        // Get all the .json files in the folderPath
+        const files = fs
+          .readdirSync(folderPath)
+          .filter((file) => file.endsWith('.json'));
+
+        // Function to read and parse JSON files based on the parserType
+        const parseTopicFromFile = (filePath: string) => {
+          const fileContent = fs.readFileSync(filePath, 'utf-8');
+          const parsedTopic = JSON.parse(fileContent);
+          if (parserType === ParserType.Colleges) {
+            return parsedTopic as ParsedCollegeTopic;
+          } else if (parserType === ParserType.Certifications) {
+            return parsedTopic as ParsedCertificationTopic;
+          } else {
+            throw new Error('Invalid parser type');
+          }
+        };
+
+        // Hydrate topics based on the parserType
+        let topics: (ParsedCollegeTopic | ParsedCertificationTopic)[] =
+          files.map((file) => {
+            const filePath = path.join(folderPath, file);
+            return parseTopicFromFile(filePath);
+          });
+
+        // Process the topics with AI Assist
+        let results;
+        switch (parserType) {
+          case ParserType.Colleges:
+            results = await processAIAssist({
+              topics: topics as ParsedCollegeTopic[],
+            });
+            break;
+          case ParserType.Certifications:
+            results = await processAIAssist({
+              topics: topics as ParsedCertificationTopic[],
+            });
+            break;
+          default:
+            throw new Error('Invalid parser type');
+        }
+
+        // Output the assist results
+        topicsLength = results.length;
+        outputAssistResults(results, folderPath);
+
+        // Log the results
+        console.log('response', topicsLength);
+      } catch (error) {
+        console.error('Error in import-ai-update-folder:', error);
+        // Handle or send feedback back to the renderer if necessary
       }
     },
   );
