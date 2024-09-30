@@ -21,6 +21,7 @@ export interface RawTopic {
 export interface ParsedQuestion extends RawQuestion {
   metaTags: string[];
   distractors: string[];
+  learnMore: string;
 }
 
 export interface ParsedTag {

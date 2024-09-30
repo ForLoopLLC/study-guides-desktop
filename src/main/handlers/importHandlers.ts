@@ -10,11 +10,17 @@ import {
   DeleteFileFeedback,
   DeleteFolderFeedback,
   ImportFile,
+  RawTopic,
+  ParserResult,
   PreParserFeedback,
   PreParserFolderFeedback,
+  ParsedCertificationTopic,
+  ParsedCollegeTopic
 } from '../../types';
 import { ParserType, ParserOperationMode } from '../../enums';
-import { fileParser } from '../lib/parse';
+import { fileParser, toParsedTopic } from '../lib/parse';
+
+const ignorelist = ['.DS_Store', 'Thumbs.db', 'parsed'];
 
 app.whenReady().then(() => {
   const tempCollegesDir = path.join(
@@ -30,12 +36,16 @@ app.whenReady().then(() => {
 
   const dirsToEnsure = [tempCollegesDir, tempCertificationsDir];
 
-  dirsToEnsure.forEach((dir) => {
-    if (!fs.existsSync(dir)) {
-      fs.mkdirSync(dir, { recursive: true });
+  const ensureDirectoryExists = (directory: string) => {
+    if (!fs.existsSync(directory)) {
+      fs.mkdirSync(directory, { recursive: true });
     }
-  });
+  };
+  
 
+  dirsToEnsure.map(ensureDirectoryExists);
+
+  // helpers
   const getWorkingDir = (parserType: ParserType) => {
     let destPath = '';
     switch (parserType) {
@@ -86,6 +96,37 @@ app.whenReady().then(() => {
     return filesList;
   };
 
+
+  // Output results
+  const outputResult = (topic: RawTopic[], parserType: ParserType): (ParsedCollegeTopic | ParsedCertificationTopic)[] => {
+    return topic.map((topic) => toParsedTopic(topic, parserType));
+  }
+
+  const outputResults = (
+    results: ParserResult[],
+    parserType: ParserType,
+    outputFolder: string,
+  ) => {
+    // Create the `parsed` folder inside the output folder
+    const parsedFolder = path.join(outputFolder, 'parsed');
+    ensureDirectoryExists(parsedFolder);
+  
+    // Iterate over each result and output each parsed topic to its own JSON file
+    const parsedTopics: (ParsedCollegeTopic | ParsedCertificationTopic)[] = results
+      .map((result) => outputResult(result.topics, parserType))
+      .flat();
+  
+    parsedTopics.forEach((parsedTopic) => {
+      const fileName = `${parsedTopic.hash}.json`; // Replace any invalid characters in the name
+      const filePath = path.join(parsedFolder, fileName);
+  
+      // Write the JSON string to the file
+      fs.writeFileSync(filePath, parsedTopic.toJson(), 'utf8');
+      console.log(`Saved ${parsedTopic.name} to ${filePath}`);
+    });
+  };
+
+  // Handle file import
   ipcMain.handle(
     'import-file-to-local',
     async (event, { filePath, parserType }) => {
@@ -197,12 +238,10 @@ app.whenReady().then(() => {
     },
   );
 
+  // Handle file listing
   ipcMain.handle('import-list-files', (event, { parserType }) => {
     try {
       const targetDir = getWorkingDir(parserType);
-
-      // Recursively get list of files in the directory and subdirectories
-      const ignorelist = ['.DS_Store', 'Thumbs.db'];
       const files = listFilesRecursive(targetDir, ignorelist);
 
       const feedback: FileListFeedback = {
@@ -228,6 +267,7 @@ app.whenReady().then(() => {
     }
   });
 
+  // Handle file deletion
   ipcMain.handle('import-delete-file', (event, { filePath }) => {
     try {
       if (fs.existsSync(filePath)) {
@@ -258,6 +298,7 @@ app.whenReady().then(() => {
     }
   });
 
+  // Handle file parsing
   ipcMain.handle(
     'import-parse-file',
     (event, { parserType, filePath, operationMode }) => {
@@ -265,6 +306,9 @@ app.whenReady().then(() => {
       try {
         const file = fs.readFileSync(filePath, 'utf-8');
         result = fileParser(file, filePath, parserType, operationMode);
+
+        const folderPath = path.dirname(filePath);
+        outputResults([result], parserType, folderPath);
 
         const feedback: PreParserFeedback = {
           message: `${operationMode as ParserOperationMode} succeeded: ${path.basename(filePath)}`,
@@ -293,6 +337,7 @@ app.whenReady().then(() => {
     },
   );
 
+  // Handle folder parsing
   ipcMain.handle(
     'import-parse-folder',
     (event, { parserType, folderName, operationMode }) => {
@@ -306,12 +351,14 @@ app.whenReady().then(() => {
         }
 
         // Recursively get all files in the folder
-        const files = listFilesRecursive(folderPath);
+        const files = listFilesRecursive(folderPath, ignorelist);
 
         const results = files.map((file) => {
           const fileContent = fs.readFileSync(file.path, 'utf-8');
           return fileParser(fileContent, file.path, parserType, operationMode);
         });
+
+        outputResults(results, parserType, folderPath);
 
         const feedback: PreParserFolderFeedback = {
           message: `${operationMode as ParserOperationMode} succeeded: ${folderName}`,
@@ -340,6 +387,7 @@ app.whenReady().then(() => {
     },
   );
 
+  // Handle folder deletion
   ipcMain.handle(
     'import-delete-folder',
     (event, { folderName, parserType }) => {
