@@ -1,9 +1,9 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaEllipsisV } from 'react-icons/fa';
+import { FaEllipsisV, FaDatabase, FaTrash } from 'react-icons/fa';
 import { ImportFile } from '../../../types';
 
 interface FileListMoreButtonProps {
-  file: ImportFile; // Adjust the type as needed for your file object
+  file: ImportFile;
   handleDelete: (file: ImportFile) => void;
   handlePreParse: (file: ImportFile) => void;
 }
@@ -14,25 +14,21 @@ const FileListMoreButton: React.FC<FileListMoreButtonProps> = ({
   handlePreParse,
 }) => {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
-  const menuRef = useRef<HTMLDivElement | null>(null); // Ref to track the menu element
+  const menuRef = useRef<HTMLDivElement | null>(null);
 
   const toggleMenu = (fileName: string) => {
     setOpenMenu(openMenu === fileName ? null : fileName);
   };
 
-  // Function to detect clicks outside the menu
   const handleClickOutside = (event: MouseEvent) => {
     if (menuRef.current && !menuRef.current.contains(event.target as Node)) {
-      setOpenMenu(null); // Close menu if clicked outside
+      setOpenMenu(null);
     }
   };
 
   useEffect(() => {
-    // Add event listener to detect outside clicks
     document.addEventListener('mousedown', handleClickOutside);
-
     return () => {
-      // Cleanup event listener on component unmount
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
@@ -41,37 +37,38 @@ const FileListMoreButton: React.FC<FileListMoreButtonProps> = ({
     <div className="relative" ref={menuRef}>
       <button
         onClick={() => toggleMenu(file.name)}
-        className="ml-2 text-slate-700"
+        className="ml-2 text-slate-700 hover:text-slate-900 focus:outline-none"
       >
-        <FaEllipsisV />
+        <FaEllipsisV className="text-xl" />
       </button>
       {openMenu === file.name && (
-        <div className="absolute right-0 mt-2 w-48 bg-white border rounded shadow-lg z-10">
-          <ul>
+        <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
+          <ul className="py-1">
             <li
               onClick={() => {
                 handlePreParse(file);
                 setOpenMenu(null);
               }}
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
             >
-              Pre-parse
+              <FaDatabase className="mr-3 text-slate-500" />
+              <span>Pre-parse</span>
             </li>
             <li
               onClick={() => {
                 handleDelete(file);
                 setOpenMenu(null);
               }}
-              className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
             >
-              Delete
+              <FaTrash className="mr-3 text-slate-500" />
+              <span>Delete</span>
             </li>
           </ul>
         </div>
       )}
     </div>
   );
-  
 };
 
 export default FileListMoreButton;

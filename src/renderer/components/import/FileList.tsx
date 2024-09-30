@@ -2,6 +2,7 @@ import React from 'react';
 import { ImportFile } from '../../../types';
 import FileListMoreButton from './FileListMoreButton';
 import FolderMoreButton from './FolderMoreButton';
+import { FaFolder, FaRegFile } from 'react-icons/fa';
 
 interface FileListProps {
   files: ImportFile[]; // Adjusted type to include directory
@@ -43,6 +44,7 @@ const FileList: React.FC<FileListProps> = ({
         <div key={folder} className="folder-container mb-4">
           {/* Folder header */}
           <div className="flex justify-between items-center bg-gray-200 p-2 rounded-t">
+            <FaFolder className="text-2xl text-slate-500" />
             <span className="folder-name font-bold text-lg">{folder}</span>
             {/* FolderMoreButton aligned to the far right */}
             <FolderMoreButton
@@ -59,6 +61,7 @@ const FileList: React.FC<FileListProps> = ({
                 key={file.name}
                 className="flex items-center justify-between cursor-pointer hover:bg-gray-100 p-2 rounded border-b"
               >
+                <FaRegFile className="text-2xl text-slate-500" />
                 <div className="flex items-center w-full">
                   <span className="text-lg ml-2">{file.name}</span>
                 </div>

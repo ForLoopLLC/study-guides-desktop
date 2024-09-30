@@ -175,8 +175,10 @@ app.whenReady().then(() => {
 
         // Send success feedback
         const feedback: Feedback = {
-          message: `Successfully imported file to local directory`,
+          message: `Imported file for processing.`,
           success: true,
+          level: 'info',
+          dateTime: new Date(),
         };
         event.sender.send('file-import-feedback', feedback);
       } catch (error) {
@@ -185,8 +187,10 @@ app.whenReady().then(() => {
 
         // Send error feedback
         const feedback: Feedback = {
-          message: `An error occurred while importing the file. ${err.message}`,
+          message: `Error importing the file. ${err.message}`,
           success: false,
+          level: 'error',
+          dateTime: new Date(),
         };
         event.sender.send('file-import-feedback', feedback);
       }
@@ -203,8 +207,10 @@ app.whenReady().then(() => {
 
       const feedback: FileListFeedback = {
         files,
-        message: 'Successfully listed files',
+        message: 'Listed files',
         success: true,
+        level: 'trace',
+        dateTime: new Date(),
       };
 
       event.sender.send('file-list-feedback', feedback);
@@ -213,8 +219,10 @@ app.whenReady().then(() => {
       log.error('list', `Error listing files. ${err.message}`);
       const feedback: FileListFeedback = {
         files: [],
-        message: `An error occurred while listing files. ${err.message}`,
+        message: `Error listing files. ${err.message}`,
         success: false,
+        level: 'error',
+        dateTime: new Date(),
       };
       event.sender.send('file-list-feedback', feedback);
     }
@@ -226,9 +234,11 @@ app.whenReady().then(() => {
         fs.unlinkSync(filePath);
         log.info('File deleted:', filePath);
         const feedback: DeleteFileFeedback = {
-          message: `Successfully deleted file: ${filePath}`,
+          message: `Deleted file: ${filePath}`,
           success: true,
           filePath: filePath,
+          level: 'info',
+          dateTime: new Date(),
         };
         event.sender.send('file-delete-feedback', feedback);
       } else {
@@ -238,9 +248,11 @@ app.whenReady().then(() => {
       const err = error as Error;
       log.error('delete', `Error deleting file. ${err.message}`);
       const feedback: DeleteFileFeedback = {
-        message: `An error occurred while deleting the file. ${err.message}`,
+        message: `Error deleting the file. ${err.message}`,
         success: false,
         filePath: filePath,
+        level: 'error',
+        dateTime: new Date(),
       };
       event.sender.send('file-delete-feedback', feedback);
     }
@@ -252,11 +264,13 @@ app.whenReady().then(() => {
       let result: any;
       try {
         const file = fs.readFileSync(filePath, 'utf-8');
-        result = fileParser(file, parserType, operationMode);
+        result = fileParser(file, filePath, parserType, operationMode);
         const feedback: PreParserFeedback = {
-          message: `Successfully ran ${operationMode as ParserOperationMode} on the file.`,
+          message: `Ran ${operationMode as ParserOperationMode} on the file.`,
           success: true,
           result: result,
+          level: 'info',
+          dateTime: new Date(),
         };
         log.info(
           'import',
@@ -266,9 +280,11 @@ app.whenReady().then(() => {
       } catch (error) {
         const err = error as Error;
         const feedback: PreParserFeedback = {
-          message: `An error occurred while ${operationMode} the file. ${err.message}`,
+          message: `Error running ${operationMode} on the file. ${err.message}`,
           success: false,
           result: result,
+          level: 'error',
+          dateTime: new Date(),
         };
         event.sender.send('file-parse-feedback', feedback);
         log.error('import', `Error ${operationMode} file. ${err.message}`);
@@ -293,13 +309,15 @@ app.whenReady().then(() => {
 
         const results = files.map((file) => {
           const fileContent = fs.readFileSync(file.path, 'utf-8');
-          return fileParser(fileContent, parserType, operationMode);
+          return fileParser(fileContent, file.path, parserType, operationMode);
         });
 
         const feedback: PreParserFolderFeedback = {
-          message: `Successfully ran ${operationMode as ParserOperationMode} on the folder.`,
+          message: `Ran ${operationMode as ParserOperationMode} on the folder.`,
           success: true,
           results: results, // Return the results for each file
+          level: 'info',
+          dateTime: new Date(),
         };
         log.info(
           'import',
@@ -309,9 +327,11 @@ app.whenReady().then(() => {
       } catch (error) {
         const err = error as Error;
         const feedback: PreParserFolderFeedback = {
-          message: `An error occurred while ${operationMode} the folder. ${err.message}`,
+          message: `Error running ${operationMode} on the folder. ${err.message}`,
           success: false,
           results: [],
+          level: 'error',
+          dateTime: new Date(),
         };
         event.sender.send('folder-parse-feedback', feedback);
         log.error('import', `Error ${operationMode} folder. ${err.message}`);
@@ -333,13 +353,15 @@ app.whenReady().then(() => {
 
         // Recursively remove the folder and its contents
         fs.rmSync(folderPath, { recursive: true, force: true });
-        log.info('Folder deleted:', folderPath);
 
         // Send success feedback
         const feedback: DeleteFolderFeedback = {
-          message: `Successfully deleted folder: ${folderPath}`,
+          message: `Deleted folder: ${folderPath}`,
           success: true,
           filePath: folderPath,
+          level: 'info',
+          dateTime: new Date(),
+
         };
         event.sender.send('folder-delete-feedback', feedback);
       } catch (error) {
@@ -348,9 +370,11 @@ app.whenReady().then(() => {
 
         // Send error feedback
         const feedback: DeleteFolderFeedback = {
-          message: `An error occurred while deleting the folder. ${err.message}`,
+          message: `Error deleting the folder. ${err.message}`,
           success: false,
           filePath: folderPath,
+          level: 'error',
+          dateTime: new Date(),
         };
         event.sender.send('folder-delete-feedback', feedback);
       }

@@ -5,11 +5,13 @@ import { ParserType } from '../../../enums';
 const useFileUpload = (parserType: ParserType) => {
   const [filePath, setFilePath] = useState<string>('');
   const [feedback, setFeedback] = useState<Feedback | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false); // Loading state
 
   const handleFileChange = (event: any) => {
     const file = event.target.files[0];
     if (file) {
       setFilePath(file.path);
+      setIsLoading(true); // Set loading to true when file is being processed
 
       // Send file to main process to copy to local working directory
       window.electron.ipcRenderer.invoke('import-file-to-local', {
@@ -22,6 +24,7 @@ const useFileUpload = (parserType: ParserType) => {
   const handleFeedback = (payload: any) => {
     const data = payload as Feedback;
     setFeedback(data);
+    setIsLoading(false); // Set loading to false when feedback is received
   };
 
   useEffect(() => {
@@ -39,6 +42,7 @@ const useFileUpload = (parserType: ParserType) => {
   return {
     filePath,
     feedback,
+    isLoading, // Return isLoading state
     handleFileChange,
   };
 };

@@ -12,11 +12,18 @@ import {
 import { getHash } from '../../util';
 
 interface Chunk {
+  filePath: string;
   header: string;
   data: string[];
 }
 
-const chunker = (lines: string[]): Chunk[] => {
+const wrappedHeader = (header: string): string =>
+  header
+    .split(':')
+    .map((item) => `[${item}]`)
+    .join(',');
+
+const chunker = (lines: string[], filePath: string): Chunk[] => {
   const chunks: Chunk[] = [];
   let currentChunk: Chunk | null = null;
 
@@ -38,7 +45,7 @@ const chunker = (lines: string[]): Chunk[] => {
       if (currentChunk) {
         chunks.push(currentChunk); // Push the previous chunk
       }
-      currentChunk = { header: line, data: [] }; // Start a new chunk
+      currentChunk = { header: line, data: [], filePath }; // Start a new chunk
     } else {
       // This is a list item
       if (currentChunk) {
@@ -81,7 +88,7 @@ const collegeHeaderParser: HeaderParser = (header: string): CollegeHeader => {
   const items = header.split(':').map((item) => item.trim());
   if (items.length !== requiredItems) {
     throw new Error(
-      `Invalid College header format. ${requiredItems} items required. Found ${items.length}. Header: ${header}`,
+      `Invalid College header format. ${requiredItems} items required. Found ${items.length}. ${wrappedHeader(header)}`,
     );
   }
   const newHeader = {
@@ -122,7 +129,7 @@ const certificationHeaderParser: HeaderParser = (
   const items = header.split(':').map((item) => item.trim());
   if (items.length !== requiredItems) {
     throw new Error(
-      `Invalid Certification header format. ${requiredItems} items required. Found ${items.length}. Header: ${header}`,
+      `Invalid Certification header format. ${requiredItems} items required. Found ${items.length}. ${wrappedHeader(header)}`,
     );
   }
   const newHeader = {
@@ -160,27 +167,37 @@ const getHeaderParser = (parserType: ParserType): HeaderParser => {
   }
 };
 
-const preParse = (lines: string[], parserType: ParserType): ParserResult => {
+const preParse = (
+  filePath: string,
+  lines: string[],
+  parserType: ParserType,
+): ParserResult => {
   const headerParser = getHeaderParser(parserType);
-  return rootParser(lines, headerParser);
+  return rootParser(filePath, lines, headerParser);
 };
 
-const parse = (lines: string[], parserType: ParserType): ParserResult => {
+const parse = (
+  filePath: string,
+  lines: string[],
+  parserType: ParserType,
+): ParserResult => {
   const headerParser = getHeaderParser(parserType);
-  return rootParser(lines, headerParser);
+  return rootParser(filePath, lines, headerParser);
 };
 
 const rootParser = (
+  filePath: string,
   lines: string[],
   headerParser: HeaderParser,
 ): ParserResult => {
-  const chunks: Chunk[] = chunker(lines);
+  const chunks: Chunk[] = chunker(lines, filePath);
   const blocks: Block[] = chunks.map((chunk) => {
     const header = headerParser(chunk.header);
     const questions = bodyParser(chunk, header);
     return {
       header,
       questions,
+      filePath: chunk.filePath,
     };
   });
   return { chunks, blocks };
@@ -188,6 +205,7 @@ const rootParser = (
 
 const fileParser = (
   file: string,
+  filePath: string,
   parserType: ParserType,
   parserOperationMode: ParserOperationMode,
 ): ParserResult => {
@@ -195,9 +213,9 @@ const fileParser = (
   try {
     switch (parserOperationMode) {
       case ParserOperationMode.PreParse:
-        return preParse(lines, parserType);
+        return preParse(filePath, lines, parserType);
       case ParserOperationMode.Parse:
-        return parse(lines, parserType);
+        return parse(filePath, lines, parserType);
     }
   } catch (error) {
     throw error;

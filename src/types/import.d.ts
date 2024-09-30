@@ -37,18 +37,21 @@ export interface Chunk {
 }
 
 export interface Block {
-  header?: CollegeHeader | CertificationHeader;
-  questions?: QuestionAndAnswer[];
+  header: CollegeHeader | CertificationHeader;
+  questions: QuestionAndAnswer[];
+  filePath: string;
 }
 
 export interface ParserResult {
   chunks: Chunk[];
-  blocks?: Block[];
+  blocks: Block[];
 }
 
 export interface Feedback {
   message: string;
   success: boolean;
+  level: 'info' | 'error' | 'warning' | 'trace';
+  dateTime: Date;
 }
 
 export interface ImportFile {
