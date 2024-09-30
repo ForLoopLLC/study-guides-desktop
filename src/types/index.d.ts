@@ -50,7 +50,8 @@ export type Channels =
   | 'import-delete-folder'
   | 'file-parse-feedback'
   | 'folder-delete-feedback'
-  | 'folder-parse-feedback';
+  | 'folder-parse-feedback'
+  | 'import-ai-update-folder';
 
 export interface Environment {
   env: 'development' | 'test' | 'production' | null;
