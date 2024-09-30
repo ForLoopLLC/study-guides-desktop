@@ -462,13 +462,15 @@ app.whenReady().then(() => {
     async (event, { parserType, folderName }) => {
       try {
         const workingDir = getWorkingDir(parserType);
-        const folderPath = path.join(workingDir, folderName);
+        const folderPath = path.join(workingDir, folderName, 'parsed');
         let topicsLength = 0;
 
         // Get all the .json files in the folderPath
         const files = fs
           .readdirSync(folderPath)
           .filter((file) => file.endsWith('.json'));
+
+        console.log('Assisting folder:', folderPath, files.length);
 
         // Function to read and parse JSON files based on the parserType
         const parseTopicFromFile = (filePath: string) => {

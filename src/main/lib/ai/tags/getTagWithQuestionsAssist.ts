@@ -22,6 +22,7 @@ const getTagWithQuestionsAssist = async (
 
   try {
     const parsedResult = JSON.parse(result);
+    console.log(parsedResult);
     log.info('ai', `Parsed AI response successfully for tag ${tag.name}.`);
     return parsedResult as AITopicResponse;
   } catch (error) {

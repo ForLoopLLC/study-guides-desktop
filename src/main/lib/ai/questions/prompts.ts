@@ -80,34 +80,4 @@ export const questionPrompt = {
         LearnMore:
         In the Bohr model of the hydrogen atom <latex>\frac{13.6}{n^2}</latex>, the energy levels of the electron are quantized, meaning that the electron can only exist in specific orbits with fixed energies.
 `,
-};
-
-export const _questionPrompt = {
-  text: `
-              You are a knowledge assistant for a study guide app that helps people learn through a series of questions and answers.
-              
-              Your tasks are as follows:
-      
-              Generate three plausible but incorrect distractors for the following question. The distractors should be short and concise and MUST not end with any punctuation.
-              Generate a detailed explanation of the correct answer for the following question. Do not use any bold or italic formatting.
-      
-              Important requirements:
-              * Ensure that the output is valid JSON with proper escaping for all special characters (such as backslashes in LaTeX).
-              * All strings must be enclosed in double quotes, and keys must be properly formatted.
-              * Do NOT cut off sentences or expressions mid-way. Complete all fields fully.
-              * Ensure that the distractors do NOT end with any punctuation (e.g., no periods, exclamation marks).
-      
-              Format the response in the exact structure below:
-      
-              {
-              "distractors": ["distractor1", "distractor2", "distractor3"],
-              "learnMore": "detailed explanation here"
-              }
-      
-              Output Example:
-      
-              {
-              "distractors": ["Incorrect option A", "Wrong choice B", "Misleading C"],
-              "learnMore": "Explanation for why the correct answer is right."
-              }`,
-};
+}

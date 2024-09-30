@@ -1,16 +1,18 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaEllipsisV, FaTrash, FaDatabase } from 'react-icons/fa';
+import { FaEllipsisV, FaTrash, FaDatabase, FaRobot } from 'react-icons/fa';
 
 interface FolderMoreButtonProps {
   folderName: string;
   handleDelete: (folder: string) => void;
   handlePreParse: (folder: string) => void;
+  handleAssist: (folder: string) => void;
 }
 
 const FolderMoreButton: React.FC<FolderMoreButtonProps> = ({
   folderName,
   handleDelete,
   handlePreParse,
+  handleAssist,
 }) => {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -43,6 +45,16 @@ const FolderMoreButton: React.FC<FolderMoreButtonProps> = ({
       {openMenu === folderName && (
         <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
           <ul className="py-1">
+          <li
+              onClick={() => {
+                handleAssist(folderName);
+                setOpenMenu(null);
+              }}
+              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
+            >
+              <FaRobot className="mr-3 text-slate-500" />
+              <span>AI Assist</span>
+            </li>
             <li
               onClick={() => {
                 handlePreParse(folderName);

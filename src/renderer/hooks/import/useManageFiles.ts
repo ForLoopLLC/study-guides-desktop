@@ -29,6 +29,8 @@ const useManageFiles = (parserType: ParserType) => {
     useState<boolean>(false);
   const [isProcessingPreParseFolder, setIsProcessingPreParseFolder] =
     useState<boolean>(false);
+    const [isProcessingAssistFolder, setIsProcessingAssistFolder] =
+    useState<boolean>(false);
 
   // List files
   const listFiles = () => {
@@ -70,6 +72,18 @@ const useManageFiles = (parserType: ParserType) => {
   ) => {
     setIsProcessingPreParseFolder(true);
     window.electron.ipcRenderer.invoke('import-parse-folder', {
+      parserType,
+      folderName,
+    });
+  };
+
+  // AI assist a folder
+  const assistFolder = (
+    folderName: string,
+    parserType: ParserType,
+  ) => {
+    setIsProcessingAssistFolder(true);
+    window.electron.ipcRenderer.invoke('import-ai-update-folder', {
       parserType,
       folderName,
     });
@@ -170,6 +184,7 @@ const useManageFiles = (parserType: ParserType) => {
     deleteFolder,
     preParseFile,
     preParseFolder,
+    assistFolder,
   };
 };
 
