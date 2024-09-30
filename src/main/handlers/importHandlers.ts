@@ -15,9 +15,9 @@ import {
   PreParserFeedback,
   PreParserFolderFeedback,
   ParsedCertificationTopic,
-  ParsedCollegeTopic
+  ParsedCollegeTopic,
 } from '../../types';
-import { ParserType, ParserOperationMode } from '../../enums';
+import { ParserType } from '../../enums';
 import { fileParser, toParsedTopic } from '../lib/parse';
 
 const ignorelist = ['.DS_Store', 'Thumbs.db', 'parsed'];
@@ -41,7 +41,6 @@ app.whenReady().then(() => {
       fs.mkdirSync(directory, { recursive: true });
     }
   };
-  
 
   dirsToEnsure.map(ensureDirectoryExists);
 
@@ -96,11 +95,13 @@ app.whenReady().then(() => {
     return filesList;
   };
 
-
   // Output results
-  const outputResult = (topic: RawTopic[], parserType: ParserType): (ParsedCollegeTopic | ParsedCertificationTopic)[] => {
+  const outputResult = (
+    topic: RawTopic[],
+    parserType: ParserType,
+  ): (ParsedCollegeTopic | ParsedCertificationTopic)[] => {
     return topic.map((topic) => toParsedTopic(topic, parserType));
-  }
+  };
 
   const outputResults = (
     results: ParserResult[],
@@ -110,16 +111,15 @@ app.whenReady().then(() => {
     // Create the `parsed` folder inside the output folder
     const parsedFolder = path.join(outputFolder, 'parsed');
     ensureDirectoryExists(parsedFolder);
-  
+
     // Iterate over each result and output each parsed topic to its own JSON file
-    const parsedTopics: (ParsedCollegeTopic | ParsedCertificationTopic)[] = results
-      .map((result) => outputResult(result.topics, parserType))
-      .flat();
-  
+    const parsedTopics: (ParsedCollegeTopic | ParsedCertificationTopic)[] =
+      results.map((result) => outputResult(result.topics, parserType)).flat();
+
     parsedTopics.forEach((parsedTopic) => {
       const fileName = `${parsedTopic.hash}.json`; // Replace any invalid characters in the name
       const filePath = path.join(parsedFolder, fileName);
-  
+
       // Write the JSON string to the file
       fs.writeFileSync(filePath, parsedTopic.toJson(), 'utf8');
       console.log(`Saved ${parsedTopic.name} to ${filePath}`);
@@ -299,93 +299,81 @@ app.whenReady().then(() => {
   });
 
   // Handle file parsing
-  ipcMain.handle(
-    'import-parse-file',
-    (event, { parserType, filePath, operationMode }) => {
-      let result: any;
-      try {
-        const file = fs.readFileSync(filePath, 'utf-8');
-        result = fileParser(file, filePath, parserType, operationMode);
+  ipcMain.handle('import-parse-file', (event, { parserType, filePath }) => {
+    let result: any;
+    try {
+      const file = fs.readFileSync(filePath, 'utf-8');
+      result = fileParser(file, filePath, parserType);
 
-        const folderPath = path.dirname(filePath);
-        outputResults([result], parserType, folderPath);
+      const folderPath = path.dirname(filePath);
+      outputResults([result], parserType, folderPath);
 
-        const feedback: PreParserFeedback = {
-          message: `${operationMode as ParserOperationMode} succeeded: ${path.basename(filePath)}`,
-          success: true,
-          result: result,
-          level: 'info',
-          dateTime: new Date(),
-        };
-        log.info(
-          'import',
-          `File ${operationMode as ParserOperationMode} succeeded.`,
-        );
-        event.sender.send('file-parse-feedback', feedback);
-      } catch (error) {
-        const err = error as Error;
-        const feedback: PreParserFeedback = {
-          message: `Error running ${operationMode}\n\n${err.message}`,
-          success: false,
-          result: result,
-          level: 'error',
-          dateTime: new Date(),
-        };
-        event.sender.send('file-parse-feedback', feedback);
-        log.error('import', `Error ${operationMode} file. ${err.message}`);
-      }
-    },
-  );
+      const feedback: PreParserFeedback = {
+        message: `Preparse succeeded: ${path.basename(filePath)}`,
+        success: true,
+        result: result,
+        level: 'info',
+        dateTime: new Date(),
+      };
+      log.info('import', `File preparse succeeded.`);
+      event.sender.send('file-parse-feedback', feedback);
+    } catch (error) {
+      const err = error as Error;
+      const feedback: PreParserFeedback = {
+        message: `Error running preparse\n\n${err.message}`,
+        success: false,
+        result: result,
+        level: 'error',
+        dateTime: new Date(),
+      };
+      event.sender.send('file-parse-feedback', feedback);
+      log.error('import', `Error preparsing file. ${err.message}`);
+    }
+  });
 
   // Handle folder parsing
-  ipcMain.handle(
-    'import-parse-folder',
-    (event, { parserType, folderName, operationMode }) => {
-      const workingDir = getWorkingDir(parserType);
-      const folderPath = path.join(workingDir, folderName);
-      console.log('parse folder', folderPath);
-      try {
-        // Ensure the folder exists
-        if (!fs.existsSync(folderPath)) {
-          throw new Error('Folder does not exist');
-        }
-
-        // Recursively get all files in the folder
-        const files = listFilesRecursive(folderPath, ignorelist);
-
-        const results = files.map((file) => {
-          const fileContent = fs.readFileSync(file.path, 'utf-8');
-          return fileParser(fileContent, file.path, parserType, operationMode);
-        });
-
-        outputResults(results, parserType, folderPath);
-
-        const feedback: PreParserFolderFeedback = {
-          message: `${operationMode as ParserOperationMode} succeeded: ${folderName}`,
-          success: true,
-          results: results, // Return the results for each file
-          level: 'info',
-          dateTime: new Date(),
-        };
-        log.info(
-          'import',
-          `Folder ${operationMode as ParserOperationMode} succeeded.`,
-        );
-        event.sender.send('folder-parse-feedback', feedback);
-      } catch (error) {
-        const err = error as Error;
-        const feedback: PreParserFolderFeedback = {
-          message: `Error running ${operationMode}\n\n${err.message}`,
-          success: false,
-          results: [],
-          level: 'error',
-          dateTime: new Date(),
-        };
-        event.sender.send('folder-parse-feedback', feedback);
-        log.error('import', `Error ${operationMode} folder. ${err.message}`);
+  ipcMain.handle('import-parse-folder', (event, { parserType, folderName }) => {
+    const workingDir = getWorkingDir(parserType);
+    const folderPath = path.join(workingDir, folderName);
+    console.log('parse folder', folderPath);
+    try {
+      // Ensure the folder exists
+      if (!fs.existsSync(folderPath)) {
+        throw new Error('Folder does not exist');
       }
-    },
-  );
+
+      // Recursively get all files in the folder
+      const files = listFilesRecursive(folderPath, ignorelist);
+
+      const results = files.map((file) => {
+        const fileContent = fs.readFileSync(file.path, 'utf-8');
+        return fileParser(fileContent, file.path, parserType);
+      });
+
+      outputResults(results, parserType, folderPath);
+
+      const feedback: PreParserFolderFeedback = {
+        message: `Preparse succeeded: ${folderName}`,
+        success: true,
+        results: results, // Return the results for each file
+        level: 'info',
+        dateTime: new Date(),
+      };
+      log.info('import', `Folder preparse succeeded.`);
+      event.sender.send('folder-parse-feedback', feedback);
+    } catch (error) {
+      const err = error as Error;
+      const feedback: PreParserFolderFeedback = {
+        message: `Error running preparse\n\n${err.message}`,
+        success: false,
+        results: [],
+        level: 'error',
+        dateTime: new Date(),
+      };
+      event.sender.send('folder-parse-feedback', feedback);
+      log.error('import', `Error preparsing folder. ${err.message}`);
+    }
+  });
 
   // Handle folder deletion
   ipcMain.handle(

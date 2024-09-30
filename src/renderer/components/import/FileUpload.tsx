@@ -1,6 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { useFileUpload, useManageFiles } from '../../hooks';
-import { ParserOperationMode, ParserType } from '../../../enums';
+import { ParserType } from '../../../enums';
 import FileList from './FileList';
 import { ImportFile, Feedback } from '../../../types';
 import { FaFileImport, FaSpinner, FaClipboard } from 'react-icons/fa';
@@ -68,11 +68,11 @@ const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
   };
 
   const handlePreParse = (file: ImportFile) => {
-    preParseFile(file.path, parserType, ParserOperationMode.PreParse);
+    preParseFile(file.path, parserType);
   };
 
   const handlePreParseFolder = (folderName: string) => {
-    preParseFolder(folderName, parserType, ParserOperationMode.PreParse);
+    preParseFolder(folderName, parserType);
   };
 
   const handleDeleteFolder = (folderName: string) => {

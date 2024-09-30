@@ -1,5 +1,5 @@
 import { TagType } from '@prisma/client';
-import { ParserType, ParserOperationMode } from '../../../enums';
+import { ParserType } from '../../../enums';
 import {
   RawTopic,
   HeaderParser,
@@ -172,20 +172,12 @@ const getHeaderParser = (parserType: ParserType): HeaderParser => {
   }
 };
 
-const preParse = (
+const fileParser = (
+  fileContent: string,
   filePath: string,
-  lines: string[],
   parserType: ParserType,
 ): ParserResult => {
-  const headerParser = getHeaderParser(parserType);
-  return rootParser(filePath, lines, headerParser);
-};
-
-const parse = (
-  filePath: string,
-  lines: string[],
-  parserType: ParserType,
-): ParserResult => {
+  const lines = fileContent.split('\n');
   const headerParser = getHeaderParser(parserType);
   return rootParser(filePath, lines, headerParser);
 };
@@ -206,25 +198,6 @@ const rootParser = (
     };
   });
   return { chunks, topics: blocks };
-};
-
-const fileParser = (
-  file: string,
-  filePath: string,
-  parserType: ParserType,
-  parserOperationMode: ParserOperationMode,
-): ParserResult => {
-  const lines = file.split('\n');
-  try {
-    switch (parserOperationMode) {
-      case ParserOperationMode.PreParse:
-        return preParse(filePath, lines, parserType);
-      case ParserOperationMode.Parse:
-        return parse(filePath, lines, parserType);
-    }
-  } catch (error) {
-    throw error;
-  }
 };
 
 export default fileParser;

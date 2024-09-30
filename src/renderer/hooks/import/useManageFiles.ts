@@ -7,7 +7,7 @@ import {
   PreParserFolderFeedback,
   DeleteFolderFeedback,
 } from '../../../types';
-import { ParserOperationMode, ParserType } from '../../../enums';
+import { ParserType } from '../../../enums';
 
 const useManageFiles = (parserType: ParserType) => {
   const [files, setFiles] = useState<ImportFile[]>([]);
@@ -46,13 +46,11 @@ const useManageFiles = (parserType: ParserType) => {
   const preParseFile = (
     filePath: string,
     parserType: ParserType,
-    operationMode: ParserOperationMode,
   ) => {
     setIsProcessingPreParse(true);
     window.electron.ipcRenderer.invoke('import-parse-file', {
       parserType,
       filePath,
-      operationMode,
     });
   };
 
@@ -69,13 +67,11 @@ const useManageFiles = (parserType: ParserType) => {
   const preParseFolder = (
     folderName: string,
     parserType: ParserType,
-    operationMode: ParserOperationMode,
   ) => {
     setIsProcessingPreParseFolder(true);
     window.electron.ipcRenderer.invoke('import-parse-folder', {
       parserType,
       folderName,
-      operationMode,
     });
   };
 
