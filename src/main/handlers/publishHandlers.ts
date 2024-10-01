@@ -1,5 +1,5 @@
 import { ipcMain } from 'electron';
-import { log } from '../main';
+//import { log } from '../main';
 import { getTags, touchTag, getTagAncestry } from '../lib/database/tags';
 import { getQuestions, touchQuestion } from '../lib/database/questions';
 import { createTagIndex } from '../lib/database/search';
@@ -10,8 +10,10 @@ import { publishUsersIndex } from '../lib/search/users';
 import { publishQuestionIndex } from '../lib/search/questions';
 import { createQuestionIndex } from '../lib/database/search';
 import { User, Tag, Question } from '@prisma/client';
+import { Channels } from '../../enums';
+import { logAndSend } from '../util';
 
-ipcMain.handle('publish-tags-index', async (event, { filter, query }) => {
+ipcMain.handle(Channels.PublishTagsIndex, async (event, { filter, query }) => {
   try {
     let page = 1;
     const limit = 500;
@@ -43,21 +45,18 @@ ipcMain.handle('publish-tags-index', async (event, { filter, query }) => {
 
       totalProcessed += tags.length;
       const payload = { page, totalProcessed };
-      event.sender.send('publish-tags-index-progress', payload);
-      log.info('publish', `Processed ${totalProcessed} tags.`);
+      logAndSend(event, Channels.PublishTagsIndexProgress, payload);
     }
 
-    event.sender.send('publish-tags-index-complete', { totalProcessed });
-    log.info('publish', `Index published with ${totalProcessed} tags.`);
+    logAndSend(event, Channels.PublishTagsIndexComplete, { totalProcessed });
   } catch (error) {
     const err = error as Error;
-    log.error('publish', `Error publishing index: ${err.message}`);
-    event.sender.send('publish-tags-index-error', { message: err.message });
+    logAndSend(event, Channels.PublishTagsIndexError, { message: err.message });
     throw new Error('Failed to publish index.');
   }
 });
 
-ipcMain.handle('publish-users-index', async (event, { filter, query }) => {
+ipcMain.handle(Channels.PublishUsersIndex, async (event, { filter, query }) => {
   try {
     let page = 1;
     const limit = 500;
@@ -82,65 +81,66 @@ ipcMain.handle('publish-users-index', async (event, { filter, query }) => {
 
       totalProcessed += users.length;
       const payload = { page, totalProcessed };
-      event.sender.send('publish-users-index-progress', payload);
-      log.info('publish', `Processed ${totalProcessed} users.`);
+      logAndSend(event, Channels.PublishUsersIndexProgress, payload);
     }
 
-    event.sender.send('publish-users-index-complete', { totalProcessed });
-    log.info('publish', `Index published with ${totalProcessed} users.`);
+    logAndSend(event, Channels.PublishUsersIndexComplete, { totalProcessed });
   } catch (error) {
     const err = error as Error;
-    log.error('publish', `Error publishing index: ${err.message}`);
-    event.sender.send('publish-users-index-error', { message: err.message });
-    throw new Error('Failed to publish index.');
-  }
-});
-
-ipcMain.handle('publish-questions-index', async (event, { filter, query }) => {
-  try {
-    let page = 1;
-    const limit = 500;
-    let allQuestions: Question[] = [];
-    let hasMore = true;
-    let totalProcessed = 0;
-
-    while (hasMore) {
-      const { data: questions } = await getQuestions(
-        page,
-        limit,
-        filter,
-        query,
-      );
-      if (questions.length === 0) {
-        hasMore = false;
-        break;
-      }
-
-      allQuestions = allQuestions.concat(questions);
-      page += 1;
-
-      const touchedQuestions = await Promise.all(
-        questions.map((question) => touchQuestion(question.id)),
-      );
-      const indexes = await Promise.all(
-        touchedQuestions.map((question) => createQuestionIndex(question)),
-      );
-      await publishQuestionIndex(indexes.filter((index) => index !== null));
-
-      totalProcessed += questions.length;
-      const payload = { page, totalProcessed };
-      event.sender.send('publish-questions-index-progress', payload);
-      log.info('publish', `Processed ${totalProcessed} questions.`);
-    }
-
-    event.sender.send('publish-questions-index-complete', { totalProcessed });
-    log.info('publish', `Index published with ${totalProcessed} questions.`);
-  } catch (error) {
-    const err = error as Error;
-    log.error('publish', `Error publishing index: ${err.message}`);
-    event.sender.send('publish-questions-index-error', {
+    logAndSend(event, Channels.PublishUsersIndexError, {
       message: err.message,
     });
     throw new Error('Failed to publish index.');
   }
 });
+
+ipcMain.handle(
+  Channels.PublishQuestionsIndex,
+  async (event, { filter, query }) => {
+    try {
+      let page = 1;
+      const limit = 500;
+      let allQuestions: Question[] = [];
+      let hasMore = true;
+      let totalProcessed = 0;
+
+      while (hasMore) {
+        const { data: questions } = await getQuestions(
+          page,
+          limit,
+          filter,
+          query,
+        );
+        if (questions.length === 0) {
+          hasMore = false;
+          break;
+        }
+
+        allQuestions = allQuestions.concat(questions);
+        page += 1;
+
+        const touchedQuestions = await Promise.all(
+          questions.map((question) => touchQuestion(question.id)),
+        );
+        const indexes = await Promise.all(
+          touchedQuestions.map((question) => createQuestionIndex(question)),
+        );
+        await publishQuestionIndex(indexes.filter((index) => index !== null));
+
+        totalProcessed += questions.length;
+        const payload = { page, totalProcessed };
+        logAndSend(event, Channels.PublishQuestionsIndexProgress, payload);
+      }
+
+      logAndSend(event, Channels.PublishQuestionsIndexComplete, {
+        totalProcessed,
+      });
+    } catch (error) {
+      const err = error as Error;
+      logAndSend(event, Channels.PublishQuestionsIndexError, {
+        message: err.message,
+      });
+      throw new Error('Failed to publish index.');
+    }
+  },
+);
