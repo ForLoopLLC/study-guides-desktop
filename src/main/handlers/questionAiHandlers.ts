@@ -2,8 +2,6 @@ import { ipcMain } from 'electron';
 import { log } from '../main';
 import {
   getQuestionInput,
-  getLearnMoreInput,
-  getDistractorsInput,
 } from '../lib/ai';
 
 import { getQuestionsCursor, updateQuestion } from '../lib/database/questions';
@@ -11,38 +9,11 @@ import { createQuestionIndex } from '../lib/database/search';
 import { publishQuestionIndex } from '../lib/search/questions';
 import { Question } from '@prisma/client';
 import { AlgoliaRecord, UpdateQuestionInput } from '../../types';
+import { logAndSend } from '../util';
+import { Channels } from '../../enums';
 
-ipcMain.handle('get-ai-learn-more', async (_event, questionId) => {
-  try {
-    const questionInput = await getLearnMoreInput(questionId);
-    log.info('ai', `Received AI learnMore for question ${questionInput.id}.`);
-    return questionInput;
-  } catch (error) {
-    const err = error as Error;
-    log.error(
-      'ai',
-      `Failed to get AI question learnMore for ${questionId}. ${err.message}`,
-    );
-    return { error: err.message };
-  }
-});
 
-ipcMain.handle('get-ai-distractors', async (_event, questionId) => {
-  try {
-    const questionInput = await getDistractorsInput(questionId);
-    log.info('ai', `Received AI distractors for question ${questionInput.id}.`);
-    return questionInput;
-  } catch (error) {
-    const err = error as Error;
-    log.error(
-      'ai',
-      `Failed to get AI question distractors for ${questionId}. ${err.message}`,
-    );
-    return { error: err.message };
-  }
-});
-
-ipcMain.handle('get-ai-question', async (_event, questionId) => {
+ipcMain.handle(Channels.AssistQuestion, async (_event, questionId) => {
   try {
     const questionInput = await getQuestionInput(questionId);
     log.info('ai', `Received AI assist for question ${questionInput.id}.`);
@@ -57,7 +28,7 @@ ipcMain.handle('get-ai-question', async (_event, questionId) => {
   }
 });
 
-ipcMain.handle('batch-assist-questions', async (event, { filter, query }) => {
+ipcMain.handle(Channels.BatchAssistQuestions, async (event, { filter, query }) => {
   try {
     const limit = 500;
     let allQuestions: Question[] = [];
@@ -104,9 +75,7 @@ ipcMain.handle('batch-assist-questions', async (event, { filter, query }) => {
       // Track total processed and emit progress to the frontend
       totalProcessed += questions.length;
       const payload = { totalProcessed };
-      event.sender.send('batch-assist-questions-progress', payload);
-      log.info('ai', `Assisted ${totalProcessed} questions.`);
-
+      logAndSend(event,Channels.BatchAssistQuestionsProgress, payload);
       // Move the cursor to the next set
       nextCursor = newCursor;
       if (!nextCursor) {
@@ -115,12 +84,10 @@ ipcMain.handle('batch-assist-questions', async (event, { filter, query }) => {
     }
 
     // Send completion event to frontend
-    event.sender.send('batch-assist-questions-complete', { totalProcessed });
-    log.info('ai', `Assist completed with ${totalProcessed} questions.`);
+    logAndSend(event,Channels.BatchAssistQuestionsComplete, { totalProcessed });
   } catch (error) {
     const err = error as Error;
-    log.error('ai', `Error assisting: ${err.message}`);
-    event.sender.send('batch-assist-questions-error', { message: err.message });
+    logAndSend(event,Channels.BatchAssistQuestionsError, { message: err.message });
     throw new Error('Failed to assist.');
   }
 });

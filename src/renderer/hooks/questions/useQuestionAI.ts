@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { UpdateQuestionInput } from '../../../types';
+import { Channels } from '../../../enums';
 
 const useQuestionAI = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -11,7 +12,7 @@ const useQuestionAI = () => {
 
     try {
       const input = await window.electron.ipcRenderer.invoke(
-        'get-ai-question',
+        Channels.AssistQuestion,
         questionId,
       );
 
