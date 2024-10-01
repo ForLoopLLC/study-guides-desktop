@@ -21,6 +21,7 @@ import {
 import { ParserType } from '../../enums';
 import { fileParser, toParsedTopic } from '../lib/parse';
 import { getParsedTopicAssist, mergeTopicWithAssist } from '../lib/ai/parse';
+import { formatAsJSON } from '../util';
 
 const ignorelist = ['.DS_Store', 'Thumbs.db', 'parsed'];
 
@@ -135,7 +136,7 @@ app.whenReady().then(() => {
     outputFolder: string,
   ) => {
     // Create the `parsed` folder inside the output folder
-    const parsedFolder = path.join(outputFolder, 'parsed');
+    const parsedFolder = path.join(outputFolder, 'ai-assisted');
     ensureDirectoryExists(parsedFolder);
 
     topics.forEach((topic) => {
@@ -477,9 +478,21 @@ app.whenReady().then(() => {
           const fileContent = fs.readFileSync(filePath, 'utf-8');
           const parsedTopic = JSON.parse(fileContent);
           if (parserType === ParserType.Colleges) {
-            return parsedTopic as ParsedCollegeTopic;
+            const collegeTopic = parsedTopic as ParsedCollegeTopic;
+            return {
+              ...collegeTopic,
+              toJson: function () {
+                return formatAsJSON(this);
+              },
+            };
           } else if (parserType === ParserType.Certifications) {
-            return parsedTopic as ParsedCertificationTopic;
+            const certTopic = parsedTopic as ParsedCertificationTopic;
+            return {
+              ...certTopic,
+              toJson: function () {
+                return formatAsJSON(this);
+              },
+            };
           } else {
             throw new Error('Invalid parser type');
           }

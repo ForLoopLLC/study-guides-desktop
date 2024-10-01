@@ -7,6 +7,7 @@ import dotenv from 'dotenv';
 import fs from 'fs';
 import log from 'electron-log';
 import { LoggerWithCategory } from '../types';
+import { ParsedCertificationTopic, ParsedCollegeTopic } from '../types';
 
 let tailInterval: NodeJS.Timeout | null = null;
 let lastSize = 0;
@@ -139,3 +140,9 @@ export const stopTailLogFile = () => {
 export const stripBackticks = (str: string): string => {
   return str.replace(/^```json\s*|```$/g, '').trim();
 };
+
+export const formatAsJSON = (
+  parsedTopic: ParsedCertificationTopic | ParsedCollegeTopic,
+): string => {
+  return JSON.stringify(parsedTopic, null, 2); // Pretty-print with 2-space indentation
+}

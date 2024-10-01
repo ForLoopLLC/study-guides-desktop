@@ -5,6 +5,7 @@ import prepareQuestions from './prepareQuestions';
 import { generateChatCompletion } from '../generateChatCompletion';
 import { ContentRatingType } from '@prisma/client';
 import { mergeTopicWithAssist } from '.';
+import { parseAITopicWithQuestionResponse } from '../tags/parsers';
 
 const getParsedTopicAssist = async (
   topic: ParsedCertificationTopic | ParsedCollegeTopic,
@@ -16,7 +17,7 @@ const getParsedTopicAssist = async (
   );
 
   try {
-    const parsedResult = JSON.parse(result);
+    const parsedResult = parseAITopicWithQuestionResponse(result);
     log.info('ai', `Parsed AI response successfully for topic ${topic.name}.`);
     return mergeTopicWithAssist(topic, parsedResult as AITopicResponse);
   } catch (error) {

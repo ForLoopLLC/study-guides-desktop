@@ -8,6 +8,7 @@ import {
 
 import { ParserType } from '../../../enums';
 import { ContentRatingType } from '@prisma/client';
+import { formatAsJSON } from '../../util';
 
 function isCollegeHeader(header: any): header is CollegeHeader {
   return (header as CollegeHeader).region !== undefined;
@@ -29,12 +30,7 @@ function toParsedQuestion(rawQuestion: any) {
   };
 }
 
-// Utility function to format parsed topic as JSON
-function formatAsJSON(
-  parsedTopic: ParsedCertificationTopic | ParsedCollegeTopic,
-): string {
-  return JSON.stringify(parsedTopic, null, 2); // Pretty-print with 2-space indentation
-}
+
 
 const outputParsedCollegeTopic = (rawTopic: RawTopic): ParsedCollegeTopic => {
   const { header } = rawTopic;
