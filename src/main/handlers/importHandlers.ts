@@ -136,7 +136,7 @@ app.whenReady().then(() => {
     outputFolder: string,
   ) => {
     // Create the `parsed` folder inside the output folder
-    const parsedFolder = path.join(outputFolder, 'ai-assisted');
+    const parsedFolder = path.join(outputFolder);
     ensureDirectoryExists(parsedFolder);
 
     topics.forEach((topic) => {
@@ -478,21 +478,9 @@ app.whenReady().then(() => {
           const fileContent = fs.readFileSync(filePath, 'utf-8');
           const parsedTopic = JSON.parse(fileContent);
           if (parserType === ParserType.Colleges) {
-            const collegeTopic = parsedTopic as ParsedCollegeTopic;
-            return {
-              ...collegeTopic,
-              toJson: function () {
-                return formatAsJSON(this);
-              },
-            };
+            return parsedTopic as ParsedCollegeTopic;
           } else if (parserType === ParserType.Certifications) {
-            const certTopic = parsedTopic as ParsedCertificationTopic;
-            return {
-              ...certTopic,
-              toJson: function () {
-                return formatAsJSON(this);
-              },
-            };
+            return parsedTopic as ParsedCertificationTopic;
           } else {
             throw new Error('Invalid parser type');
           }
