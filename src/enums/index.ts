@@ -18,6 +18,16 @@ export enum UserFilterType {
   Freelancer = 'Freelancer',
 }
 
+export enum Routes {
+  Root = '/',
+  Colleges = '/colleges',
+  Certifications = '/certifications',
+  Tags = '/tags',
+  Questions = '/questions',
+  Users = '/users',
+
+}
+
 export enum Channels {
   // Navigation
   Navigate = 'navigate',

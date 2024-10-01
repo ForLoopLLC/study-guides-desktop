@@ -1,5 +1,6 @@
 import { MenuItemConstructorOptions, BrowserWindow } from 'electron';
 import { environmentManager } from '../lib/environment';
+import { Channels } from '../../enums';
 
 export const createConnectionsMenu = (
   mainWindow: BrowserWindow,
@@ -11,7 +12,7 @@ export const createConnectionsMenu = (
       click: () => {
         environmentManager.setEnvironment('development');
         mainWindow.webContents.send(
-          'env-update',
+          Channels.EnvUpdate,
           environmentManager.getEnvironment(),
         );
       },
@@ -21,7 +22,7 @@ export const createConnectionsMenu = (
       click: () => {
         environmentManager.setEnvironment('test');
         mainWindow.webContents.send(
-          'env-update',
+          Channels.EnvUpdate,
           environmentManager.getEnvironment(),
         );
       },
@@ -31,7 +32,7 @@ export const createConnectionsMenu = (
       click: () => {
         environmentManager.setEnvironment('production');
         mainWindow.webContents.send(
-          'env-update',
+          Channels.EnvUpdate,
           environmentManager.getEnvironment(),
         );
       },

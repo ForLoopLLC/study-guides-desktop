@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Question } from '../../../types';
+import { Channels } from '../../../enums';
 
 const useUpdateQuestions = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -13,7 +14,7 @@ const useUpdateQuestions = () => {
 
     try {
       const result = await window.electron.ipcRenderer.invoke(
-        'update-questions',
+        Channels.UpdateQuestions,
         udpatedQuestions,
       );
 

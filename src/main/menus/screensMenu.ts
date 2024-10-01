@@ -1,4 +1,5 @@
 import { MenuItemConstructorOptions, BrowserWindow } from 'electron';
+import { Channels, Routes } from '../../enums';
 
 export const createScreensMenu = (
   mainWindow: BrowserWindow,
@@ -8,19 +9,19 @@ export const createScreensMenu = (
     {
       label: 'Tags',
       click: () => {
-        mainWindow.webContents.send('navigate', '/tags');
+        mainWindow.webContents.send(Channels.Navigate, Routes.Tags);
       },
     },
     {
       label: 'Questions',
       click: () => {
-        mainWindow.webContents.send('navigate', '/questions');
+        mainWindow.webContents.send(Channels.Navigate, Routes.Questions);
       },
     },
     {
       label: 'Users',
       click: () => {
-        mainWindow.webContents.send('navigate', '/users');
+        mainWindow.webContents.send(Channels.Navigate, Routes.Users);
       },
     },
   ],

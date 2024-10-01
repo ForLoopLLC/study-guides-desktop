@@ -1,4 +1,5 @@
 import { MenuItemConstructorOptions, BrowserWindow } from 'electron';
+import { Channels, Routes } from '../../enums';
 
 export const createImportMenu = (
   mainWindow: BrowserWindow,
@@ -8,13 +9,13 @@ export const createImportMenu = (
     {
       label: 'Colleges',
       click: () => {
-        mainWindow.webContents.send('navigate', '/colleges');
+        mainWindow.webContents.send(Channels.Navigate, Routes.Colleges);
       },
     },
     {
       label: 'Certifications',
       click: () => {
-        mainWindow.webContents.send('navigate', '/certifications');
+        mainWindow.webContents.send(Channels.Navigate, Routes.Certifications);
       },
     },
   ],

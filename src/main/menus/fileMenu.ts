@@ -1,4 +1,5 @@
 import { MenuItemConstructorOptions, BrowserWindow } from 'electron';
+import { Channels, Routes } from '../../enums';
 
 export const createFileMenu = (
   mainWindow: BrowserWindow,
@@ -8,7 +9,7 @@ export const createFileMenu = (
     {
       label: 'Home',
       click: () => {
-        mainWindow.webContents.send('navigate', '/');
+        mainWindow.webContents.send(Channels.Navigate, Routes.Root);
       },
     },
     {
