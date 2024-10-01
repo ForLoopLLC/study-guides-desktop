@@ -29,8 +29,10 @@ export enum Channels {
   StopTailLog = 'stop-tail-log',
   // tags
   GetTags = 'get-tags',
+  GetTagWithRelations = 'get-tag-with-relations',
   UpdateTags = 'update-tags',
   UpdateTag = 'update-tag',
+  DeleteTag = 'delete-tag',
   GetTagAssist = 'get-ai-tag',
   // users
   GetUsers = 'get-users',

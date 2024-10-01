@@ -14,8 +14,9 @@ import {
   unpublishTagIndex,
 
 } from '../lib/search/tags';
+import { Channels } from '../../enums';
 
-ipcMain.handle('get-tags', async (_event, { page, limit, filter, query }) => {
+ipcMain.handle(Channels.GetTags, async (_event, { page, limit, filter, query }) => {
   try {
     const tags = await getTags(page, limit, filter, query);
     return tags;
@@ -26,7 +27,7 @@ ipcMain.handle('get-tags', async (_event, { page, limit, filter, query }) => {
   }
 });
 
-ipcMain.handle('get-tag-with-relations', async (_event, id) => {
+ipcMain.handle(Channels.GetTagWithRelations, async (_event, id) => {
   try {
     const tag = await getTagWithRelations(id);
     return tag;
@@ -37,7 +38,7 @@ ipcMain.handle('get-tag-with-relations', async (_event, id) => {
   }
 });
 
-ipcMain.handle('update-tag', async (_event, updatedTag) => {
+ipcMain.handle(Channels.UpdateTag, async (_event, updatedTag) => {
   try {
     const tag = await updateTag(updatedTag);
     if (!tag) {
@@ -57,7 +58,7 @@ ipcMain.handle('update-tag', async (_event, updatedTag) => {
   }
 });
 
-ipcMain.handle('delete-tag', async (_event, id) => {
+ipcMain.handle(Channels.DeleteTag, async (_event, id) => {
   try {
     const result = await deleteTag(id);
     if (result) {

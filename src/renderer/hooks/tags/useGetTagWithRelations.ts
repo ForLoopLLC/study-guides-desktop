@@ -1,5 +1,6 @@
 import { useState, useCallback } from 'react';
 import { TagWithRelations } from '../../../types';
+import { Channels } from '../../../enums';
 
 const useGetTagWithRelations = () => {
   const [tag, setTag] = useState<TagWithRelations | null>(null); // Initialize with null
@@ -16,7 +17,7 @@ const useGetTagWithRelations = () => {
     setError(null); // Clear previous errors before fetch
     try {
       const result = await window.electron.ipcRenderer.invoke(
-        'get-tag-with-relations',
+        Channels.GetTagWithRelations,
         id,
       );
 

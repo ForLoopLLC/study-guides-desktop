@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { cleanIpcError } from '../../util';
+import { Channels } from '../../../enums';
 
 const useDeleteTag = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -17,10 +18,10 @@ const useDeleteTag = () => {
     setSuccess(false);
 
     try {
-      const result = await window.electron.ipcRenderer.invoke('delete-tag', id);
+      const result = await window.electron.ipcRenderer.invoke(Channels.DeleteTag, id);
 
       if (result.error) {
-        setError(cleanIpcError(result.error, 'delete-tag'));
+        setError(cleanIpcError(result.error, Channels.DeleteTag));
         return false;
       } else {
         setSuccess(true);
@@ -28,7 +29,7 @@ const useDeleteTag = () => {
       }
     } catch (error) {
       const err = error as Error;
-      setError(cleanIpcError(err.message, 'delete-tag'));
+      setError(cleanIpcError(err.message, Channels.DeleteTag));
       return false; 
     } finally {
       setIsLoading(false);

@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Tag } from '../../../types/tag';
+import { Channels } from '../../../enums';
 
 const useUpdateTag = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -18,7 +19,7 @@ const useUpdateTag = () => {
 
     try {
       const result = await window.electron.ipcRenderer.invoke(
-        'update-tag',
+        Channels.UpdateTag,
         updatedTag,
       );
 

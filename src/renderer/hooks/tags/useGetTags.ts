@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Tag } from '../../../types/tag';
 import { Environment, TagFilter } from '../../../types';
+import { Channels } from '../../../enums';
 
 const useGetTags = (
   page: number = 1,
@@ -18,7 +19,7 @@ const useGetTags = (
   const fetchTags = useCallback(async () => {
     setIsLoading(true); // Set loading to true when fetch starts
     try {
-      const result = await window.electron.ipcRenderer.invoke('get-tags', {
+      const result = await window.electron.ipcRenderer.invoke(Channels.GetTags, {
         page,
         limit,
         filter,
