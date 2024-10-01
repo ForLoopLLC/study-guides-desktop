@@ -18,10 +18,10 @@ const getParsedTopicAssist = async (
   topic: ParsedCertificationTopic | ParsedCollegeTopic,
   onProgress: (data: {
     message: string;
-    question: ParsedQuestion;
     processed: number;
     total: number;
   }) => void,
+  sharedQuestionCounter: { current: number },
 ): Promise<ParsedCertificationTopic | ParsedCollegeTopic> => {
   const preparedQuestions = prepareQuestions(topic);
   const result = await generateChatCompletion(
@@ -31,31 +31,28 @@ const getParsedTopicAssist = async (
 
   // Total number of questions to process
   const totalQuestions = topic.questions.length;
-  let processedQuestions = 0;
 
+  // Process questions in parallel
   const updatedQuestions = await Promise.all(
     topic.questions.map(async (question) => {
-      const preparedQuestion = prepareQuestion(question); // Prepare the question
+      const preparedQuestion = prepareQuestion(question);
       const result = await generateChatCompletion(
         questionPrompt.text,
         preparedQuestion,
-      ); // Call the AI completion
-      const parsed = parseAIQuestionResponse(result); // Parse the AI response
+      );
+      const parsed = parseAIQuestionResponse(result);
 
-      processedQuestions += 1;
+      // Increment the shared question counter
+      sharedQuestionCounter.current += 1;
 
-      // Send progress update
+      // Send progress update after each question
       onProgress({
-        message: `Processed AI assisted results for question: ${question.question}`,
-        question: { ...question, ...parsed },
-        processed: processedQuestions,
+        message: `Processed AI-assisted results for question: ${question.question}`,
+        processed: sharedQuestionCounter.current, // Use shared counter
         total: totalQuestions,
       });
 
-      return {
-        ...question,
-        ...parsed,
-      };
+      return { ...question, ...parsed };
     }),
   );
 
@@ -72,13 +69,11 @@ const getParsedTopicAssist = async (
     };
   } catch (error) {
     const err = error as Error;
-    log.error(
-      'ai',
-      `The result is not in a valid format ${result}. ${err.message}.`,
-    );
+    log.error('ai', `The result is not in a valid format ${result}. ${err.message}.`);
     log.error('ai', `Bad result. ${JSON.stringify(result)}.`);
     throw new Error('Failed to parse AI response.');
   }
 };
+
 
 export default getParsedTopicAssist;

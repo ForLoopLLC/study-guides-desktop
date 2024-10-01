@@ -7,11 +7,13 @@ import {
   PreParserFolderFeedback,
   DeleteFolderFeedback,
   AssistFolderFeedback,
+  AssistFolderProgress,
 } from '../../../types';
 import { ParserType, Channels } from '../../../enums';
 
 const useManageFiles = (parserType: ParserType) => {
   const [files, setFiles] = useState<ImportFile[]>([]);
+  const [progress, setProgress] = useState<AssistFolderProgress | null>(null);
   const [feedback, setFeedback] = useState<
     | FileListFeedback
     | DeleteFileFeedback
@@ -31,7 +33,7 @@ const useManageFiles = (parserType: ParserType) => {
     useState<boolean>(false);
   const [isProcessingPreParseFolder, setIsProcessingPreParseFolder] =
     useState<boolean>(false);
-    const [isProcessingAssistFolder, setIsProcessingAssistFolder] =
+  const [isProcessingAssistFolder, setIsProcessingAssistFolder] =
     useState<boolean>(false);
 
   // List files
@@ -47,10 +49,7 @@ const useManageFiles = (parserType: ParserType) => {
   };
 
   // Pre-parse a file
-  const preParseFile = (
-    filePath: string,
-    parserType: ParserType,
-  ) => {
+  const preParseFile = (filePath: string, parserType: ParserType) => {
     setIsProcessingPreParse(true);
     window.electron.ipcRenderer.invoke(Channels.ParseFile, {
       parserType,
@@ -68,10 +67,7 @@ const useManageFiles = (parserType: ParserType) => {
   };
 
   // Pre-parse a folder
-  const preParseFolder = (
-    folderName: string,
-    parserType: ParserType,
-  ) => {
+  const preParseFolder = (folderName: string, parserType: ParserType) => {
     setIsProcessingPreParseFolder(true);
     window.electron.ipcRenderer.invoke(Channels.ParseFolder, {
       parserType,
@@ -80,11 +76,9 @@ const useManageFiles = (parserType: ParserType) => {
   };
 
   // AI assist a folder
-  const assistFolder = (
-    folderName: string,
-    parserType: ParserType,
-  ) => {
+  const assistFolder = (folderName: string, parserType: ParserType) => {
     setIsProcessingAssistFolder(true);
+    setFeedback(null);
     window.electron.ipcRenderer.invoke(Channels.AssistFolder, {
       parserType,
       folderName,
@@ -94,6 +88,7 @@ const useManageFiles = (parserType: ParserType) => {
   // Handle feedback from the main process
   const handleFileListFeedback = (payload: any) => {
     setIsProcessingList(false);
+    setFeedback(null);
     const response = payload as FileListFeedback;
     if (response.success) {
       setFiles(response.files);
@@ -103,6 +98,7 @@ const useManageFiles = (parserType: ParserType) => {
 
   const handleDeleteFileFeedback = (payload: any) => {
     setIsProcessingDelete(false);
+    setFeedback(null);
     const response = payload as DeleteFileFeedback;
     if (response.success) {
       setFiles((prevFiles) =>
@@ -114,12 +110,14 @@ const useManageFiles = (parserType: ParserType) => {
 
   const handlePreParseFeedback = (payload: any) => {
     setIsProcessingPreParse(false);
+    setFeedback(null);
     const response = payload as PreParserFeedback;
     setFeedback(response);
   };
 
   const handleDeleteFolderFeedback = (payload: any) => {
     setIsProcessingDeleteFolder(false);
+    setFeedback(null);
     const response = payload as DeleteFolderFeedback;
     if (response.success) {
       listFiles();
@@ -129,15 +127,21 @@ const useManageFiles = (parserType: ParserType) => {
 
   const handlePreParseFolderFeedback = (payload: any) => {
     setIsProcessingPreParseFolder(false);
+    setFeedback(null);
     const response = payload as PreParserFolderFeedback;
     setFeedback(response);
   };
 
   const handleAssistFolderFeedback = (payload: any) => {
     setIsProcessingAssistFolder(false);
+    setFeedback(null);
     const response = payload as AssistFolderFeedback;
     setFeedback(response);
-  }
+  };
+
+  const handleAssistFolderProgress = (payload: any) => {
+    setProgress(payload as AssistFolderProgress);
+  };
 
   useEffect(() => {
     // Subscribe to feedback events when component mounts
@@ -171,6 +175,11 @@ const useManageFiles = (parserType: ParserType) => {
       handleAssistFolderFeedback,
     );
 
+    const unsubscribeAssistFolderProgress = window.electron.ipcRenderer.on(
+      Channels.AssistProgress,
+      handleAssistFolderProgress,
+    );
+
     // Initial file listing
     listFiles();
 
@@ -182,12 +191,14 @@ const useManageFiles = (parserType: ParserType) => {
       unsubscribeDeleteFolderFeedback();
       unsubscribePreParseFolderFeedback();
       unsubscribeAssistFolderFeedback();
+      unsubscribeAssistFolderProgress();
     };
   }, [parserType]);
 
   return {
     files,
     feedback,
+    progress,
     isProcessingList,
     isProcessingDelete,
     isProcessingPreParse,

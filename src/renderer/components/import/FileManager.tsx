@@ -4,6 +4,7 @@ import { ParserType } from '../../../enums';
 import FileList from './FileList';
 import { ImportFile, Feedback } from '../../../types';
 import { FaFileImport, FaSpinner, FaClipboard } from 'react-icons/fa';
+import ProgressBar from '../ProgressBar';
 
 interface FileManagerProps {
   parserType: ParserType;
@@ -19,6 +20,7 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
   } = useFileUpload(parserType);
   const {
     feedback: fileManagementFeedback,
+    progress,
     files,
     listFiles,
     deleteFile,
@@ -31,6 +33,7 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
     isProcessingPreParse,
     isProcessingDeleteFolder,
     isProcessingPreParseFolder,
+    isProcessingAssistFolder,
   } = useManageFiles(parserType);
 
   const [combinedFeedback, setCombinedFeedback] = useState<Feedback | null>(
@@ -104,7 +107,8 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
     isProcessingDelete ||
     isProcessingPreParse ||
     isProcessingDeleteFolder ||
-    isProcessingPreParseFolder;
+    isProcessingPreParseFolder ||
+    isProcessingAssistFolder;
 
   const handleCopyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(
@@ -162,6 +166,26 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
         )}
         {copySuccess && <p className="text-sm text-green-500">{copySuccess}</p>}
       </section>
+
+      {isProcessingAssistFolder && (
+        <div>
+          <section id="assist-topic-progress" className="mt-6">
+            <ProgressBar
+              progress={progress?.topicProgress.processed || 0}
+              total={progress?.topicProgress.total || 1} // Avoid division by zero
+              label={progress?.topicProgress.message || 'Topic Progress'}
+            />
+          </section>
+
+          <section id="assist-question-progress" className="mt-6">
+            <ProgressBar
+              progress={progress?.questionProgress.processed || 0}
+              total={progress?.questionProgress.total || 1} // Avoid division by zero
+              label={progress?.questionProgress.message || 'Question Progress'}
+            />
+          </section>
+        </div>
+      )}
 
       <section className="mt-6">
         <div className="flex items-center space-x-2">
