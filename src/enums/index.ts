@@ -19,77 +19,94 @@ export enum UserFilterType {
 }
 
 export enum Channels {
+  // Navigation
   Navigate = 'navigate',
   Connection = 'connection',
   EnvUpdate = 'env-update',
-  // logs
-  LogMessage = 'log-message',
-  LogUpdate = 'log-update',
-  StartTailLog = 'start-tail-log',
-  StopTailLog = 'stop-tail-log',
-  // tags
-  GetTags = 'get-tags',
-  GetTagWithRelations = 'get-tag-with-relations',
-  UpdateTags = 'update-tags',
-  UpdateTag = 'update-tag',
-  DeleteTag = 'delete-tag',
-  ClearTagReports = 'clear-tag-reports',
-  GetTagAssist = 'get-ai-tag',
-  // users
-  GetUsers = 'get-users',
-  UpdateUser = 'update-user',
-  // questions
-  GetQuestion = 'get-question',
-  GetQuestions = 'get-questions',
-  UpdateQuestions = 'update-questions',
-  UpdateQuestion = 'update-question',
-  ClearQuestionReports = 'clear-question-reports',
-  // assist questions
-  AssistQuestion = 'get-ai-question',
-  // publish tags index
-  PublishTagsIndex = 'publish-tags-index',
-  PublishTagsIndexProgress = 'publish-tags-index-progress',
-  PublishTagsIndexComplete = 'publish-tags-index-complete',
-  PublishTagsIndexError = 'publish-tags-index-error',
-  // batch assist tags
-  BatchAssistTags = 'batch-assist-tags',
-  BatchAssistTagsProgress = 'batch-assist-tags-progress',
-  BatchAssistTagsComplete = 'batch-assist-tags-complete',
-  BatchAssistTagsError = 'batch-assist-tags-error',
-  // batch assist questions
-  BatchAssistQuestions = 'batch-assist-questions',
-  BatchAssistQuestionsProgress = 'batch-assist-questions-progress',
-  BatchAssistQuestionsComplete = 'batch-assist-questions-complete',
-  BatchAssistQuestionsError = 'batch-assist-questions-error',
-  // publish users index
-  PublishUsersIndex = 'publish-users-index',
-  PublishUsersIndexProgress = 'publish-users-index-progress',
-  PublishUsersIndexComplete = 'publish-users-index-complete',
-  PublishUsersIndexError = 'publish-users-index-error',
-  // publish questions index
-  PublishQuestionsIndex = 'publish-questions-index',
-  PublishQuestionsIndexProgress = 'publish-questions-index-progress',
-  PublishQuestionsIndexComplete = 'publish-questions-index-complete',
-  PublishQuestionsIndexError = 'publish-questions-index-error',
-  // import files
-  ImportFile = 'import-file-to-local',
-  ImportFeedback = 'file-import-feedback',
-  // delete files
-  DeleteFile = 'import-delete-file',
-  DeleteFileFeedback = 'file-delete-feedback',
-  DeleteFolder = 'import-delete-folder',
-  DeleteFolderFeedback = 'folder-delete-feedback',
-  // list files
-  ListFiles = 'import-list-files',
-  ListFilesFeedback = 'file-list-feedback',
-  // parse files
-  ParseFile = 'import-parse-file',
-  ParseFileFeedback = 'file-parse-feedback',
-  ParseFolder = 'import-parse-folder',
-  ParseFolderFeedback = 'folder-parse-feedback',
-  // assist files
-  AssistFolder = 'import-assist-folder',
-  AssistFeedback = 'folder-assist-feedback',
-  AssistProgress = 'folder-assist-progress',
+
+  // Logs
+  LogMessage = 'log:message',
+  LogUpdate = 'log:update',
+  StartTailLog = 'log:start-tail',
+  StopTailLog = 'log:stop-tail',
+
+  // Tags
+  GetTags = 'tags:get',
+  GetTagWithRelations = 'tags:get-with-relations',
+  UpdateTags = 'tags:update',
+  UpdateTag = 'tags:update-single',
+  DeleteTag = 'tags:delete',
+  ClearTagReports = 'tags:clear-reports',
+  GetTagAssist = 'tags:get-ai-assist',
+
+  // Users
+  GetUsers = 'users:get',
+  UpdateUser = 'users:update',
+
+  // Questions
+  GetQuestion = 'questions:get-single',
+  GetQuestions = 'questions:get',
+  UpdateQuestions = 'questions:update',
+  UpdateQuestion = 'questions:update-single',
+  ClearQuestionReports = 'questions:clear-reports',
+
+  // Assist Questions
+  AssistQuestion = 'questions:assist',
+
+  // Publish Tags Index
+  PublishTagsIndex = 'tags:publish-index',
+  PublishTagsIndexProgress = 'tags:publish-index-progress',
+  PublishTagsIndexComplete = 'tags:publish-index-complete',
+  PublishTagsIndexError = 'tags:publish-index-error',
+
+  // Batch Assist Tags
+  BatchAssistTags = 'tags:batch-assist',
+  BatchAssistTagsProgress = 'tags:batch-assist-progress',
+  BatchAssistTagsComplete = 'tags:batch-assist-complete',
+  BatchAssistTagsError = 'tags:batch-assist-error',
+
+  // Batch Assist Questions
+  BatchAssistQuestions = 'questions:batch-assist',
+  BatchAssistQuestionsProgress = 'questions:batch-assist-progress',
+  BatchAssistQuestionsComplete = 'questions:batch-assist-complete',
+  BatchAssistQuestionsError = 'questions:batch-assist-error',
+
+  // Publish Users Index
+  PublishUsersIndex = 'users:publish-index',
+  PublishUsersIndexProgress = 'users:publish-index-progress',
+  PublishUsersIndexComplete = 'users:publish-index-complete',
+  PublishUsersIndexError = 'users:publish-index-error',
+
+  // Publish Questions Index
+  PublishQuestionsIndex = 'questions:publish-index',
+  PublishQuestionsIndexProgress = 'questions:publish-index-progress',
+  PublishQuestionsIndexComplete = 'questions:publish-index-complete',
+  PublishQuestionsIndexError = 'questions:publish-index-error',
+
+  // Import Files
+  ImportFile = 'files:import',
+  ImportFeedback = 'files:import-feedback',
+
+  // Delete Files
+  DeleteFile = 'files:delete',
+  DeleteFileFeedback = 'files:delete-feedback',
+  DeleteFolder = 'folder:delete',
+  DeleteFolderFeedback = 'folder:delete-feedback',
+
+  // List Files
+  ListFiles = 'files:list',
+  ListFilesFeedback = 'files:list-feedback',
+
+  // Parse Files
+  ParseFile = 'files:parse',
+  ParseFileFeedback = 'files:parse-feedback',
+  ParseFolder = 'folder:parse',
+  ParseFolderFeedback = 'folder:parse-feedback',
+
+  // Assist Files
+  AssistFolder = 'folder:assist',
+  AssistFeedback = 'folder:assist-feedback',
+  AssistProgress = 'folder:assist-progress',
 }
+
 

@@ -6,6 +6,7 @@ import crypto from 'crypto';
 import dotenv from 'dotenv';
 import fs from 'fs';
 import log from 'electron-log';
+import { log as appLogger } from '../main/main';
 import { LoggerWithCategory } from '../types';
 import { ParsedCertificationTopic, ParsedCollegeTopic } from '../types';
 
@@ -148,10 +149,15 @@ export const formatAsJSON = (
 }
 
 export function logAndSend(event: Electron.IpcMainInvokeEvent, channel: string, ...data: any[]) {
-  console.log(`Sending IPC message on channel: ${channel}`);
-  console.log('Data:', data);
+  // Use a default value "general" if the channel name does not split properly
+  const prefix = channel.includes(':') ? channel.split(':')[0] : 'general';
+  
+  // Log the channel and the data being sent
+  appLogger.info(prefix, `Sending IPC message on channel: ${channel}`);
+  appLogger.info(prefix, JSON.stringify(data, null, 2));
 
   // Send the original message
   event.sender.send(channel, ...data);
 }
+
 
