@@ -141,7 +141,7 @@ const QuestionUpdate: React.FC<QuestionUpdateProps> = ({
   };
 
   if (!question) {
-    return <p className="text-gray-500">Select a tag to edit</p>;
+    return <p className="text-gray-500">Select a question to edit</p>;
   }
 
   return (

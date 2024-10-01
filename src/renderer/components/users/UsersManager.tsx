@@ -4,7 +4,6 @@ import {
   usePublishUsersIndex,
   useGetTagWithRelations,
 } from '../../hooks';
-import { FaSpinner } from 'react-icons/fa';
 import { useAppContext } from '../../contexts/AppContext';
 import { UserFilter, User } from '../../../types';
 import { UserFilterType } from '../../../enums';
@@ -17,6 +16,8 @@ import {
 } from '..';
 import Search from '../SearchBar';
 import UserList from './UserList';
+import Toolbar from './Toolbar';
+import MessageBar from '../MessageBar';
 
 const UserManager: React.FC = () => {
   const [filter, setFilter] = useState<UserFilter>('All');
@@ -92,37 +93,23 @@ const UserManager: React.FC = () => {
   return (
     <div>
       {/* Toolbar and Message Bar */}
-      <section
-        id="toolbar"
-        className="flex flex-wrap gap-1 justify-start items-center border-2 p-2"
-      >
-        <button
-          onClick={handleUpdateIndexes}
-          disabled={users.length === 0 || isLoading || publishProcessing}
-          className="p-2 bg-blue-500 text-white rounded flex items-center justify-center disabled:opacity-50"
-        >
-          {publishProcessing ? (
-            <FaSpinner className="animate-spin mr-2" />
-          ) : null}
-          Update Indexes
-        </button>
-      </section>
+      <Toolbar
+        disabled={users.length === 0}
+        isProcessing={isLoading || publishProcessing}
+        handleUpdateIndexes={handleUpdateIndexes}
+      />
 
-      <section id="messagebar" className="mt-4 p-4 border bg-gray-100 rounded">
-        {/* progress display */}
-        {publishProcessing && (
-          <p>Indexing in progress: ({totalPublished} users published)</p>
-        )}
-        {/* completed display */}
-        {publishComplete && (
-          <p className="text-green-500">
-            Indexing complete! {totalPublished} users published.
-          </p>
-        )}
-
-        {/* error display */}
-        {publishError && <p className="text-red-500">Error: {publishError}</p>}
-      </section>
+      <MessageBar
+        totalPublished={totalPublished}
+        totalAssisted={0}
+        publishProcessing={publishProcessing}
+        assistProcessing={false}
+        publishComplete={publishComplete}
+        assistComplete={false}
+        publishError={publishError || ''}
+        assistError={''}
+        entityType="tags"
+      />
 
       <section className="mt-4 mb-4 flex flex-row">
         <div className="mr-3">

@@ -19,6 +19,9 @@ import {
 import Search from '../SearchBar';
 import QuestionList from './QuestionList';
 import { QuestionFilterType } from '../../../enums';
+import Toolbar from './Toolbar';
+import MessageBar from '../MessageBar';
+
 const QuestionsManager: React.FC = () => {
   const [filter, setFilter] = useState<QuestionFilter>('All');
   const appContext = useAppContext();
@@ -126,66 +129,26 @@ const QuestionsManager: React.FC = () => {
   return (
     <div>
       {/* Toolbar and Message Bar */}
-      <section
-        id="toolbar"
-        className="flex flex-wrap gap-1 justify-start items-center border-2 p-2"
-      >
-        <button
-          onClick={handleUpdateIndexes}
-          disabled={
-            questions.length === 0 ||
-            isLoading ||
-            publishProcessing ||
-            assistProcessing
-          }
-          className="p-2 bg-blue-500 text-white rounded flex items-center justify-center disabled:opacity-50"
-        >
-          {publishProcessing ? (
-            <FaSpinner className="animate-spin mr-2" />
-          ) : null}
-          Update Indexes
-        </button>
-        <button
-          onClick={handleAiAssist}
-          disabled={
-            questions.length === 0 ||
-            isLoading ||
-            publishProcessing ||
-            assistProcessing
-          }
-          className="p-2 bg-blue-500 text-white rounded flex items-center justify-center disabled:opacity-50"
-        >
-          {assistProcessing ? (
-            <FaSpinner className="animate-spin mr-2" />
-          ) : null}
-          Assist
-        </button>
-      </section>
+      <Toolbar
+        disabled={questions.length === 0}
+        isProcessing={
+          isLoading || publishProcessing || assistProcessing || clearingLoading
+        }
+        handleUpdateIndexes={handleUpdateIndexes}
+        handleAiAssist={handleAiAssist}
+      />
 
-      <section id="messagebar" className="mt-4 p-4 border bg-gray-100 rounded">
-        {/* progress display */}
-        {publishProcessing && (
-          <p>Indexing in progress: ({totalPublished} questions published)</p>
-        )}
-        {assistProcessing && (
-          <p>Assisting in progress: ({totalAssisted} questions assisted)</p>
-        )}
-        {/* completed display */}
-        {publishComplete && (
-          <p className="text-green-500">
-            Indexing complete! {totalPublished} questions published.
-          </p>
-        )}
-
-        {assistComplete && (
-          <p className="text-green-500">
-            Assist complete! {totalAssisted} questions assisted.
-          </p>
-        )}
-        {/* error display */}
-        {publishError && <p className="text-red-500">Error: {publishError}</p>}
-        {assistError && <p className="text-red-500">Error: {assistError}</p>}
-      </section>
+      <MessageBar
+        totalPublished={totalPublished}
+        totalAssisted={totalAssisted}
+        publishProcessing={publishProcessing}
+        assistProcessing={assistProcessing}
+        publishComplete={publishComplete}
+        assistComplete={assistComplete}
+        publishError={publishError || ''}
+        assistError={assistError || ''}
+        entityType="questions"
+      />
 
       <section className="mt-4 mb-4 flex flex-row">
         <div className="mr-3">

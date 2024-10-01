@@ -7,7 +7,7 @@ import {
   useDeleteTag,
   useTagBatchAI,
 } from '../../hooks';
-import { FaSpinner } from 'react-icons/fa';
+
 import { TagType } from '@prisma/client';
 import { useAppContext } from '../../contexts/AppContext';
 import { TagFilter, Tag } from '../../../types';
@@ -21,6 +21,8 @@ import {
 import TagTree from './TagTree';
 import Search from '../SearchBar';
 import TagList from './TagList';
+import Toolbar from './Toolbar';
+import MessageBar from '../MessageBar';
 
 const TagsManager: React.FC = () => {
   const [filter, setFilter] = useState<TagFilter>('All');
@@ -149,56 +151,30 @@ const TagsManager: React.FC = () => {
   return (
     <div>
       {/* Toolbar and Message Bar */}
-      <section
-        id="toolbar"
-        className="flex flex-wrap gap-1 justify-start items-center border-2 p-2"
-      >
-        <button
-          onClick={handleUpdateIndexes}
-          disabled={tags.length === 0 || isLoading || publishProcessing}
-          className="p-2 bg-blue-500 text-white rounded flex items-center justify-center disabled:opacity-50"
-        >
-          {publishProcessing ? (
-            <FaSpinner className="animate-spin mr-2" />
-          ) : null}
-          Update Indexes
-        </button>
-        <button
-          onClick={handleAiAssist}
-          disabled={tags.length === 0 || isLoading || publishProcessing}
-          className="p-2 bg-blue-500 text-white rounded flex items-center justify-center disabled:opacity-50"
-        >
-          {publishProcessing ? (
-            <FaSpinner className="animate-spin mr-2" />
-          ) : null}
-          Assist
-        </button>
-      </section>
+      <Toolbar
+        disabled={tags.length === 0}
+        isProcessing={
+          isLoading ||
+          publishProcessing ||
+          assistProcessing ||
+          clearingLoading ||
+          isDeleting
+        }
+        handleUpdateIndexes={handleUpdateIndexes}
+        handleAiAssist={handleAiAssist}
+      />
 
-      <section id="messagebar" className="mt-4 p-4 border bg-gray-100 rounded">
-        {/* progress display */}
-        {publishProcessing && (
-          <p>Indexing in progress: ({totalPublished} tags published)</p>
-        )}
-        {assistProcessing && (
-          <p>Indexing in progress: ({totalAssisted} tags assisted)</p>
-        )}
-        {/* completed display */}
-        {publishComplete && (
-          <p className="text-green-500">
-            Indexing complete! {totalPublished} tags published.
-          </p>
-        )}
-
-        {assistComplete && (
-          <p className="text-green-500">
-            Assist complete! {totalAssisted} tags assisted.
-          </p>
-        )}
-        {/* error display */}
-        {publishError && <p className="text-red-500">Error: {publishError}</p>}
-        {assistError && <p className="text-red-500">Error: {assistError}</p>}
-      </section>
+      <MessageBar
+        totalPublished={totalPublished}
+        totalAssisted={totalAssisted}
+        publishProcessing={publishProcessing}
+        assistProcessing={assistProcessing}
+        publishComplete={publishComplete}
+        assistComplete={assistComplete}
+        publishError={publishError || ''}
+        assistError={assistError || ''}
+        entityType="tags"
+      />
 
       <section className="mt-4 mb-4 flex flex-row">
         <div className="mr-3">

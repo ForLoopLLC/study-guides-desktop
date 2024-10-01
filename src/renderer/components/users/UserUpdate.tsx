@@ -111,7 +111,7 @@ const TagForm: React.FC<TagUpdateProps> = ({ user, onUpdate }) => {
   };
 
   if (!user) {
-    return <p className="text-gray-500">Select a tag to edit</p>;
+    return <p className="text-gray-500">Select a user to edit</p>;
   }
 
   return (
