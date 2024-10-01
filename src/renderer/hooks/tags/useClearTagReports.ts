@@ -1,4 +1,5 @@
 import { useState } from 'react';
+import { Channels } from '../../../enums';
 
 const useClearTagReports = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -7,7 +8,7 @@ const useClearTagReports = () => {
     setIsLoading(true);
     try {
       const result = await window.electron.ipcRenderer.invoke(
-        'clear-tag-reports',
+        Channels.ClearTagReports,
         id,
       );
 

@@ -74,7 +74,7 @@ ipcMain.handle(Channels.DeleteTag, async (_event, id) => {
   }
 });
 
-ipcMain.handle('clear-tag-reports', async (_event, id) => {
+ipcMain.handle(Channels.ClearTagReports, async (_event, id) => {
   try {
     const result = await clearTagReports(id);
     if (result) {

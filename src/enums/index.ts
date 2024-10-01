@@ -33,6 +33,7 @@ export enum Channels {
   UpdateTags = 'update-tags',
   UpdateTag = 'update-tag',
   DeleteTag = 'delete-tag',
+  ClearTagReports = 'clear-tag-reports',
   GetTagAssist = 'get-ai-tag',
   // users
   GetUsers = 'get-users',
