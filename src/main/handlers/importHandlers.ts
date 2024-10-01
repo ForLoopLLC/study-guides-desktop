@@ -14,14 +14,13 @@ import {
   ParserResult,
   PreParserFeedback,
   PreParserFolderFeedback,
+  AssistFolderFeedback,
   ParsedCertificationTopic,
   ParsedCollegeTopic,
-  AITopicResponse,
 } from '../../types';
 import { ParserType } from '../../enums';
 import { fileParser, toParsedTopic } from '../lib/parse';
-import { getParsedTopicAssist, mergeTopicWithAssist } from '../lib/ai/parse';
-import { formatAsJSON } from '../util';
+import { getParsedTopicAssist } from '../lib/ai/parse';
 
 const ignorelist = ['.DS_Store', 'Thumbs.db', 'parsed'];
 
@@ -153,12 +152,19 @@ app.whenReady().then(() => {
     T extends ParsedCertificationTopic | ParsedCollegeTopic,
   >({
     topics,
+    onProgress,
   }: {
     topics: T[];
+    onProgress: (data: { message: string; topic: T }) => void;
   }) => {
     const results = await Promise.all(
       topics.map(async (topic: T) => {
         const updatedTopic = await getParsedTopicAssist(topic);
+        onProgress({
+          message: `Processed AI assisted results for ${topic.name}`,
+          topic: updatedTopic as T,
+        });
+  
         return updatedTopic;
       }),
     );
@@ -459,7 +465,7 @@ app.whenReady().then(() => {
 
   // Handle AI updates
   ipcMain.handle(
-    'import-ai-update-folder',
+    'import-assist-folder',
     async (event, { parserType, folderName }) => {
       try {
         const workingDir = getWorkingDir(parserType);
@@ -499,11 +505,19 @@ app.whenReady().then(() => {
           case ParserType.Colleges:
             results = await processAIAssist({
               topics: topics as ParsedCollegeTopic[],
+              onProgress: ({ message, topic }) => {
+                // Send progress update to the renderer
+                event.sender.send('assist-folder-progress', { message, topic });
+              },
             });
             break;
           case ParserType.Certifications:
             results = await processAIAssist({
               topics: topics as ParsedCertificationTopic[],
+              onProgress: ({ message, topic }) => {
+                // Send progress update to the renderer
+                event.sender.send('assist-folder-progress', { message, topic });
+              },
             });
             break;
           default:
@@ -514,11 +528,24 @@ app.whenReady().then(() => {
         topicsLength = results.length;
         outputAssistResults(results, folderPath);
 
-        // Log the results
-        console.log('response', topicsLength);
+        const feedback: AssistFolderFeedback = {
+          message: `AI assist succeeded: ${folderName}`,
+          success: true,
+          level: 'info',
+          dateTime: new Date(),
+        };
+        log.info('import', `AI assist succeeded.`);
+        event.sender.send('assist-folder-feedback', feedback);
       } catch (error) {
-        console.error('Error in import-ai-update-folder:', error);
-        // Handle or send feedback back to the renderer if necessary
+        const err = error as Error;
+      const feedback: AssistFolderFeedback = {
+        message: `Error running AI assist\n\n${err.message}`,
+        success: false,
+        level: 'error',
+        dateTime: new Date(),
+      };
+      event.sender.send('assist-folder-feedback', feedback);
+      log.error('import', `Error AI assist for folder. ${err.message}`);
       }
     },
   );

@@ -51,7 +51,9 @@ export type Channels =
   | 'file-parse-feedback'
   | 'folder-delete-feedback'
   | 'folder-parse-feedback'
-  | 'import-ai-update-folder';
+  | 'import-assist-folder'
+  | 'assist-folder-feedback'
+  | 'assist-folder-progress';
 
 export interface Environment {
   env: 'development' | 'test' | 'production' | null;

@@ -12,7 +12,6 @@ import { generateChatCompletion } from '../generateChatCompletion';
 import { mergeTopicWithAssist } from '.';
 import { parseAITopicWithQuestionResponse } from '../tags/parsers';
 import { parseAIQuestionResponse } from '../questions/parsers';
-import { updateQuestion } from '../../database/questions';
 
 const getParsedTopicAssist = async (
   topic: ParsedCertificationTopic | ParsedCollegeTopic,
@@ -52,7 +51,7 @@ const getParsedTopicAssist = async (
     const err = error as Error;
     log.error(
       'ai',
-      `The result is not a valid JSON string ${result}. ${err.message}.`,
+      `The result is not in a valid format ${result}. ${err.message}.`,
     );
     log.error('ai', `Bad result. ${JSON.stringify(result)}.`);
     throw new Error('Failed to parse AI response.');

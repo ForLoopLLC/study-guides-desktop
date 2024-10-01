@@ -123,3 +123,6 @@ export interface DeleteFolderFeedback extends Feedback {
 export interface PreParserFolderFeedback extends Feedback {
   results: ParserResult[];
 }
+
+export interface AssistFolderFeedback extends Feedback {
+}
