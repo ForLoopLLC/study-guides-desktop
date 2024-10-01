@@ -18,9 +18,10 @@ import {
   ParsedCertificationTopic,
   ParsedCollegeTopic,
 } from '../../types';
-import { ParserType } from '../../enums';
+import { ParserType, Channels } from '../../enums';
 import { fileParser, toParsedTopic } from '../lib/parse';
 import { getParsedTopicAssist } from '../lib/ai/parse';
+import { logAndSend } from '../util';
 
 const ignorelist = ['.DS_Store', 'Thumbs.db', 'parsed'];
 
@@ -126,7 +127,6 @@ app.whenReady().then(() => {
 
       // Write the JSON string to the file
       fs.writeFileSync(filePath, parsedTopic.toJson(), 'utf8');
-      console.log(`Saved ${parsedTopic.name} to ${filePath}`);
     });
   };
 
@@ -144,7 +144,6 @@ app.whenReady().then(() => {
 
       // Write the JSON string to the file
       fs.writeFileSync(filePath, topic.toJson(), 'utf8');
-      console.log(`Saved ${topic.name} to ${filePath}`);
     });
   };
 
@@ -164,7 +163,7 @@ app.whenReady().then(() => {
           message: `Processed AI assisted results for ${topic.name}`,
           topic: updatedTopic as T,
         });
-  
+
         return updatedTopic;
       }),
     );
@@ -174,7 +173,7 @@ app.whenReady().then(() => {
 
   // Handle file import
   ipcMain.handle(
-    'import-file-to-local',
+    Channels.ImportFile,
     async (event, { filePath, parserType }) => {
       try {
         const parser = parserType as ParserType;
@@ -267,10 +266,9 @@ app.whenReady().then(() => {
           level: 'info',
           dateTime: new Date(),
         };
-        event.sender.send('file-import-feedback', feedback);
+        logAndSend(event, Channels.ImportFeedback, feedback);
       } catch (error) {
         const err = error as Error;
-        log.error('import', `File import error. ${err.message}`);
 
         // Send error feedback
         const feedback: Feedback = {
@@ -279,13 +277,13 @@ app.whenReady().then(() => {
           level: 'error',
           dateTime: new Date(),
         };
-        event.sender.send('file-import-feedback', feedback);
+        logAndSend(event, Channels.ImportFeedback, feedback);
       }
     },
   );
 
   // Handle file listing
-  ipcMain.handle('import-list-files', (event, { parserType }) => {
+  ipcMain.handle(Channels.ListFiles, (event, { parserType }) => {
     try {
       const targetDir = getWorkingDir(parserType);
       const files = listFilesRecursive(targetDir, ignorelist);
@@ -298,10 +296,9 @@ app.whenReady().then(() => {
         dateTime: new Date(),
       };
 
-      event.sender.send('file-list-feedback', feedback);
+      logAndSend(event, Channels.ListFilesFeedback, feedback);
     } catch (error) {
       const err = error as Error;
-      log.error('list', `Error listing files. ${err.message}`);
       const feedback: FileListFeedback = {
         files: [],
         message: `Error listing files. ${err.message}`,
@@ -309,16 +306,15 @@ app.whenReady().then(() => {
         level: 'error',
         dateTime: new Date(),
       };
-      event.sender.send('file-list-feedback', feedback);
+      logAndSend(event, Channels.ListFilesFeedback, feedback);
     }
   });
 
   // Handle file deletion
-  ipcMain.handle('import-delete-file', (event, { filePath }) => {
+  ipcMain.handle(Channels.DeleteFile, (event, { filePath }) => {
     try {
       if (fs.existsSync(filePath)) {
         fs.unlinkSync(filePath);
-        log.info('File deleted:', filePath);
         const feedback: DeleteFileFeedback = {
           message: `Deleted file: ${path.basename(filePath)}`,
           success: true,
@@ -326,13 +322,12 @@ app.whenReady().then(() => {
           level: 'info',
           dateTime: new Date(),
         };
-        event.sender.send('file-delete-feedback', feedback);
+        logAndSend(event, Channels.DeleteFileFeedback, feedback);
       } else {
         throw new Error('File does not exist');
       }
     } catch (error) {
       const err = error as Error;
-      log.error('delete', `Error deleting file. ${err.message}`);
       const feedback: DeleteFileFeedback = {
         message: `Error deleting the file. ${err.message}`,
         success: false,
@@ -340,12 +335,12 @@ app.whenReady().then(() => {
         level: 'error',
         dateTime: new Date(),
       };
-      event.sender.send('file-delete-feedback', feedback);
+      logAndSend(event, Channels.DeleteFileFeedback, feedback);
     }
   });
 
   // Handle file parsing
-  ipcMain.handle('import-parse-file', (event, { parserType, filePath }) => {
+  ipcMain.handle(Channels.ParseFile, (event, { parserType, filePath }) => {
     let result: any;
     try {
       const file = fs.readFileSync(filePath, 'utf-8');
@@ -361,8 +356,7 @@ app.whenReady().then(() => {
         level: 'info',
         dateTime: new Date(),
       };
-      log.info('import', `File preparse succeeded.`);
-      event.sender.send('file-parse-feedback', feedback);
+      logAndSend(event, Channels.ParseFileFeedback, feedback);
     } catch (error) {
       const err = error as Error;
       const feedback: PreParserFeedback = {
@@ -372,16 +366,14 @@ app.whenReady().then(() => {
         level: 'error',
         dateTime: new Date(),
       };
-      event.sender.send('file-parse-feedback', feedback);
-      log.error('import', `Error preparsing file. ${err.message}`);
+      logAndSend(event, Channels.ParseFileFeedback, feedback);
     }
   });
 
   // Handle folder parsing
-  ipcMain.handle('import-parse-folder', (event, { parserType, folderName }) => {
+  ipcMain.handle(Channels.ParseFolder, (event, { parserType, folderName }) => {
     const workingDir = getWorkingDir(parserType);
     const folderPath = path.join(workingDir, folderName);
-    console.log('parse folder', folderPath);
     try {
       // Ensure the folder exists
       if (!fs.existsSync(folderPath)) {
@@ -405,8 +397,7 @@ app.whenReady().then(() => {
         level: 'info',
         dateTime: new Date(),
       };
-      log.info('import', `Folder preparse succeeded.`);
-      event.sender.send('folder-parse-feedback', feedback);
+      logAndSend(event, Channels.ParseFolderFeedback, feedback);
     } catch (error) {
       const err = error as Error;
       const feedback: PreParserFolderFeedback = {
@@ -416,56 +407,50 @@ app.whenReady().then(() => {
         level: 'error',
         dateTime: new Date(),
       };
-      event.sender.send('folder-parse-feedback', feedback);
-      log.error('import', `Error preparsing folder. ${err.message}`);
+      logAndSend(event, Channels.ParseFolderFeedback, feedback);
     }
   });
 
   // Handle folder deletion
-  ipcMain.handle(
-    'import-delete-folder',
-    (event, { folderName, parserType }) => {
-      const workingDir = getWorkingDir(parserType);
-      const folderPath = path.join(workingDir, folderName);
-      console.log('delete folder', folderPath);
-      try {
-        // Ensure the folder exists
-        if (!fs.existsSync(folderPath)) {
-          throw new Error('Folder does not exist');
-        }
-
-        // Recursively remove the folder and its contents
-        fs.rmSync(folderPath, { recursive: true, force: true });
-
-        // Send success feedback
-        const feedback: DeleteFolderFeedback = {
-          message: `Deleted folder: ${folderName}`,
-          success: true,
-          filePath: folderPath,
-          level: 'info',
-          dateTime: new Date(),
-        };
-        event.sender.send('folder-delete-feedback', feedback);
-      } catch (error) {
-        const err = error as Error;
-        log.error('delete', `Error deleting folder. ${err.message}`);
-
-        // Send error feedback
-        const feedback: DeleteFolderFeedback = {
-          message: `Error deleting the folder. ${err.message}`,
-          success: false,
-          filePath: folderPath,
-          level: 'error',
-          dateTime: new Date(),
-        };
-        event.sender.send('folder-delete-feedback', feedback);
+  ipcMain.handle(Channels.DeleteFolder, (event, { folderName, parserType }) => {
+    const workingDir = getWorkingDir(parserType);
+    const folderPath = path.join(workingDir, folderName);
+    try {
+      // Ensure the folder exists
+      if (!fs.existsSync(folderPath)) {
+        throw new Error('Folder does not exist');
       }
-    },
-  );
+
+      // Recursively remove the folder and its contents
+      fs.rmSync(folderPath, { recursive: true, force: true });
+
+      // Send success feedback
+      const feedback: DeleteFolderFeedback = {
+        message: `Deleted folder: ${folderName}`,
+        success: true,
+        filePath: folderPath,
+        level: 'info',
+        dateTime: new Date(),
+      };
+      logAndSend(event, Channels.DeleteFolderFeedback, feedback);
+    } catch (error) {
+      const err = error as Error;
+
+      // Send error feedback
+      const feedback: DeleteFolderFeedback = {
+        message: `Error deleting the folder. ${err.message}`,
+        success: false,
+        filePath: folderPath,
+        level: 'error',
+        dateTime: new Date(),
+      };
+      logAndSend(event, Channels.DeleteFolderFeedback, feedback);
+    }
+  });
 
   // Handle AI updates
   ipcMain.handle(
-    'import-assist-folder',
+    Channels.AssistFolder,
     async (event, { parserType, folderName }) => {
       try {
         const workingDir = getWorkingDir(parserType);
@@ -507,7 +492,7 @@ app.whenReady().then(() => {
               topics: topics as ParsedCollegeTopic[],
               onProgress: ({ message, topic }) => {
                 // Send progress update to the renderer
-                event.sender.send('assist-folder-progress', { message, topic });
+                logAndSend(event, Channels.AssistProgress, { message, topic });
               },
             });
             break;
@@ -516,7 +501,7 @@ app.whenReady().then(() => {
               topics: topics as ParsedCertificationTopic[],
               onProgress: ({ message, topic }) => {
                 // Send progress update to the renderer
-                event.sender.send('assist-folder-progress', { message, topic });
+                logAndSend(event, Channels.AssistProgress, { message, topic });
               },
             });
             break;
@@ -534,18 +519,16 @@ app.whenReady().then(() => {
           level: 'info',
           dateTime: new Date(),
         };
-        log.info('import', `AI assist succeeded.`);
-        event.sender.send('assist-folder-feedback', feedback);
+        logAndSend(event, Channels.AssistFeedback, feedback);
       } catch (error) {
         const err = error as Error;
-      const feedback: AssistFolderFeedback = {
-        message: `Error running AI assist\n\n${err.message}`,
-        success: false,
-        level: 'error',
-        dateTime: new Date(),
-      };
-      event.sender.send('assist-folder-feedback', feedback);
-      log.error('import', `Error AI assist for folder. ${err.message}`);
+        const feedback: AssistFolderFeedback = {
+          message: `Error running AI assist\n\n${err.message}`,
+          success: false,
+          level: 'error',
+          dateTime: new Date(),
+        };
+        logAndSend(event, Channels.AssistFeedback, feedback);
       }
     },
   );
