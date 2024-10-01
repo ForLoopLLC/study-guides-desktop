@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { UpdateTagInput } from '../../../types';
+import { Channels } from '../../../enums';
 
 const useTagAI = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -9,7 +10,7 @@ const useTagAI = () => {
 
     try {
       const input = await window.electron.ipcRenderer.invoke(
-        'get-ai-tag',
+        Channels.GetTagAssist,
         tagId,
       );
 
