@@ -8,8 +8,9 @@ import {
 } from '../lib/database/questions';
 import { createQuestionIndex } from '../lib/database/search';
 import { publishQuestionIndex } from '../lib/search/questions';
+import { Channels } from '../../enums';
 
-ipcMain.handle('get-question', async (_event, id) => {
+ipcMain.handle(Channels.GetQuestion, async (_event, id) => {
   try {
     const questions = await getQuestion(id);
     return questions;
@@ -20,7 +21,7 @@ ipcMain.handle('get-question', async (_event, id) => {
   }
 });
 
-ipcMain.handle('get-questions', async (_event, { page, limit, filter, query }) => {
+ipcMain.handle(Channels.GetQuestions, async (_event, { page, limit, filter, query }) => {
   try {
     const questions = await getQuestions(page, limit, filter, query);
     return questions;
@@ -32,7 +33,7 @@ ipcMain.handle('get-questions', async (_event, { page, limit, filter, query }) =
 });
 
 
-ipcMain.handle('update-question', async (_event, updatedTag) => {
+ipcMain.handle(Channels.UpdateQuestion, async (_event, updatedTag) => {
   try {
     const question = await updateQuestion(updatedTag);
     if (!question) {
@@ -52,7 +53,7 @@ ipcMain.handle('update-question', async (_event, updatedTag) => {
 });
 
 
-ipcMain.handle('clear-question-reports', async (_event, id) => {
+ipcMain.handle(Channels.ClearQuestionReports, async (_event, id) => {
   try {
     const result = await clearQuestionReports(id);
     if (result) {
