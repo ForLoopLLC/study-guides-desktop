@@ -5,11 +5,11 @@ import FileList from './FileList';
 import { ImportFile, Feedback } from '../../../types';
 import { FaFileImport, FaSpinner, FaClipboard } from 'react-icons/fa';
 
-interface FileUploadProps {
+interface FileManagerProps {
   parserType: ParserType;
 }
 
-const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
+const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
   const [copySuccess, setCopySuccess] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement | null>(null); // Ref for the file input element
   const {
@@ -66,7 +66,7 @@ const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
 
   const handleAssistFolder = (folderName: string) => {
     assistFolder(folderName, parserType);
-  }
+  };
 
   const handleDeleteFile = (file: ImportFile) => {
     deleteFile(file.path);
@@ -184,4 +184,4 @@ const FileUpload: React.FC<FileUploadProps> = ({ parserType }) => {
   );
 };
 
-export default FileUpload;
+export default FileManager;

@@ -1,28 +1,18 @@
 import React from 'react';
 import { User } from '@prisma/client';
+import Circle from '../Circle'; // Import the reusable Circle component
 import { useDeterministicColor } from '../../hooks';
-import clsx from 'clsx';
 
 interface UserCircleProps {
   user: User;
 }
 
 const UserCircle: React.FC<UserCircleProps> = ({ user }) => {
-  const {getColor} = useDeterministicColor();
-  const color = getColor(user.email || user.gamerTag || '');
+  const { getColor } = useDeterministicColor();
+  const label = user.email?.slice(0, 1) || user.gamerTag?.slice(0, 1) || ''; // First letter of email or gamerTag
+  const color = getColor(user.email || user.gamerTag || ''); // Generate color based on email or gamerTag
 
-  const style = clsx(
-    "w-8 h-8 flex items-center justify-center rounded-full text-white mr-3"
-  );
-
-  return (
-    <div
-      className={style}
-      style={{ backgroundColor: color }}
-    >
-      {user.email?.slice(0, 1).toUpperCase()}
-    </div>
-  );
+  return <Circle label={label} backgroundColor={color} />;
 };
 
 export default UserCircle;

@@ -1,35 +1,30 @@
 import React from 'react';
 import { TagType } from '@prisma/client';
+import Circle from '../Circle'; // Import the reusable Circle component
 
 const tagTypeColors: Record<TagType, string> = {
-  [TagType.Category]: 'bg-blue-500',
-  [TagType.SubCategory]: 'bg-green-500',
-  [TagType.University]: 'bg-red-500',
-  [TagType.Region]: 'bg-yellow-500',
-  [TagType.Department]: 'bg-purple-500',
-  [TagType.Course]: 'bg-teal-500',
-  [TagType.Topic]: 'bg-pink-500',
-  [TagType.UserFolder]: 'bg-orange-500',
-  [TagType.Organization]: 'bg-indigo-500',
-  [TagType.Certification]: 'bg-cyan-500',
-  [TagType.Module]: 'bg-rose-500',
+  [TagType.Category]: '#3b82f6', // blue-500
+  [TagType.SubCategory]: '#10b981', // green-500
+  [TagType.University]: '#ef4444', // red-500
+  [TagType.Region]: '#f59e0b', // yellow-500
+  [TagType.Department]: '#a855f7', // purple-500
+  [TagType.Course]: '#14b8a6', // teal-500
+  [TagType.Topic]: '#ec4899', // pink-500
+  [TagType.UserFolder]: '#f97316', // orange-500
+  [TagType.Organization]: '#6366f1', // indigo-500
+  [TagType.Certification]: '#06b6d4', // cyan-500
+  [TagType.Module]: '#f43f5e', // rose-500
 };
-
-// Helper function to get the first letter of the tag type
-const getTagTypeLetter = (type: TagType) => TagType[type][0];
 
 interface TagTypeCircleProps {
   type: TagType;
 }
 
 const TagTypeCircle: React.FC<TagTypeCircleProps> = ({ type }) => {
-  return (
-    <div
-      className={`w-8 h-8 flex items-center justify-center rounded-full text-white mr-3 ${tagTypeColors[type]}`}
-    >
-      {getTagTypeLetter(type)}
-    </div>
-  );
+  const color = tagTypeColors[type];
+  const label = TagType[type][0]; // Get the first letter of the tag type
+
+  return <Circle label={label} backgroundColor={color} />;
 };
 
 export default TagTypeCircle;

@@ -92,7 +92,6 @@ const UserManager: React.FC = () => {
 
   return (
     <div>
-      {/* Toolbar and Message Bar */}
       <Toolbar
         disabled={users.length === 0}
         isProcessing={isLoading || publishProcessing}

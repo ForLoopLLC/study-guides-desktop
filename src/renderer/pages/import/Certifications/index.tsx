@@ -1,10 +1,10 @@
-import { Page, FileUpload } from '../../../components';
+import { Page, FileManager } from '../../../components';
 import { ParserType } from '../../../../enums';
 
 const Certifications = () => {
   return (
     <Page title="Certifications">
-      <FileUpload parserType={ParserType.Certifications} />
+      <FileManager parserType={ParserType.Certifications} />
     </Page>
   );
 };

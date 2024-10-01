@@ -150,7 +150,6 @@ const TagsManager: React.FC = () => {
 
   return (
     <div>
-      {/* Toolbar and Message Bar */}
       <Toolbar
         disabled={tags.length === 0}
         isProcessing={

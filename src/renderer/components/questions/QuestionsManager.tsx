@@ -128,7 +128,6 @@ const QuestionsManager: React.FC = () => {
 
   return (
     <div>
-      {/* Toolbar and Message Bar */}
       <Toolbar
         disabled={questions.length === 0}
         isProcessing={
