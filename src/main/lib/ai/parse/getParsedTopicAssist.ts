@@ -54,7 +54,7 @@ const getParsedTopicAssist = async (
 
     // Send progress update for each question with QPS
     onProgress({
-      message: `Processed AI-assisted results for question: ${question.question}`,
+      message: `Processed question: ${question.question}`,
       processed: sharedQuestionCounter.current, // Total questions processed so far
       total: sharedQuestionCounter.total, // Total number of questions across all topics
       qps, // Questions per second

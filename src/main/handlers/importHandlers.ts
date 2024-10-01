@@ -204,7 +204,7 @@ app.whenReady().then(() => {
           // Send question progress update along with TPS
           onProgress({
             topicProgress: {
-              message: `Processing questions for ${topic.name}`,
+              message: `Processing questions for: ${topic.name}`,
               processed: processedTopics + 1, // Topic progress
               total: totalTopics,
               tps: tps > 0 ? tps : undefined, // Topics per second, only show if valid
@@ -230,13 +230,13 @@ app.whenReady().then(() => {
       // Send final topic progress
       onProgress({
         topicProgress: {
-          message: `Processed AI-assisted results for ${topic.name}`,
+          message: `Processed: ${topic.name}`,
           processed: processedTopics,
           total: totalTopics,
           tps: tps > 0 ? tps : undefined, // Topics per second, only show if valid
         },
         questionProgress: {
-          message: `Completed all questions for ${topic.name}`,
+          message: `Completed all questions for: ${topic.name}`,
           processed: sharedQuestionCounter.current, // Use shared counter
           total: sharedQuestionCounter.total, // Total questions across all topics
         },
