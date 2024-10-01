@@ -14,30 +14,35 @@ const PaginationControls: React.FC<PaginationControlsProps> = ({
   totalPages,
   totalRecords,
   onPageChange,
-  isLoading
+  isLoading,
 }) => {
+  // Determine if pagination controls should be disabled
+  const noRecords = totalRecords === 0;
+  const disablePrevious = currentPage === 1 || isLoading || noRecords;
+  const disableNext = currentPage === totalPages || isLoading || noRecords;
+
   return (
     <div className="mt-4 mb-4 flex items-center space-x-4">
       <button
         onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
-        disabled={currentPage === 1 || isLoading}
+        disabled={disablePrevious}
         className="p-2 bg-gray-300 rounded flex items-center justify-center disabled:opacity-50"
       >
         <FaArrowLeft className="text-xl" />
       </button>
       <p className="text-sm font-bold">
-        Page {currentPage} of {totalPages}
+        Page {noRecords ? 0 : currentPage} of {totalPages}
       </p>
       <button
         onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
-        disabled={currentPage === totalPages || isLoading}
+        disabled={disableNext}
         className="p-2 bg-gray-300 rounded flex items-center justify-center disabled:opacity-50"
       >
         <FaArrowRight className="text-xl" />
       </button>
       <p className="text-sm font-bold">
-          {totalRecords} records
-        </p>
+        {totalRecords} {totalRecords === 1 ? 'record' : 'records'}
+      </p>
     </div>
   );
 };
