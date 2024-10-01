@@ -6,8 +6,9 @@ import {
 } from '../lib/database/users';
 import { createUserIndex } from '../lib/database/search';
 import { publishUsersIndex } from '../lib/search/users';
+import { Channels } from '../../enums';
 
-ipcMain.handle('get-users', async (_event, { page, limit, filter, query }) => {
+ipcMain.handle(Channels.GetUsers, async (_event, { page, limit, filter, query }) => {
   try {
     const users = await getUsers(page, limit, filter, query);
     return users;
@@ -18,7 +19,7 @@ ipcMain.handle('get-users', async (_event, { page, limit, filter, query }) => {
   }
 });
 
-ipcMain.handle('update-user', async (_event, updatedUser) => {
+ipcMain.handle(Channels.UpdateUser, async (_event, updatedUser) => {
   try {
     const user = await updateUser(updatedUser);
     if (!user) {

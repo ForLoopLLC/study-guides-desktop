@@ -1,6 +1,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { User } from '../../../types';
 import { Environment, UserFilter } from '../../../types';
+import { Channels } from '../../../enums';
 
 const useGetUsers = (
   page: number = 1,
@@ -18,7 +19,7 @@ const useGetUsers = (
   const fetchUsers = useCallback(async () => {
     setIsLoading(true); // Set loading to true when fetch starts
     try {
-      const result = await window.electron.ipcRenderer.invoke('get-users', {
+      const result = await window.electron.ipcRenderer.invoke(Channels.GetUsers, {
         page,
         limit,
         filter,
