@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Environment } from '../../../types';
+import { Channels } from '../../../enums';
 
 const useTagBatchAI = (filter: string, query: string, env: Environment) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -18,7 +19,7 @@ const useTagBatchAI = (filter: string, query: string, env: Environment) => {
       setProgress(0);
       setTotalProcessed(0);
 
-      await window.electron.ipcRenderer.invoke('batch-assist-tags', {
+      await window.electron.ipcRenderer.invoke(Channels.BatchAssistTags, {
         filter,
         query,
       });
@@ -63,15 +64,15 @@ const useTagBatchAI = (filter: string, query: string, env: Environment) => {
 
     // Register the listeners
     const unsubscribeProgress = window.electron.ipcRenderer.on(
-      'batch-assist-tags-progress',
+      Channels.BatchAssistTagsProgress,
       handleProgress,
     );
     const unsubscribeComplete = window.electron.ipcRenderer.on(
-      'batch-assist-tags-complete',
+      Channels.BatchAssistTagsComplete,
       handleComplete,
     );
     const unsubscribeError = window.electron.ipcRenderer.on(
-      'batch-assist-tags-error',
+      Channels.BatchAssistTagsError,
       handleError,
     );
 

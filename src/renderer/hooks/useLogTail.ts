@@ -1,4 +1,5 @@
 import { useState, useEffect } from 'react';
+import { Channels } from '../../enums';
 
 export const useLogTail = (keyName: string) => {
   const [logContent, setLogContent] = useState<string[]>(() => {
@@ -22,7 +23,7 @@ export const useLogTail = (keyName: string) => {
       }
     };
 
-    const removeListener = window.electron.ipcRenderer.on('log-update', handleLogUpdate);
+    const removeListener = window.electron.ipcRenderer.on(Channels.LogUpdate, handleLogUpdate);
 
     return () => {
       removeListener();
@@ -31,14 +32,14 @@ export const useLogTail = (keyName: string) => {
 
   const startTail = () => {
     if (!isTailing) {
-      window.electron.ipcRenderer.invoke('start-tail-log');
+      window.electron.ipcRenderer.invoke(Channels.StartTailLog);
       setIsTailing(true);
     }
   };
 
   const stopTail = () => {
     if (isTailing) {
-      window.electron.ipcRenderer.invoke('stop-tail-log');
+      window.electron.ipcRenderer.invoke(Channels.StopTailLog);
       setIsTailing(false);
     }
   };

@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { TagFilter, Environment } from '../../../types';
+import { Channels } from '../../../enums';
 
 const usePublishTagsIndex = (
   filter: TagFilter,
@@ -20,8 +21,7 @@ const usePublishTagsIndex = (
       setError(null);
       setProgress(0);
       setTotalProcessed(0);
-      console.log('publish-tags-index', filter, query);
-      await window.electron.ipcRenderer.invoke('publish-tags-index', {
+      await window.electron.ipcRenderer.invoke(Channels.PublishTagsIndex, {
         filter,
         query,
       });
@@ -65,15 +65,15 @@ const usePublishTagsIndex = (
 
     // Register the listeners
     const unsubscribeProgress = window.electron.ipcRenderer.on(
-      'publish-tags-index-progress',
+      Channels.PublishTagsIndexProgress,
       handleProgress,
     );
     const unsubscribeComplete = window.electron.ipcRenderer.on(
-      'publish-tags-index-complete',
+      Channels.PublishTagsIndexComplete,
       handleComplete,
     );
     const unsubscribeError = window.electron.ipcRenderer.on(
-      'publish-tags-index-error',
+      Channels.PublishTagsIndexError,
       handleError,
     );
 

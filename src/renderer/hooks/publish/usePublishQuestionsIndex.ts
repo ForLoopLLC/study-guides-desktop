@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { QuestionFilter, Environment } from '../../../types';
+import { Channels } from '../../../enums';
 
 const usePublishQuestionsIndex = (
   filter: QuestionFilter,
@@ -20,8 +21,7 @@ const usePublishQuestionsIndex = (
       setError(null);
       setProgress(0);
       setTotalProcessed(0);
-      console.log('publish-questions-index', filter, query);
-      await window.electron.ipcRenderer.invoke('publish-questions-index', {
+      await window.electron.ipcRenderer.invoke(Channels.PublishQuestionsIndex, {
         filter,
         query,
       });
@@ -65,15 +65,15 @@ const usePublishQuestionsIndex = (
 
     // Register the listeners
     const unsubscribeProgress = window.electron.ipcRenderer.on(
-      'publish-questions-index-progress',
+      Channels.PublishQuestionsIndexProgress,
       handleProgress,
     );
     const unsubscribeComplete = window.electron.ipcRenderer.on(
-      'publish-questions-index-complete',
+      Channels.PublishQuestionsIndexComplete,
       handleComplete,
     );
     const unsubscribeError = window.electron.ipcRenderer.on(
-      'publish-questions-index-error',
+      Channels.PublishQuestionsIndexError,
       handleError,
     );
 

@@ -1,6 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
-import { Question } from '../../../types';
-import { Environment, QuestionFilter } from '../../../types';
+import { Question, Environment, QuestionFilter } from '../../../types';
+import { Channels } from '../../../enums';
 
 const useGetQuestions = (
   page: number = 1,
@@ -18,7 +18,7 @@ const useGetQuestions = (
   const fetchQuestions = useCallback(async () => {
     setIsLoading(true); // Set loading to true when fetch starts
     try {
-      const result = await window.electron.ipcRenderer.invoke('get-questions', {
+      const result = await window.electron.ipcRenderer.invoke(Channels.GetQuestions, {
         page,
         limit,
         filter,

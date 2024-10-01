@@ -1,8 +1,13 @@
 import { LogLevel } from '../../types';
+import { Channels } from '../../enums';
 
-const logMessage = async (level: LogLevel, category: string, message: string) => {
+const logMessage = async (
+  level: LogLevel,
+  category: string,
+  message: string,
+) => {
   await window.electron.ipcRenderer
-    .invoke('log-message', level, category, message)
+    .invoke(Channels.LogMessage, level, category, message)
     .catch((error) => console.error('Logging error:', error)); // Ensure to catch errors
 };
 

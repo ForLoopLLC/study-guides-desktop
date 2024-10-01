@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Environment } from '../../../types';
+import { Channels } from '../../../enums';
 
 const useQuestionBatchAI = (filter: string, query: string, env: Environment,) => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -18,7 +19,7 @@ const useQuestionBatchAI = (filter: string, query: string, env: Environment,) =>
       setProgress(0);
       setTotalProcessed(0);
 
-      await window.electron.ipcRenderer.invoke('batch-assist-questions', {
+      await window.electron.ipcRenderer.invoke(Channels.BatchAssistQuestions, {
         filter,
         query,
       });
@@ -63,15 +64,15 @@ const useQuestionBatchAI = (filter: string, query: string, env: Environment,) =>
 
     // Register the listeners
     const unsubscribeProgress = window.electron.ipcRenderer.on(
-      'batch-assist-questions-progress',
+      Channels.BatchAssistQuestionsProgress,
       handleProgress,
     );
     const unsubscribeComplete = window.electron.ipcRenderer.on(
-      'batch-assist-questions-complete',
+      Channels.BatchAssistQuestionsComplete,
       handleComplete,
     );
     const unsubscribeError = window.electron.ipcRenderer.on(
-      'batch-assist-questions-error',
+      Channels.BatchAssistQuestionsError,
       handleError,
     );
 

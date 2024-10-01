@@ -1,5 +1,6 @@
 import { useState } from 'react';
 import { Tag } from '../../../types';
+import { Channels } from '../../../enums';
 
 const useUpdateTags = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
@@ -12,7 +13,10 @@ const useUpdateTags = () => {
     setSuccess(false);
 
     try {
-      const result = await window.electron.ipcRenderer.invoke('update-tags', updatedTags);
+      const result = await window.electron.ipcRenderer.invoke(
+        Channels.UpdateTags,
+        updatedTags,
+      );
 
       if (result.error) {
         setError(result.error);

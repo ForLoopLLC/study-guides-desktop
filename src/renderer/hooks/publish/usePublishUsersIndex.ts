@@ -1,5 +1,6 @@
 import { useState, useEffect, useCallback } from 'react';
 import { UserFilter, Environment } from '../../../types';
+import { Channels } from '../../../enums';
 
 const usePublishTagsIndex = (
   filter: UserFilter,
@@ -20,8 +21,7 @@ const usePublishTagsIndex = (
       setError(null);
       setProgress(0);
       setTotalProcessed(0);
-      console.log('publish-users-index', filter, query);
-      await window.electron.ipcRenderer.invoke('publish-users-index', {
+      await window.electron.ipcRenderer.invoke(Channels.PublishUsersIndex, {
         filter,
         query,
       });
@@ -65,15 +65,15 @@ const usePublishTagsIndex = (
 
     // Register the listeners
     const unsubscribeProgress = window.electron.ipcRenderer.on(
-      'publish-users-index-progress',
+      Channels.PublishUsersIndexProgress,
       handleProgress,
     );
     const unsubscribeComplete = window.electron.ipcRenderer.on(
-      'publish-users-index-complete',
+      Channels.PublishUsersIndexComplete,
       handleComplete,
     );
     const unsubscribeError = window.electron.ipcRenderer.on(
-      'publish-users-index-error',
+      Channels.PublishUsersIndexError,
       handleError,
     );
 
