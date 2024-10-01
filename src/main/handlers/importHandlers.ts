@@ -17,6 +17,7 @@ import {
   AssistFolderFeedback,
   ParsedCertificationTopic,
   ParsedCollegeTopic,
+  ParsedQuestion,
 } from '../../types';
 import { ParserType, Channels } from '../../enums';
 import { fileParser, toParsedTopic } from '../lib/parse';
@@ -152,16 +153,75 @@ app.whenReady().then(() => {
   >({
     topics,
     onProgress,
+    totalRecords, // Optional if passed as an argument
   }: {
     topics: T[];
-    onProgress: (data: { message: string; topic: T }) => void;
+    onProgress: (data: {
+      topicProgress: {
+        message: string;
+        topic: T;
+        processed: number;
+        total: number;
+      };
+      questionProgress: {
+        message: string;
+        question: ParsedQuestion | null;
+        processed: number;
+        total: number;
+      };
+    }) => void;
+    totalRecords?: number; // Optional total number of records, otherwise calculated by length
+    event: Electron.IpcMainInvokeEvent;
   }) => {
+    const total = totalRecords ?? topics.length; // Calculate total based on the topics length or from passed totalRecords
+    let processed = 0;
+
+    let question: ParsedQuestion | null = null;
+    let questionMessage = '';
+    let questionsProcessed = 0;
+    let questionsTotal = 0;
+
     const results = await Promise.all(
       topics.map(async (topic: T) => {
-        const updatedTopic = await getParsedTopicAssist(topic);
+        const updatedTopic = await getParsedTopicAssist(
+          topic,
+          ({ message, question: proccessedQuestion, processed, total }) => {
+            question = proccessedQuestion;
+            questionMessage = message;
+            questionsProcessed = processed;
+            questionsTotal = total;
+            onProgress({
+              topicProgress: {
+                message: `Processed AI assisted results for ${topic.name}`,
+                topic: updatedTopic as T,
+                processed,
+                total,
+              },
+              questionProgress: {
+                message: questionMessage,
+                question: question,
+                processed: questionsProcessed,
+                total: questionsTotal,
+              },
+            });
+          },
+        );
+        processed += 1;
+
+        // Send progress update to the callback
         onProgress({
-          message: `Processed AI assisted results for ${topic.name}`,
-          topic: updatedTopic as T,
+          topicProgress: {
+            message: `Processed AI assisted results for ${topic.name}`,
+            topic: updatedTopic as T,
+            processed,
+            total,
+          },
+          questionProgress: {
+            message: questionMessage,
+            question: question,
+            processed: questionsProcessed,
+            total: questionsTotal,
+          },
         });
 
         return updatedTopic;
@@ -490,19 +550,27 @@ app.whenReady().then(() => {
           case ParserType.Colleges:
             results = await processAIAssist({
               topics: topics as ParsedCollegeTopic[],
-              onProgress: ({ message, topic }) => {
+              onProgress: ({ topicProgress, questionProgress }) => {
                 // Send progress update to the renderer
-                logAndSend(event, Channels.AssistProgress, { message, topic });
+                logAndSend(event, Channels.AssistProgress, {
+                  topicProgress,
+                  questionProgress,
+                });
               },
+              event,
             });
             break;
           case ParserType.Certifications:
             results = await processAIAssist({
               topics: topics as ParsedCertificationTopic[],
-              onProgress: ({ message, topic }) => {
+              onProgress: ({ topicProgress, questionProgress }) => {
                 // Send progress update to the renderer
-                logAndSend(event, Channels.AssistProgress, { message, topic });
+                logAndSend(event, Channels.AssistProgress, {
+                  topicProgress,
+                  questionProgress,
+                });
               },
+              event,
             });
             break;
           default:

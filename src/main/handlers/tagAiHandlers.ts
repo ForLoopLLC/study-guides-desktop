@@ -9,7 +9,7 @@ import { Tag } from '@prisma/client';
 import { Channels } from '../../enums';
 import { logAndSend } from '../util';
 
-ipcMain.handle(Channels.GetTagAssist, async (_event, tagId) => {
+ipcMain.handle(Channels.AssistTag, async (_event, tagId) => {
   try {
     const tagInput = await getTagInput(tagId);
     log.info('ai', `Received AI assist for tag ${tagInput.name}.`);

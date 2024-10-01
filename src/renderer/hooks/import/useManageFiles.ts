@@ -181,6 +181,7 @@ const useManageFiles = (parserType: ParserType) => {
       unsubscribePreParseFeedback();
       unsubscribeDeleteFolderFeedback();
       unsubscribePreParseFolderFeedback();
+      unsubscribeAssistFolderFeedback();
     };
   }, [parserType]);
 
@@ -192,6 +193,7 @@ const useManageFiles = (parserType: ParserType) => {
     isProcessingPreParse,
     isProcessingDeleteFolder,
     isProcessingPreParseFolder,
+    isProcessingAssistFolder,
     listFiles,
     deleteFile,
     deleteFolder,

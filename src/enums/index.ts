@@ -25,7 +25,6 @@ export enum Routes {
   Tags = '/tags',
   Questions = '/questions',
   Users = '/users',
-
 }
 
 export enum Channels {
@@ -47,7 +46,6 @@ export enum Channels {
   UpdateTag = 'tags:update-single',
   DeleteTag = 'tags:delete',
   ClearTagReports = 'tags:clear-reports',
-  GetTagAssist = 'tags:get-ai-assist',
 
   // Users
   GetUsers = 'users:get',
@@ -59,9 +57,6 @@ export enum Channels {
   UpdateQuestions = 'questions:update',
   UpdateQuestion = 'questions:update-single',
   ClearQuestionReports = 'questions:clear-reports',
-
-  // Assist Questions
-  AssistQuestion = 'questions:assist',
 
   // Publish Tags Index
   PublishTagsIndex = 'tags:publish-index',
@@ -114,9 +109,10 @@ export enum Channels {
   ParseFolderFeedback = 'folder:parse-feedback',
 
   // Assist Files
+  // Assist Questions
+  AssistTag = 'tags:assist',
+  AssistQuestion = 'questions:assist',
   AssistFolder = 'folder:assist',
   AssistFeedback = 'folder:assist-feedback',
   AssistProgress = 'folder:assist-progress',
 }
-
-

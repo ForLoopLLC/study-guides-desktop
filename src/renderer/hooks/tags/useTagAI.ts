@@ -10,7 +10,7 @@ const useTagAI = () => {
 
     try {
       const input = await window.electron.ipcRenderer.invoke(
-        Channels.GetTagAssist,
+        Channels.AssistTag,
         tagId,
       );
 

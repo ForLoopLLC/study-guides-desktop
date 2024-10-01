@@ -2,6 +2,7 @@ import {
   AITopicResponse,
   ParsedCollegeTopic,
   ParsedCertificationTopic,
+  ParsedQuestion,
 } from '../../../../types';
 import { log } from '../../../main';
 import { topicPrompt } from '../tags/prompts';
@@ -15,6 +16,12 @@ import { parseAIQuestionResponse } from '../questions/parsers';
 
 const getParsedTopicAssist = async (
   topic: ParsedCertificationTopic | ParsedCollegeTopic,
+  onProgress: (data: {
+    message: string;
+    question: ParsedQuestion;
+    processed: number;
+    total: number;
+  }) => void,
 ): Promise<ParsedCertificationTopic | ParsedCollegeTopic> => {
   const preparedQuestions = prepareQuestions(topic);
   const result = await generateChatCompletion(
@@ -22,6 +29,9 @@ const getParsedTopicAssist = async (
     preparedQuestions,
   );
 
+  // Total number of questions to process
+  const totalQuestions = topic.questions.length;
+  let processedQuestions = 0;
 
   const updatedQuestions = await Promise.all(
     topic.questions.map(async (question) => {
@@ -31,22 +41,35 @@ const getParsedTopicAssist = async (
         preparedQuestion,
       ); // Call the AI completion
       const parsed = parseAIQuestionResponse(result); // Parse the AI response
+
+      processedQuestions += 1;
+
+      // Send progress update
+      onProgress({
+        message: `Processed AI assisted results for question: ${question.question}`,
+        question: { ...question, ...parsed },
+        processed: processedQuestions,
+        total: totalQuestions,
+      });
+
       return {
         ...question,
-        ...parsed
+        ...parsed,
       };
-    })
+    }),
   );
-  
 
   try {
     const parsedResult = parseAITopicWithQuestionResponse(result);
     log.info('ai', `Parsed AI response successfully for topic ${topic.name}.`);
-    const updatedTopic =  mergeTopicWithAssist(topic, parsedResult as AITopicResponse);
+    const updatedTopic = mergeTopicWithAssist(
+      topic,
+      parsedResult as AITopicResponse,
+    );
     return {
       ...updatedTopic,
-      questions: updatedQuestions
-    }
+      questions: updatedQuestions,
+    };
   } catch (error) {
     const err = error as Error;
     log.error(
