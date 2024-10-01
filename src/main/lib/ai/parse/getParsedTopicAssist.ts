@@ -13,6 +13,7 @@ import { generateChatCompletion } from '../generateChatCompletion';
 import { mergeTopicWithAssist } from '.';
 import { parseAITopicWithQuestionResponse } from '../tags/parsers';
 import { parseAIQuestionResponse } from '../questions/parsers';
+import RunQueue from 'run-queue';
 
 const getParsedTopicAssist = async (
   topic: ParsedCertificationTopic | ParsedCollegeTopic,
@@ -20,8 +21,9 @@ const getParsedTopicAssist = async (
     message: string;
     processed: number;
     total: number;
+    qps?: number; // Optional: Questions per second
   }) => void,
-  sharedQuestionCounter: { current: number },
+  sharedQuestionCounter: { current: number; total: number },
 ): Promise<ParsedCertificationTopic | ParsedCollegeTopic> => {
   const preparedQuestions = prepareQuestions(topic);
   const result = await generateChatCompletion(
@@ -29,32 +31,45 @@ const getParsedTopicAssist = async (
     preparedQuestions,
   );
 
-  // Total number of questions to process
   const totalQuestions = topic.questions.length;
+  const queue = new RunQueue({ maxConcurrency: 25 }); // Limit concurrency to 25
 
-  // Process questions in parallel
-  const updatedQuestions = await Promise.all(
-    topic.questions.map(async (question) => {
-      const preparedQuestion = prepareQuestion(question);
-      const result = await generateChatCompletion(
-        questionPrompt.text,
-        preparedQuestion,
-      );
-      const parsed = parseAIQuestionResponse(result);
+  const startTime = Date.now(); // Track start time for QPS calculation
 
-      // Increment the shared question counter
-      sharedQuestionCounter.current += 1;
+  // Function to handle each question processing
+  const processQuestion = async (question: ParsedQuestion) => {
+    const preparedQuestion = prepareQuestion(question);
+    const result = await generateChatCompletion(
+      questionPrompt.text,
+      preparedQuestion,
+    );
+    const parsed = parseAIQuestionResponse(result);
 
-      // Send progress update after each question
-      onProgress({
-        message: `Processed AI-assisted results for question: ${question.question}`,
-        processed: sharedQuestionCounter.current, // Use shared counter
-        total: totalQuestions,
-      });
+    // Increment the shared question counter
+    sharedQuestionCounter.current += 1;
 
-      return { ...question, ...parsed };
-    }),
-  );
+    // Calculate elapsed time and QPS
+    const elapsedTimeInSeconds = (Date.now() - startTime) / 1000;
+    const qps = sharedQuestionCounter.current / elapsedTimeInSeconds;
+
+    // Send progress update for each question with QPS
+    onProgress({
+      message: `Processed AI-assisted results for question: ${question.question}`,
+      processed: sharedQuestionCounter.current, // Total questions processed so far
+      total: sharedQuestionCounter.total, // Total number of questions across all topics
+      qps, // Questions per second
+    });
+
+    return { ...question, ...parsed };
+  };
+
+  // Add questions to the queue
+  topic.questions.forEach((question) => {
+    queue.add(1, () => processQuestion(question));
+  });
+
+  // Wait for all tasks in the queue to finish
+  await queue.run();
 
   try {
     const parsedResult = parseAITopicWithQuestionResponse(result);
@@ -65,7 +80,7 @@ const getParsedTopicAssist = async (
     );
     return {
       ...updatedTopic,
-      questions: updatedQuestions,
+      questions: topic.questions, // Questions are processed and updated
     };
   } catch (error) {
     const err = error as Error;
@@ -74,6 +89,5 @@ const getParsedTopicAssist = async (
     throw new Error('Failed to parse AI response.');
   }
 };
-
 
 export default getParsedTopicAssist;

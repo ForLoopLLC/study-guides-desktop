@@ -146,18 +146,20 @@ export const formatAsJSON = (
   parsedTopic: ParsedCertificationTopic | ParsedCollegeTopic,
 ): string => {
   return JSON.stringify(parsedTopic, null, 2); // Pretty-print with 2-space indentation
-}
+};
 
-export function logAndSend(event: Electron.IpcMainInvokeEvent, channel: string, ...data: any[]) {
+export function logAndSend(
+  event: Electron.IpcMainInvokeEvent,
+  channel: string,
+  ...data: any[]
+) {
   // Use a default value "general" if the channel name does not split properly
   const prefix = channel.includes(':') ? channel.split(':')[0] : 'general';
-  
+
   // Log the channel and the data being sent
   appLogger.info(prefix, `Sending IPC message on channel: ${channel}`);
-  appLogger.info(prefix, JSON.stringify(data, null, 2));
+  //appLogger.info(prefix, JSON.stringify(data, null, 2));
 
   // Send the original message
   event.sender.send(channel, ...data);
 }
-
-

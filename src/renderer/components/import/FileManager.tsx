@@ -176,7 +176,6 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
               label={progress?.topicProgress.message || 'Topic Progress'}
             />
           </section>
-
           <section id="assist-question-progress" className="mt-6">
             <ProgressBar
               progress={progress?.questionProgress.processed || 0}

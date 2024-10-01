@@ -39,18 +39,24 @@ const useManageFiles = (parserType: ParserType) => {
   // List files
   const listFiles = () => {
     setIsProcessingList(true);
+    setFeedback(null);
+    setProgress(null);
     window.electron.ipcRenderer.invoke(Channels.ListFiles, { parserType });
   };
 
   // Delete a file
   const deleteFile = (filePath: string) => {
     setIsProcessingDelete(true);
+    setFeedback(null);
+    setProgress(null);
     window.electron.ipcRenderer.invoke(Channels.DeleteFile, { filePath });
   };
 
   // Pre-parse a file
   const preParseFile = (filePath: string, parserType: ParserType) => {
     setIsProcessingPreParse(true);
+    setFeedback(null);
+    setProgress(null);
     window.electron.ipcRenderer.invoke(Channels.ParseFile, {
       parserType,
       filePath,
@@ -60,6 +66,8 @@ const useManageFiles = (parserType: ParserType) => {
   // Delete a folder
   const deleteFolder = (folderName: string) => {
     setIsProcessingDeleteFolder(true);
+    setFeedback(null);
+    setProgress(null);
     window.electron.ipcRenderer.invoke(Channels.DeleteFolder, {
       folderName,
       parserType,
@@ -69,6 +77,8 @@ const useManageFiles = (parserType: ParserType) => {
   // Pre-parse a folder
   const preParseFolder = (folderName: string, parserType: ParserType) => {
     setIsProcessingPreParseFolder(true);
+    setFeedback(null);
+    setProgress(null);
     window.electron.ipcRenderer.invoke(Channels.ParseFolder, {
       parserType,
       folderName,
@@ -79,6 +89,7 @@ const useManageFiles = (parserType: ParserType) => {
   const assistFolder = (folderName: string, parserType: ParserType) => {
     setIsProcessingAssistFolder(true);
     setFeedback(null);
+    setProgress(null);
     window.electron.ipcRenderer.invoke(Channels.AssistFolder, {
       parserType,
       folderName,
@@ -88,7 +99,6 @@ const useManageFiles = (parserType: ParserType) => {
   // Handle feedback from the main process
   const handleFileListFeedback = (payload: any) => {
     setIsProcessingList(false);
-    setFeedback(null);
     const response = payload as FileListFeedback;
     if (response.success) {
       setFiles(response.files);
@@ -98,7 +108,6 @@ const useManageFiles = (parserType: ParserType) => {
 
   const handleDeleteFileFeedback = (payload: any) => {
     setIsProcessingDelete(false);
-    setFeedback(null);
     const response = payload as DeleteFileFeedback;
     if (response.success) {
       setFiles((prevFiles) =>
@@ -110,14 +119,12 @@ const useManageFiles = (parserType: ParserType) => {
 
   const handlePreParseFeedback = (payload: any) => {
     setIsProcessingPreParse(false);
-    setFeedback(null);
     const response = payload as PreParserFeedback;
     setFeedback(response);
   };
 
   const handleDeleteFolderFeedback = (payload: any) => {
     setIsProcessingDeleteFolder(false);
-    setFeedback(null);
     const response = payload as DeleteFolderFeedback;
     if (response.success) {
       listFiles();
@@ -127,14 +134,12 @@ const useManageFiles = (parserType: ParserType) => {
 
   const handlePreParseFolderFeedback = (payload: any) => {
     setIsProcessingPreParseFolder(false);
-    setFeedback(null);
     const response = payload as PreParserFolderFeedback;
     setFeedback(response);
   };
 
   const handleAssistFolderFeedback = (payload: any) => {
     setIsProcessingAssistFolder(false);
-    setFeedback(null);
     const response = payload as AssistFolderFeedback;
     setFeedback(response);
   };

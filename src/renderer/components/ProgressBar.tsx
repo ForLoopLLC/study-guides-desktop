@@ -14,10 +14,10 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
   const percentage = (progress / total) * 100;
 
   return (
-    <div className="w-full mb-4">
+    <div className="w-full mb-1">
       <div className="flex justify-between mb-1">
-        <span className="text-sm font-medium">{label}</span>
-        <span className="text-sm font-medium">
+        <span className="text-sm truncate">{label}</span>
+        <span className="text-sm">
           {progress}/{total}
         </span>
       </div>
@@ -30,5 +30,4 @@ const ProgressBar: React.FC<ProgressBarProps> = ({
     </div>
   );
 };
-
 export default ProgressBar;

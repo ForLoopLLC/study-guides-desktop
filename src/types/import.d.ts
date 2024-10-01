@@ -124,18 +124,19 @@ export interface PreParserFolderFeedback extends Feedback {
   results: ParserResult[];
 }
 
-export interface AssistFolderFeedback extends Feedback {
-}
+export interface AssistFolderFeedback extends Feedback {}
 
 export interface AssistFolderProgress {
   topicProgress: {
     message: string;
     processed: number;
     total: number;
+    tps: number;
   };
   questionProgress: {
     message: string;
     processed: number;
     total: number;
+    qps: number;
   };
 }

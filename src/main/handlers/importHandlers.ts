@@ -149,80 +149,104 @@ app.whenReady().then(() => {
   };
 
   const processAIAssist = async <
-  T extends ParsedCertificationTopic | ParsedCollegeTopic,
->({
-  topics,
-  onProgress,
-  totalRecords, // Optional if passed as an argument
-}: {
-  topics: T[];
-  onProgress: (data: {
-    topicProgress: {
-      message: string;
-      processed: number;
-      total: number;
-    };
-    questionProgress: {
-      message: string;
-      processed: number;
-      total: number;
-    };
-  }) => void;
-  totalRecords?: number;
-}) => {
-  const totalTopics = totalRecords ?? topics.length;
-  let processedTopics = 0;
+    T extends ParsedCertificationTopic | ParsedCollegeTopic,
+  >({
+    topics,
+    onProgress,
+    totalRecords, // Optional if passed as an argument
+  }: {
+    topics: T[];
+    onProgress: (data: {
+      topicProgress: {
+        message: string;
+        processed: number;
+        total: number;
+        tps?: number; // Topics per second
+      };
+      questionProgress: {
+        message: string;
+        processed: number;
+        total: number;
+        qps?: number; // Optional: Questions per second
+      };
+    }) => void;
+    totalRecords?: number;
+  }) => {
+    const totalTopics = totalRecords ?? topics.length;
+    let processedTopics = 0;
 
-  const results = await Promise.all(
-    topics.map(async (topic: T) => {
-      // Shared counter for tracking the progress of questions
-      const sharedQuestionCounter = { current: 0 };
-      const questionsTotal = topic.questions.length;
+    // Track the start time for calculating TPS
+    const startTime = Date.now();
 
+    // Calculate total questions across all topics
+    const totalQuestionsAcrossTopics = topics.reduce(
+      (sum, topic) => sum + topic.questions.length,
+      0,
+    );
+
+    // Shared counter for tracking question progress
+    const sharedQuestionCounter = {
+      current: 0,
+      total: totalQuestionsAcrossTopics,
+    };
+
+    const results = [];
+
+    for (const topic of topics) {
       const updatedTopic = await getParsedTopicAssist(
         topic,
-        ({ message, processed, total }) => {
-          // Send progress update for each question
+        ({ message, processed, total, qps }) => {
+          // Calculate elapsed time and TPS after a few topics have been processed
+          const elapsedTimeInSeconds = (Date.now() - startTime) / 1000;
+          const tps =
+            processedTopics > 0 ? processedTopics / elapsedTimeInSeconds : 0;
+
+          // Send question progress update along with TPS
           onProgress({
             topicProgress: {
               message: `Processing questions for ${topic.name}`,
-              processed: processedTopics + 1, // Reflect the current topic
+              processed: processedTopics + 1, // Topic progress
               total: totalTopics,
+              tps: tps > 0 ? tps : undefined, // Topics per second, only show if valid
             },
             questionProgress: {
               message,
-              processed, // Use the processed value from the shared counter
-              total: total, // Total questions for this topic
+              processed,
+              total,
+              qps, // Questions per second
             },
           });
         },
         sharedQuestionCounter, // Pass the shared question counter
       );
 
-      // Increment the topic counter after processing all questions for the topic
       processedTopics += 1;
 
-      // Send final progress for the topic
+      // Calculate elapsed time and TPS again after each topic completes
+      const elapsedTimeInSeconds = (Date.now() - startTime) / 1000;
+      const tps =
+        processedTopics > 0 ? processedTopics / elapsedTimeInSeconds : 0;
+
+      // Send final topic progress
       onProgress({
         topicProgress: {
           message: `Processed AI-assisted results for ${topic.name}`,
           processed: processedTopics,
           total: totalTopics,
+          tps: tps > 0 ? tps : undefined, // Topics per second, only show if valid
         },
         questionProgress: {
           message: `Completed all questions for ${topic.name}`,
-          processed: questionsTotal, // All questions should be done at this point
-          total: questionsTotal,
+          processed: sharedQuestionCounter.current, // Use shared counter
+          total: sharedQuestionCounter.total, // Total questions across all topics
         },
       });
 
-      return updatedTopic;
-    }),
-  );
+      results.push(updatedTopic);
+    }
 
-  return results;
-};
-
+    return results;
+  };
 
   // Handle file import
   ipcMain.handle(
