@@ -146,3 +146,12 @@ export const formatAsJSON = (
 ): string => {
   return JSON.stringify(parsedTopic, null, 2); // Pretty-print with 2-space indentation
 }
+
+export function logAndSend(event: Electron.IpcMainInvokeEvent, channel: string, ...data: any[]) {
+  console.log(`Sending IPC message on channel: ${channel}`);
+  console.log('Data:', data);
+
+  // Send the original message
+  event.sender.send(channel, ...data);
+}
+

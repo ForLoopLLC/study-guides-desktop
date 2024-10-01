@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { Feedback } from '../../../types';
-import { ParserType } from '../../../enums';
+import { ParserType, Channels } from '../../../enums';
 
 const useFileUpload = (parserType: ParserType) => {
   const [filePath, setFilePath] = useState<string>('');
@@ -14,7 +14,7 @@ const useFileUpload = (parserType: ParserType) => {
       setIsLoading(true); // Set loading to true when file is being processed
 
       // Send file to main process to copy to local working directory
-      window.electron.ipcRenderer.invoke('import-file-to-local', {
+      window.electron.ipcRenderer.invoke(Channels.ImportFile, {
         filePath: file.path,
         parserType,
       });
@@ -30,7 +30,7 @@ const useFileUpload = (parserType: ParserType) => {
   useEffect(() => {
     // Subscribe to the feedback event when component mounts
     const unsubscribeFeedback = window.electron.ipcRenderer.on(
-      'file-import-feedback',
+      Channels.ImportFeedback,
       handleFeedback,
     );
 

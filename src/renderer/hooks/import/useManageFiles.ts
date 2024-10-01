@@ -6,8 +6,9 @@ import {
   PreParserFeedback,
   PreParserFolderFeedback,
   DeleteFolderFeedback,
+  AssistFolderFeedback,
 } from '../../../types';
-import { ParserType } from '../../../enums';
+import { ParserType, Channels } from '../../../enums';
 
 const useManageFiles = (parserType: ParserType) => {
   const [files, setFiles] = useState<ImportFile[]>([]);
@@ -17,6 +18,7 @@ const useManageFiles = (parserType: ParserType) => {
     | PreParserFeedback
     | PreParserFolderFeedback
     | DeleteFolderFeedback
+    | AssistFolderFeedback
     | null
   >(null);
 
@@ -35,13 +37,13 @@ const useManageFiles = (parserType: ParserType) => {
   // List files
   const listFiles = () => {
     setIsProcessingList(true);
-    window.electron.ipcRenderer.invoke('import-list-files', { parserType });
+    window.electron.ipcRenderer.invoke(Channels.ListFiles, { parserType });
   };
 
   // Delete a file
   const deleteFile = (filePath: string) => {
     setIsProcessingDelete(true);
-    window.electron.ipcRenderer.invoke('import-delete-file', { filePath });
+    window.electron.ipcRenderer.invoke(Channels.DeleteFile, { filePath });
   };
 
   // Pre-parse a file
@@ -50,7 +52,7 @@ const useManageFiles = (parserType: ParserType) => {
     parserType: ParserType,
   ) => {
     setIsProcessingPreParse(true);
-    window.electron.ipcRenderer.invoke('import-parse-file', {
+    window.electron.ipcRenderer.invoke(Channels.ParseFile, {
       parserType,
       filePath,
     });
@@ -59,7 +61,7 @@ const useManageFiles = (parserType: ParserType) => {
   // Delete a folder
   const deleteFolder = (folderName: string) => {
     setIsProcessingDeleteFolder(true);
-    window.electron.ipcRenderer.invoke('import-delete-folder', {
+    window.electron.ipcRenderer.invoke(Channels.DeleteFolder, {
       folderName,
       parserType,
     });
@@ -71,7 +73,7 @@ const useManageFiles = (parserType: ParserType) => {
     parserType: ParserType,
   ) => {
     setIsProcessingPreParseFolder(true);
-    window.electron.ipcRenderer.invoke('import-parse-folder', {
+    window.electron.ipcRenderer.invoke(Channels.ParseFolder, {
       parserType,
       folderName,
     });
@@ -83,7 +85,7 @@ const useManageFiles = (parserType: ParserType) => {
     parserType: ParserType,
   ) => {
     setIsProcessingAssistFolder(true);
-    window.electron.ipcRenderer.invoke('import-ai-update-folder', {
+    window.electron.ipcRenderer.invoke(Channels.AssistFolder, {
       parserType,
       folderName,
     });
@@ -131,31 +133,42 @@ const useManageFiles = (parserType: ParserType) => {
     setFeedback(response);
   };
 
+  const handleAssistFolderFeedback = (payload: any) => {
+    setIsProcessingAssistFolder(false);
+    const response = payload as AssistFolderFeedback;
+    setFeedback(response);
+  }
+
   useEffect(() => {
     // Subscribe to feedback events when component mounts
     const unsubscribeFileListFeedback = window.electron.ipcRenderer.on(
-      'file-list-feedback',
+      Channels.ListFilesFeedback,
       handleFileListFeedback,
     );
 
     const unsubscribeDeleteFileFeedback = window.electron.ipcRenderer.on(
-      'file-delete-feedback',
+      Channels.DeleteFileFeedback,
       handleDeleteFileFeedback,
     );
 
     const unsubscribePreParseFeedback = window.electron.ipcRenderer.on(
-      'file-parse-feedback',
+      Channels.ParseFileFeedback,
       handlePreParseFeedback,
     );
 
     const unsubscribeDeleteFolderFeedback = window.electron.ipcRenderer.on(
-      'folder-delete-feedback',
+      Channels.DeleteFolderFeedback,
       handleDeleteFolderFeedback,
     );
 
     const unsubscribePreParseFolderFeedback = window.electron.ipcRenderer.on(
-      'folder-parse-feedback',
+      Channels.ParseFolderFeedback,
       handlePreParseFolderFeedback,
+    );
+
+    const unsubscribeAssistFolderFeedback = window.electron.ipcRenderer.on(
+      Channels.AssistFeedback,
+      handleAssistFolderFeedback,
     );
 
     // Initial file listing

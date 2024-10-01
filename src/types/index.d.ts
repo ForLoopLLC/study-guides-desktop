@@ -8,53 +8,6 @@ export * from './search';
 export * from './ai';
 export * from './import';
 
-export type Channels =
-  | 'navigate'
-  | 'connection'
-  | 'env-update'
-  | 'get-tags'
-  | 'update-tags'
-  | 'update-tag'
-  | 'publish-tags-index'
-  | 'publish-tags-index-progress'
-  | 'publish-tags-index-complete'
-  | 'publish-tags-index-error'
-  | 'batch-assist-tags-progress'
-  | 'batch-assist-tags-complete'
-  | 'batch-assist-tags-error'
-  | 'log-update'
-  | 'get-users'
-  | 'update-user'
-  | 'publish-users-index'
-  | 'publish-users-index-progress'
-  | 'publish-users-index-complete'
-  | 'publish-users-index-error'
-  | 'get-questions'
-  | 'update-questions'
-  | 'update-question'
-  | 'publish-questions-index'
-  | 'publish-questions-index-progress'
-  | 'publish-questions-index-complete'
-  | 'publish-questions-index-error'
-  | 'batch-assist-questions-progress'
-  | 'batch-assist-questions-complete'
-  | 'batch-assist-questions-error'
-  | 'import-file-to-local'
-  | 'file-import-feedback'
-  | 'import-delete-file'
-  | 'file-delete-feedback'
-  | 'import-list-files'
-  | 'file-list-feedback'
-  | 'import-parse-file'
-  | 'import-parse-folder'
-  | 'import-delete-folder'
-  | 'file-parse-feedback'
-  | 'folder-delete-feedback'
-  | 'folder-parse-feedback'
-  | 'import-assist-folder'
-  | 'assist-folder-feedback'
-  | 'assist-folder-progress';
-
 export interface Environment {
   env: 'development' | 'test' | 'production' | null;
   algoliaAdminKey: string | null;

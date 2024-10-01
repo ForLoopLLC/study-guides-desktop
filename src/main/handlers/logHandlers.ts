@@ -2,9 +2,10 @@ import { ipcMain, app, BrowserWindow } from 'electron';
 import { log } from '../main';
 import { LogLevel } from '../../types';
 import { tailLogFile, stopTailLogFile } from '../util';
+import { Channels } from '../../enums';
 
 
-ipcMain.handle('log-message', (_event, level: string, category: string, message: string) => {
+ipcMain.handle(Channels.LogMessage, (_event, level: string, category: string, message: string) => {
   if (['info', 'warn', 'error', 'debug', 'verbose', 'silly'].includes(level)) {
     (log as any)[level as LogLevel](category, message);
   } else {
@@ -12,7 +13,7 @@ ipcMain.handle('log-message', (_event, level: string, category: string, message:
   }
 });
 
-ipcMain.handle('start-tail-log', (event) => {
+ipcMain.handle(Channels.StartTailLog, (event) => {
   const window = BrowserWindow.fromWebContents(event.sender);
   if (window) {
     tailLogFile(app, window);
@@ -21,7 +22,7 @@ ipcMain.handle('start-tail-log', (event) => {
   }
 });
 
-ipcMain.handle('stop-tail-log', () => {
+ipcMain.handle(Channels.StopTailLog, () => {
   stopTailLogFile();
 });
 
