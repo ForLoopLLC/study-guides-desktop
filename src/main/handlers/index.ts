@@ -6,3 +6,4 @@ export * from './userHandlers';
 export * from './questionHandlers';
 export * from './questionAiHandlers';
 export * from './importHandlers';
+export * from './exportHandlers';

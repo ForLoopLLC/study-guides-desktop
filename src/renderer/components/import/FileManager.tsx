@@ -28,12 +28,14 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
     preParseFile,
     preParseFolder,
     assistFolder,
+    exportFolder,
     isProcessingList,
     isProcessingDelete,
     isProcessingPreParse,
     isProcessingDeleteFolder,
     isProcessingPreParseFolder,
     isProcessingAssistFolder,
+    isProcessingExportFolder,
   } = useManageFiles(parserType);
 
   const [combinedFeedback, setCombinedFeedback] = useState<Feedback | null>(
@@ -66,6 +68,10 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
   useEffect(() => {
     listFiles();
   }, [uploadFeedback]);
+
+  const handleExportFolder = (folderName: string) => {
+    exportFolder(folderName, parserType);
+  };
 
   const handleAssistFolder = (folderName: string) => {
     assistFolder(folderName, parserType);
@@ -108,6 +114,7 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
     isProcessingPreParse ||
     isProcessingDeleteFolder ||
     isProcessingPreParseFolder ||
+    isProcessingExportFolder ||
     isProcessingAssistFolder;
 
   const handleCopyToClipboard = (text: string) => {
@@ -201,6 +208,7 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
           onDeleteFolder={handleDeleteFolder}
           onPreParseFolder={handlePreParseFolder}
           onAssistFolder={handleAssistFolder}
+          onExportFolder={handleExportFolder}
         />
       </section>
     </main>

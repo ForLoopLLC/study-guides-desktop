@@ -11,6 +11,7 @@ interface FileListProps {
   onDeleteFolder: (folder: string) => void;
   onPreParseFolder: (folder: string) => void;
   onAssistFolder: (folder: string) => void;
+  onExportFolder: (folder: string) => void;
 }
 
 const groupFilesByFolder = (files: ImportFile[]) => {
@@ -36,6 +37,7 @@ const FileList: React.FC<FileListProps> = ({
   onPreParse,
   onPreParseFolder,
   onAssistFolder,
+  onExportFolder,
 }) => {
   // Group the files by their parent directories
   const groupedFiles = groupFilesByFolder(files);
@@ -54,6 +56,7 @@ const FileList: React.FC<FileListProps> = ({
               handleDelete={onDeleteFolder}
               handlePreParse={onPreParseFolder}
               handleAssist={onAssistFolder}
+              handleExport={onExportFolder}
             />
           </div>
 

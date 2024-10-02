@@ -9,7 +9,6 @@ import {
   ParsedCertificationTopic,
   ParsedCollegeTopic,
   ExportFolderFeedback,
-  ExportFileFeedback
 } from '../../types';
 import { ParserType } from '../../enums';
 
@@ -51,27 +50,6 @@ app.whenReady().then(() => {
     return destPath;
   };
 
-  ipcMain.handle(Channels.ExportFile, async (event, filePath) => {
-    try {
-      const fileContent = fs.readFileSync(filePath, 'utf-8');
-      const parsedTopic: ParsedCollegeTopic | ParsedCertificationTopic =
-        JSON.parse(fileContent);
-      await exportTopics([parsedTopic]);
-
-      const feedback: ExportFileFeedback = {
-        message: `Exported file: ${filePath}`,
-        success: true,
-        level: 'info',
-        dateTime: new Date(),
-      };
-
-      logAndSend(event, Channels.ExportFileComplete, feedback);
-    } catch (error) {
-      const err = error as Error;
-      logAndSend(event, Channels.ExportFileError, { message: err.message });
-      throw new Error('Failed to export file.');
-    }
-  });
   ipcMain.handle(
     Channels.ExportFolder,
     async (event, { folderName, parserType }) => {

@@ -6,6 +6,7 @@ interface FolderMoreButtonProps {
   handleDelete: (folder: string) => void;
   handlePreParse: (folder: string) => void;
   handleAssist: (folder: string) => void;
+  handleExport: (folder: string) => void;
 }
 
 const FolderMoreButton: React.FC<FolderMoreButtonProps> = ({
@@ -13,6 +14,7 @@ const FolderMoreButton: React.FC<FolderMoreButtonProps> = ({
   handleDelete,
   handlePreParse,
   handleAssist,
+  handleExport,
 }) => {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -64,6 +66,16 @@ const FolderMoreButton: React.FC<FolderMoreButtonProps> = ({
             >
               <FaDatabase className="mr-3 text-slate-500" />
               <span>Pre-parse</span>
+            </li>
+            <li
+              onClick={() => {
+                handleExport(folderName);
+                setOpenMenu(null);
+              }}
+              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
+            >
+              <FaTrash className="mr-3 text-slate-500" />
+              <span>Export</span>
             </li>
             <li
               onClick={() => {
