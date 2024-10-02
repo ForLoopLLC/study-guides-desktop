@@ -25,13 +25,11 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
     listFiles,
     deleteFile,
     deleteFolder,
-    preParseFile,
     preParseFolder,
     assistFolder,
     exportFolder,
     isProcessingList,
     isProcessingDelete,
-    isProcessingPreParse,
     isProcessingDeleteFolder,
     isProcessingPreParseFolder,
     isProcessingAssistFolder,
@@ -81,10 +79,6 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
     deleteFile(file.path);
   };
 
-  const handlePreParse = (file: ImportFile) => {
-    preParseFile(file.path, parserType);
-  };
-
   const handlePreParseFolder = (folderName: string) => {
     preParseFolder(folderName, parserType);
   };
@@ -111,7 +105,6 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
   const isAnyProcessing =
     isProcessingList ||
     isProcessingDelete ||
-    isProcessingPreParse ||
     isProcessingDeleteFolder ||
     isProcessingPreParseFolder ||
     isProcessingExportFolder ||
@@ -204,7 +197,6 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
         <FileList
           files={files}
           onDelete={handleDeleteFile}
-          onPreParse={handlePreParse}
           onDeleteFolder={handleDeleteFolder}
           onPreParseFolder={handlePreParseFolder}
           onAssistFolder={handleAssistFolder}

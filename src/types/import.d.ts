@@ -107,10 +107,6 @@ export interface DeleteFileFeedback extends Feedback {
   filePath: string;
 }
 
-export interface PreParserFeedback extends Feedback {
-  result: ParserResult;
-}
-
 export interface DeleteFolderFeedback extends Feedback {
   filePath: string;
 }

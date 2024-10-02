@@ -5,13 +5,11 @@ import { ImportFile } from '../../../types';
 interface FileListMoreButtonProps {
   file: ImportFile;
   handleDelete: (file: ImportFile) => void;
-  handlePreParse: (file: ImportFile) => void;
 }
 
 const FileListMoreButton: React.FC<FileListMoreButtonProps> = ({
   file,
   handleDelete,
-  handlePreParse,
 }) => {
   const [openMenu, setOpenMenu] = useState<string | null>(null);
   const menuRef = useRef<HTMLDivElement | null>(null);
@@ -44,16 +42,6 @@ const FileListMoreButton: React.FC<FileListMoreButtonProps> = ({
       {openMenu === file.name && (
         <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
           <ul className="py-1">
-            <li
-              onClick={() => {
-                handlePreParse(file);
-                setOpenMenu(null);
-              }}
-              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
-            >
-              <FaDatabase className="mr-3 text-slate-500" />
-              <span>Pre-parse</span>
-            </li>
             <li
               onClick={() => {
                 handleDelete(file);

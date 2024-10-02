@@ -12,7 +12,6 @@ import {
   ImportFile,
   RawTopic,
   ParserResult,
-  PreParserFeedback,
   PreParserFolderFeedback,
   AssistFolderFeedback,
   ParsedCertificationTopic,
@@ -413,37 +412,6 @@ app.whenReady().then(() => {
         dateTime: new Date(),
       };
       logAndSend(event, Channels.DeleteFileFeedback, feedback);
-    }
-  });
-
-  // Handle file parsing
-  ipcMain.handle(Channels.ParseFile, (event, { parserType, filePath }) => {
-    let result: any;
-    try {
-      const file = fs.readFileSync(filePath, 'utf-8');
-      result = fileParser(file, filePath, parserType);
-
-      const folderPath = path.dirname(filePath);
-      outputParserResults([result], parserType, folderPath);
-
-      const feedback: PreParserFeedback = {
-        message: `Preparse succeeded: ${path.basename(filePath)}`,
-        success: true,
-        result: result,
-        level: 'info',
-        dateTime: new Date(),
-      };
-      logAndSend(event, Channels.ParseFileFeedback, feedback);
-    } catch (error) {
-      const err = error as Error;
-      const feedback: PreParserFeedback = {
-        message: `Error running preparse\n\n${err.message}`,
-        success: false,
-        result: result,
-        level: 'error',
-        dateTime: new Date(),
-      };
-      logAndSend(event, Channels.ParseFileFeedback, feedback);
     }
   });
 

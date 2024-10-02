@@ -7,7 +7,6 @@ import { FaFolder, FaRegFile } from 'react-icons/fa';
 interface FileListProps {
   files: ImportFile[]; // Adjusted type to include directory
   onDelete: (file: ImportFile) => void;
-  onPreParse: (file: ImportFile) => void;
   onDeleteFolder: (folder: string) => void;
   onPreParseFolder: (folder: string) => void;
   onAssistFolder: (folder: string) => void;
@@ -34,7 +33,6 @@ const FileList: React.FC<FileListProps> = ({
   files,
   onDelete,
   onDeleteFolder,
-  onPreParse,
   onPreParseFolder,
   onAssistFolder,
   onExportFolder,
@@ -74,7 +72,6 @@ const FileList: React.FC<FileListProps> = ({
                 <FileListMoreButton
                   file={file}
                   handleDelete={onDelete}
-                  handlePreParse={onPreParse}
                 />
               </li>
             ))}
