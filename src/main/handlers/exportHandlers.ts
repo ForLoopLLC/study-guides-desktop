@@ -9,6 +9,8 @@ import {
   ParsedCertificationTopic,
   ParsedCollegeTopic,
   ExportFolderFeedback,
+  ExportFolderProgress,
+  ExportFolderComplete,
 } from '../../types';
 import { ParserType } from '../../enums';
 
@@ -80,20 +82,47 @@ app.whenReady().then(() => {
             return parseTopicFromFile(filePath);
           });
 
-        await exportTopics(topics);
+        const sharedEtlCounter = {
+          current: 0,
+          total: 0,
+        };
 
-        const feedback: ExportFolderFeedback = {
+        await exportTopics(
+          topics,
+          ({ message, processed, total }) => {
+            const feedback: ExportFolderProgress = {
+              message,
+              processed,
+              total,
+              success: true,
+              level: 'info',
+              dateTime: new Date(),
+            };
+            logAndSend(event, Channels.ExportFolderProgress, feedback);
+          },
+          sharedEtlCounter,
+        );
+
+        const feedback: ExportFolderComplete = {
           message: `Exported folder: ${folderName}`,
           success: true,
           level: 'info',
           dateTime: new Date(),
         };
 
-        logAndSend(event, Channels.ExportFileComplete, feedback);
+        logAndSend(event, Channels.ExportFolderFeedback, feedback);
       } catch (error) {
         const err = error as Error;
-        logAndSend(event, Channels.ExportFileError, { message: err.message });
-        throw new Error('Failed to export folder.');
+
+        const feedback: ExportFolderFeedback = {
+          message: `Failed to export folder: ${folderName}`,
+          success: false,
+          level: 'info',
+          dateTime: new Date(),
+        };
+
+        logAndSend(event, Channels.ExportFolderFeedback, feedback);
+        throw new Error(`Failed to export folder.${err.message}`);
       }
     },
   );

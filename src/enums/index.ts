@@ -114,14 +114,7 @@ export enum Channels {
   AssistProgress = 'folder:assist-progress',
 
   // Export files
-  ExportFile = 'files:export',
-  ExportFileFeedback = 'files:export-feedback',
-  ExportFileProgress = 'files:export-progress',
-  ExportFileComplete = 'files:export-complete',
-  ExportFileError = 'files:export-error',
   ExportFolder = 'folder:export',
   ExportFolderFeedback = 'folder:export-feedback',
   ExportFolderProgress = 'folder:export-progress',
-  ExportFolderComplete = 'folder:export-complete',
-  ExportFolderError = 'folder:export-error',
 }

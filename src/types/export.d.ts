@@ -2,7 +2,10 @@ import { Feedback } from '.';
 import { ContentRatingType, TagType } from '@prisma/client';
 
 export interface ExportFolderFeedback extends Feedback {}
-export interface ExportFolderProgress extends Feedback {}
+export interface ExportFolderProgress extends Feedback {
+    processed: number;
+    total: number;
+}
 export interface ExportFolderComplete extends Feedback {}
 export interface ExportFolderError extends Feedback {}
 

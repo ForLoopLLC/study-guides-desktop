@@ -118,21 +118,54 @@ const topicsToEtl = (
 
 const exportTopics = async (
   parsedTopics: (ParsedCollegeTopic | ParsedCertificationTopic)[],
+  onProgress: (data: {
+    message: string;
+    processed: number;
+    total: number;
+  }) => void,
+  sharedEtlCounter: { current: number; total: number },
 ) => {
   const { tags, questions } = topicsToEtl(parsedTopics);
 
+  sharedEtlCounter.total = tags.length + questions.length;
+
   // Process tags sequentially
   for (const tag of tags) {
-    await addOrUpdateTag(tag);
+    const success = await addOrUpdateTag(tag);
+    if (!success) {
+      onProgress({
+        message: `Error exporting: ${tag.name}`,
+        processed: sharedEtlCounter.current, // Total questions processed so far
+        total: sharedEtlCounter.total, // Total number of questions across all topics
+      });
+    } else {
+      onProgress({
+        message: `Exported: ${tag.name}`,
+        processed: sharedEtlCounter.current, // Total questions processed so far
+        total: sharedEtlCounter.total, // Total number of questions across all topics
+      });
+    }
+    sharedEtlCounter.current += 1;
   }
 
   // Process questions sequentially
   for (const question of questions) {
-    await addOrUpdateQuestion(question);
+    const success = await addOrUpdateQuestion(question);
+    if (!success) {
+      onProgress({
+        message: `Error exporting: ${question.question}`,
+        processed: sharedEtlCounter.current, // Total questions processed so far
+        total: sharedEtlCounter.total, // Total number of questions across all topics
+      });
+    } else {
+      onProgress({
+        message: `Exported: ${question.question}`,
+        processed: sharedEtlCounter.current, // Total questions processed so far
+        total: sharedEtlCounter.total, // Total number of questions across all topics
+      });
+    }
+    sharedEtlCounter.current += 1;
   }
-
-  // Optionally log or return results
-  // console.log(tags, questions);
 };
 
 export default exportTopics;

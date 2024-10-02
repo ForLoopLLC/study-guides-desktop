@@ -8,12 +8,13 @@ import {
   AssistFolderFeedback,
   AssistFolderProgress,
   ExportFolderFeedback,
+  ExportFolderProgress,
 } from '../../../types';
 import { ParserType, Channels } from '../../../enums';
 
 const useManageFiles = (parserType: ParserType) => {
   const [files, setFiles] = useState<ImportFile[]>([]);
-  const [progress, setProgress] = useState<AssistFolderProgress | null>(null);
+  const [progress, setProgress] = useState<AssistFolderProgress | ExportFolderProgress | null>(null);
   const [feedback, setFeedback] = useState<
     | FileListFeedback
     | DeleteFileFeedback
@@ -102,6 +103,11 @@ const useManageFiles = (parserType: ParserType) => {
     setFeedback(response);
   };
 
+  const handleExportFolderProgress = (payload: any) => {
+    const response = payload as ExportFolderProgress;
+    setProgress(response);
+  };
+
 
   // Handle feedback from the main process
   const handleFileListFeedback = (payload: any) => {
@@ -181,9 +187,14 @@ const useManageFiles = (parserType: ParserType) => {
       handleAssistFolderProgress,
     );
 
+    const unsubscribeExportFolderFeedback = window.electron.ipcRenderer.on(
+      Channels.ExportFolderFeedback,
+      handleExportFolderFeedback,
+    );
+
     const unsubscribeExportFolderProgress = window.electron.ipcRenderer.on(
       Channels.ExportFolderProgress,
-      handleExportFolderFeedback,
+      handleExportFolderProgress,
     );
 
     // Initial file listing
@@ -197,6 +208,7 @@ const useManageFiles = (parserType: ParserType) => {
       unsubscribePreParseFolderFeedback();
       unsubscribeAssistFolderFeedback();
       unsubscribeAssistFolderProgress();
+      unsubscribeExportFolderFeedback();
       unsubscribeExportFolderProgress();
     };
   }, [parserType]);
