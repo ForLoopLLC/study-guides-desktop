@@ -7,6 +7,7 @@ export * from './tag';
 export * from './search';
 export * from './ai';
 export * from './import';
+export * from './export';
 
 export interface Environment {
   env: 'development' | 'test' | 'production' | null;
@@ -64,3 +65,11 @@ export interface LoggerWithCategory {
   transports: typeof log.transports;
   original: typeof log;
 }
+
+export interface Feedback {
+  message: string;
+  success: boolean;
+  level: 'info' | 'error' | 'warning' | 'trace';
+  dateTime: Date;
+}
+

@@ -539,7 +539,6 @@ app.whenReady().then(() => {
           .readdirSync(folderPath)
           .filter((file) => file.endsWith('.json'));
 
-        console.log('Assisting folder:', folderPath, files.length);
 
         // Function to read and parse JSON files based on the parserType
         const parseTopicFromFile = (filePath: string) => {

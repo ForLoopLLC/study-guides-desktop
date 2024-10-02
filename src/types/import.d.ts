@@ -1,5 +1,6 @@
 import { TagType } from '@prisma/client';
 import { ContentRatingType } from '@prisma/client';
+import { Feedback } from '.';
 
 export interface Chunk {
   header: string;
@@ -97,12 +98,6 @@ export type HeaderParser = (
 ) => CollegeHeader | CertificationHeader;
 
 // Types for feedback
-export interface Feedback {
-  message: string;
-  success: boolean;
-  level: 'info' | 'error' | 'warning' | 'trace';
-  dateTime: Date;
-}
 
 export interface FileListFeedback extends Feedback {
   files: ImportFile[];
