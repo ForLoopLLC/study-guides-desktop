@@ -1,4 +1,11 @@
-import { ParsedCertificationTopic, ParsedCollegeTopic } from '../../../types';
+import {
+  ParsedCertificationTopic,
+  ParsedCollegeTopic,
+  EtlTag,
+  EtlQuestion,
+  ParsedTag,
+} from '../../../types';
+import { TagType } from '@prisma/client';
 
 function isParsedCollegeTopic(
   topic: ParsedCollegeTopic | ParsedCertificationTopic,
@@ -12,30 +19,106 @@ function isParsedCertificationTopic(
   return (topic as ParsedCertificationTopic).module !== undefined;
 }
 
-// Process function for ParsedCollegeTopic
-const processCollegeTopic = async (topic: ParsedCollegeTopic) => {
-  console.log('Processing college topic:', topic);
-};
+function getUniqueList(items: EtlTag[]): EtlTag[] {
+  const seen = new Set<string>();
+  return items.filter(item => {
+    if (seen.has(item.hash)) {
+      return false; // Duplicate found
+    } else {
+      seen.add(item.hash); // Add the unique hash to the set
+      return true; // Keep this item
+    }
+  });
+}
 
-// Process function for ParsedCertificationTopic
-const processCertificationTopic = async (topic: ParsedCertificationTopic) => {
-  console.log('Processing certification topic:', topic);
+
+function parsedTagToEtlTag(tag: ParsedTag, parentTag?: ParsedTag): EtlTag {
+  return {
+    hash: tag.hash,
+    parentHash: parentTag?.hash|| '',
+    name: tag.name,
+    description: '',
+    type: TagType[tag.type],
+    metaTags: tag.metaTags,
+    contentRating: tag.contentRating,
+    contentDescriptors: tag.contentDescriptors,
+  };
+}
+
+function toEtlTag(
+  topic: ParsedCollegeTopic | ParsedCertificationTopic,
+  parentTag?: ParsedTag,
+): EtlTag {
+  return {
+    hash: topic.hash,
+    parentHash: parentTag?.hash || '',
+    name: topic.name,
+    description: '',
+    type: TagType.Topic,
+    metaTags: topic.metaTags,
+    contentRating: topic.contentRating,
+    contentDescriptors: topic.contentDescriptors,
+  };
+}
+
+function extractCollegeTags(topic: ParsedCollegeTopic): EtlTag[] {
+  const parsedTags = [
+    parsedTagToEtlTag(topic.parent),
+    parsedTagToEtlTag(topic.region, topic.parent),
+    parsedTagToEtlTag(topic.university,topic.region),
+    parsedTagToEtlTag(topic.department,topic.university),
+    parsedTagToEtlTag(topic.course,topic.department),
+    toEtlTag(topic, topic.course),
+  ];
+  return parsedTags;
+}
+
+function extractCertificationTags(topic: ParsedCertificationTopic): EtlTag[] {
+  const parsedTags = [
+    parsedTagToEtlTag(topic.parent),
+    parsedTagToEtlTag(topic.organization, topic.parent),
+    parsedTagToEtlTag(topic.certification, topic.organization),
+    parsedTagToEtlTag(topic.module, topic.certification),
+    toEtlTag(topic, topic.module),
+  ];
+  return parsedTags;
+}
+
+function extractQuestionEtl(topic: ParsedCollegeTopic | ParsedCertificationTopic): EtlQuestion[] {
+  return topic.questions.map(question => ({
+    hash: question.hash,
+    parentHash: topic.hash,
+    question: question.question,
+    answer: question.answer,
+    metaTags: question.metaTags,
+    distractors: question.distractors,
+    learnMore: question.learnMore,
+  }));
+}
+
+const topicsToEtl = (
+  parsedTopics: (ParsedCollegeTopic | ParsedCertificationTopic)[],
+): { tags: EtlTag[]; questions: EtlQuestion[] } => {
+  const collegeTags: EtlTag[] = parsedTopics
+    .filter(isParsedCollegeTopic)
+    .map(extractCollegeTags)
+    .flat();
+  const certificationTags: EtlTag[] = parsedTopics
+    .filter(isParsedCertificationTopic)
+    .map(extractCertificationTags)
+    .flat();
+
+  const tags = getUniqueList([...collegeTags, ...certificationTags]);
+  const questions = parsedTopics.map(extractQuestionEtl).flat();
+
+  return { tags, questions };
 };
 
 const exportTopics = async (
   parsedTopics: (ParsedCollegeTopic | ParsedCertificationTopic)[],
 ) => {
-  for (const topic of parsedTopics) {
-    if (isParsedCollegeTopic(topic)) {
-      await processCollegeTopic(topic);
-    } else if (isParsedCertificationTopic(topic)) {
-      await processCertificationTopic(topic);
-    } else {
-      console.error('Unknown topic type:', topic);
-    }
-  }
-
-  return Promise.resolve();
+  const { tags, questions } = topicsToEtl(parsedTopics);
+  console.log(tags, questions);
 };
 
 export default exportTopics;
