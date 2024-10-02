@@ -6,6 +6,7 @@ import {
   ParsedTag,
 } from '../../../types';
 import { TagType } from '@prisma/client';
+import { addOrUpdateTag, addOrUpdateQuestion } from '../database/export';
 
 function isParsedCollegeTopic(
   topic: ParsedCollegeTopic | ParsedCertificationTopic,
@@ -21,7 +22,7 @@ function isParsedCertificationTopic(
 
 function getUniqueList(items: EtlTag[]): EtlTag[] {
   const seen = new Set<string>();
-  return items.filter(item => {
+  return items.filter((item) => {
     if (seen.has(item.hash)) {
       return false; // Duplicate found
     } else {
@@ -31,13 +32,12 @@ function getUniqueList(items: EtlTag[]): EtlTag[] {
   });
 }
 
-
 function parsedTagToEtlTag(tag: ParsedTag, parentTag?: ParsedTag): EtlTag {
   return {
     hash: tag.hash,
-    parentHash: parentTag?.hash|| '',
+    parentHash: parentTag?.hash || '',
     name: tag.name,
-    description: '',
+    description: tag.name,
     type: TagType[tag.type],
     metaTags: tag.metaTags,
     contentRating: tag.contentRating,
@@ -53,7 +53,7 @@ function toEtlTag(
     hash: topic.hash,
     parentHash: parentTag?.hash || '',
     name: topic.name,
-    description: '',
+    description: topic.name,
     type: TagType.Topic,
     metaTags: topic.metaTags,
     contentRating: topic.contentRating,
@@ -65,9 +65,9 @@ function extractCollegeTags(topic: ParsedCollegeTopic): EtlTag[] {
   const parsedTags = [
     parsedTagToEtlTag(topic.parent),
     parsedTagToEtlTag(topic.region, topic.parent),
-    parsedTagToEtlTag(topic.university,topic.region),
-    parsedTagToEtlTag(topic.department,topic.university),
-    parsedTagToEtlTag(topic.course,topic.department),
+    parsedTagToEtlTag(topic.university, topic.region),
+    parsedTagToEtlTag(topic.department, topic.university),
+    parsedTagToEtlTag(topic.course, topic.department),
     toEtlTag(topic, topic.course),
   ];
   return parsedTags;
@@ -84,8 +84,10 @@ function extractCertificationTags(topic: ParsedCertificationTopic): EtlTag[] {
   return parsedTags;
 }
 
-function extractQuestionEtl(topic: ParsedCollegeTopic | ParsedCertificationTopic): EtlQuestion[] {
-  return topic.questions.map(question => ({
+function extractQuestionEtl(
+  topic: ParsedCollegeTopic | ParsedCertificationTopic,
+): EtlQuestion[] {
+  return topic.questions.map((question) => ({
     hash: question.hash,
     parentHash: topic.hash,
     question: question.question,
@@ -118,7 +120,19 @@ const exportTopics = async (
   parsedTopics: (ParsedCollegeTopic | ParsedCertificationTopic)[],
 ) => {
   const { tags, questions } = topicsToEtl(parsedTopics);
-  console.log(tags, questions);
+
+  // Process tags sequentially
+  for (const tag of tags) {
+    await addOrUpdateTag(tag);
+  }
+
+  // Process questions sequentially
+  for (const question of questions) {
+    await addOrUpdateQuestion(question);
+  }
+
+  // Optionally log or return results
+  // console.log(tags, questions);
 };
 
 export default exportTopics;

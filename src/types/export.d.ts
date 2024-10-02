@@ -1,5 +1,5 @@
 import { Feedback } from '.';
-import { ContentRatingType } from '@prisma/client';
+import { ContentRatingType, TagType } from '@prisma/client';
 
 export interface ExportFolderFeedback extends Feedback {}
 export interface ExportFolderProgress extends Feedback {}
@@ -11,7 +11,7 @@ export interface EtlTag {
     parentHash: string;
     name: string;
     description: string;
-    type: string;
+    type: TagType;
     metaTags: string[];
     contentRating: ContentRatingType;
     contentDescriptors: string[];
