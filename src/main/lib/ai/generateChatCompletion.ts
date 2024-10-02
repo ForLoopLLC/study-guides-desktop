@@ -28,12 +28,12 @@ export const generateChatCompletion = async (
     });
 
     const content = completion.choices[0].message?.content || '';
-    log.silly('ai', '**********************************');
-    log.silly('ai', `model:    ${openAiModel || 'gpt-3.5-turbo'}`);
-    log.silly('ai', `prompt:   ${promptText}`);
-    log.silly('ai', `user:     ${userPrompt}`);
-    log.silly('ai', `response: ${content}`);
-    log.silly('ai', '**********************************');
+    log.info('ai', '**********************************');
+    log.info('ai', `model:    ${openAiModel || 'gpt-3.5-turbo'}`);
+    log.info('ai', `prompt:   ${promptText}`);
+    log.info('ai', `user:     ${userPrompt}`);
+    log.info('ai', `response: ${content}`);
+    log.info('ai', '**********************************');
     return content;
   } catch (error) {
     throw error;
