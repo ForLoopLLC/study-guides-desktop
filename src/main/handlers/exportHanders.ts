@@ -8,7 +8,8 @@ import { exportTopics } from '../lib/export';
 import {
   ParsedCertificationTopic,
   ParsedCollegeTopic,
-  ExportFeedback,
+  ExportFolderFeedback,
+  ExportFileFeedback
 } from '../../types';
 import { ParserType } from '../../enums';
 
@@ -57,7 +58,7 @@ app.whenReady().then(() => {
         JSON.parse(fileContent);
       await exportTopics([parsedTopic]);
 
-      const feedback: ExportFeedback = {
+      const feedback: ExportFileFeedback = {
         message: `Exported file: ${filePath}`,
         success: true,
         level: 'info',
@@ -102,7 +103,7 @@ app.whenReady().then(() => {
 
         await exportTopics(topics);
 
-        const feedback: ExportFeedback = {
+        const feedback: ExportFolderFeedback = {
           message: `Exported folder: ${folderName}`,
           success: true,
           level: 'info',
