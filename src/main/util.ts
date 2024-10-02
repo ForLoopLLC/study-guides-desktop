@@ -158,7 +158,7 @@ export function logAndSend(
 
   // Log the channel and the data being sent
   appLogger.info(prefix, `Sending IPC message on channel: ${channel}`);
-  appLogger.info(prefix, JSON.stringify(data, null, 2));
+  //appLogger.info(prefix, JSON.stringify(data, null, 2));
 
   // Send the original message
   event.sender.send(channel, ...data);
