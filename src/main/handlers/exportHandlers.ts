@@ -56,6 +56,7 @@ app.whenReady().then(() => {
       try {
         const workingDir = getWorkingDir(parserType);
         const folderPath = path.join(workingDir, folderName, 'parsed');
+        ensureDirectoryExists(folderPath);
 
         const files = fs
           .readdirSync(folderPath)
