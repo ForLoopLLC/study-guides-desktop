@@ -275,7 +275,7 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
       {startAssistTime && stopAssistTime && (
         <section className="mt-4 text-sm text-slate-500">
           <span className="mr-4">
-            Started: {new Date(startAssistTime).toLocaleTimeString()}
+            Assist - Started: {new Date(startAssistTime).toLocaleTimeString()}
           </span>
           <span className="mr-4">
             Finished: {new Date(stopAssistTime).toLocaleTimeString()}
@@ -290,7 +290,7 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
       {startExportTime && stopExportTime && (
         <section className="mt-4 text-sm text-slate-500">
           <span className="mr-4">
-            Started: {new Date(startExportTime).toLocaleTimeString()}
+            Export - Started: {new Date(startExportTime).toLocaleTimeString()}
           </span>
           <span className="mr-4">
             Finished: {new Date(stopExportTime).toLocaleTimeString()}
