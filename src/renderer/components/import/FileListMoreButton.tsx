@@ -1,13 +1,16 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaEllipsisV, FaDatabase, FaTrash } from 'react-icons/fa';
+import { FaEllipsisV, FaTrash } from 'react-icons/fa';
 import { ImportFile } from '../../../types';
+import clsx from 'clsx';
 
 interface FileListMoreButtonProps {
+  disabled: boolean;
   file: ImportFile;
   handleDelete: (file: ImportFile) => void;
 }
 
 const FileListMoreButton: React.FC<FileListMoreButtonProps> = ({
+  disabled,
   file,
   handleDelete,
 }) => {
@@ -34,10 +37,13 @@ const FileListMoreButton: React.FC<FileListMoreButtonProps> = ({
   return (
     <div className="relative" ref={menuRef}>
       <button
+        disabled={disabled}
         onClick={() => toggleMenu(file.name)}
         className="ml-2 text-slate-700 hover:text-slate-900 focus:outline-none"
       >
-        <FaEllipsisV className="text-xl" />
+        <FaEllipsisV
+          className={clsx('text-xl', { 'text-slate-300': disabled })}
+        />
       </button>
       {openMenu === file.name && (
         <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">

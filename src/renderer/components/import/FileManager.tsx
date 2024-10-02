@@ -1,9 +1,9 @@
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useMemo } from 'react';
 import { useFileUpload, useManageFiles } from '../../hooks';
 import { ParserType } from '../../../enums';
 import FileList from './FileList';
 import { ImportFile, Feedback } from '../../../types';
-import { FaFileImport, FaSpinner, FaClipboard } from 'react-icons/fa';
+import { FaFileImport, FaSpinner, FaClipboard, FaListUl } from 'react-icons/fa';
 import ProgressBar from '../ProgressBar';
 
 interface FileManagerProps {
@@ -13,7 +13,9 @@ interface FileManagerProps {
 const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
   const [copySuccess, setCopySuccess] = useState<string | null>(null);
   const [startAssistTime, setStartAssistTime] = useState<number | null>(null); // Store assist start time
-  const [stopAssistTime, setStopAssistTime] = useState<number | null>(null);   // Store assist stop time
+  const [stopAssistTime, setStopAssistTime] = useState<number | null>(null); // Store assist stop time
+  const [startExportTime, setStartExportTime] = useState<number | null>(null); // Store export start time
+  const [stopExportTime, setStopExportTime] = useState<number | null>(null); // Store export stop time
   const fileInputRef = useRef<HTMLInputElement | null>(null); // Ref for the file input element
   const {
     feedback: uploadFeedback,
@@ -22,7 +24,8 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
   } = useFileUpload(parserType);
   const {
     feedback: fileManagementFeedback,
-    progress,
+    assistProgress,
+    exportProgress,
     files,
     listFiles,
     deleteFile,
@@ -76,26 +79,58 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
     }
   }, [isProcessingAssistFolder, startAssistTime]);
 
+  useEffect(() => {
+    // If assist is complete, capture the stop time
+    if (!isProcessingExportFolder && startExportTime) {
+      setStopExportTime(Date.now());
+    }
+  }, [isProcessingExportFolder, startExportTime]);
+
+  // Combine the isProcessing states
+  const isAnyProcessing = useMemo(
+    () =>
+      isProcessingList ||
+      isProcessingDelete ||
+      isProcessingDeleteFolder ||
+      isProcessingPreParseFolder ||
+      isProcessingExportFolder ||
+      isProcessingAssistFolder,
+    [
+      isProcessingList,
+      isProcessingDelete,
+      isProcessingDeleteFolder,
+      isProcessingPreParseFolder,
+      isProcessingExportFolder,
+      isProcessingAssistFolder,
+    ],
+  );
+
   const handleExportFolder = (folderName: string) => {
+    if (isAnyProcessing) return;
+    setStartExportTime(Date.now());
+    setStopExportTime(null);
     exportFolder(folderName, parserType);
   };
 
   const handleAssistFolder = (folderName: string) => {
-    // Set start time when assist process begins
+    if (isAnyProcessing) return;
     setStartAssistTime(Date.now());
-    setStopAssistTime(null); // Clear stop time when starting new assist
+    setStopAssistTime(null);
     assistFolder(folderName, parserType);
   };
 
   const handleDeleteFile = (file: ImportFile) => {
+    if (isAnyProcessing) return;
     deleteFile(file.path);
   };
 
   const handlePreParseFolder = (folderName: string) => {
+    if (isAnyProcessing) return;
     preParseFolder(folderName, parserType);
   };
 
   const handleDeleteFolder = (folderName: string) => {
+    if (isAnyProcessing) return;
     deleteFolder(folderName);
   };
 
@@ -113,15 +148,6 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
     resetFileInput(); // Reset the input after handling the file
   };
 
-  // Combine the isProcessing states
-  const isAnyProcessing =
-    isProcessingList ||
-    isProcessingDelete ||
-    isProcessingDeleteFolder ||
-    isProcessingPreParseFolder ||
-    isProcessingExportFolder ||
-    isProcessingAssistFolder;
-
   const handleCopyToClipboard = (text: string) => {
     navigator.clipboard.writeText(text).then(
       () => {
@@ -135,18 +161,21 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
     );
   };
 
-  const getAssistDuration = () => {
-    if (startAssistTime && stopAssistTime) {
-      const durationMs = stopAssistTime - startAssistTime;
+  const getHumanReadableDuration = (
+    startTime: number,
+    stopTime: number,
+  ): string | null => {
+    if (startTime && stopTime) {
+      const durationMs = stopTime - startTime;
       const durationSeconds = durationMs / 1000;
-  
+
       const days = Math.floor(durationSeconds / (3600 * 24));
       const hours = Math.floor((durationSeconds % (3600 * 24)) / 3600);
       const minutes = Math.floor((durationSeconds % 3600) / 60);
       const seconds = Math.floor(durationSeconds % 60);
-  
+
       let durationString = '';
-  
+
       if (days > 0) {
         durationString += `${days} day${days > 1 ? 's' : ''} `;
       }
@@ -159,12 +188,11 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
       if (seconds > 0 || durationString === '') {
         durationString += `${seconds} second${seconds > 1 ? 's' : ''}`;
       }
-  
+
       return durationString.trim(); // Remove any extra spaces at the end
     }
     return null;
   };
-  
 
   return (
     <main className="p-6">
@@ -214,16 +242,30 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
         <div>
           <section id="assist-topic-progress" className="mt-6">
             <ProgressBar
-              progress={progress?.topicProgress.processed || 0}
-              total={progress?.topicProgress.total || 1} // Avoid division by zero
-              label={progress?.topicProgress.message || 'Topic Progress'}
+              progress={assistProgress?.topicProgress.processed || 0}
+              total={assistProgress?.topicProgress.total || 1} // Avoid division by zero
+              label={assistProgress?.topicProgress.message || 'Topic Progress'}
             />
           </section>
           <section id="assist-question-progress" className="mt-6">
             <ProgressBar
-              progress={progress?.questionProgress.processed || 0}
-              total={progress?.questionProgress.total || 1} // Avoid division by zero
-              label={progress?.questionProgress.message || 'Question Progress'}
+              progress={assistProgress?.questionProgress.processed || 0}
+              total={assistProgress?.questionProgress.total || 1} // Avoid division by zero
+              label={
+                assistProgress?.questionProgress.message || 'Question Progress'
+              }
+            />
+          </section>
+        </div>
+      )}
+
+      {isProcessingExportFolder && (
+        <div>
+          <section id="assist-question-progress" className="mt-6">
+            <ProgressBar
+              progress={exportProgress?.processed || 0}
+              total={exportProgress?.total || 1} // Avoid division by zero
+              label={exportProgress?.message || 'Question Progress'}
             />
           </section>
         </div>
@@ -231,21 +273,46 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
 
       {startAssistTime && stopAssistTime && (
         <section className="mt-4 text-sm text-slate-500">
-          <span className='mr-4'>Started: {new Date(startAssistTime).toLocaleTimeString()}</span>
-          <span className='mr-4'>Finished: {new Date(stopAssistTime).toLocaleTimeString()}</span>
-          <span className='mr-4'>Duration: {getAssistDuration()}</span>
+          <span className="mr-4">
+            Started: {new Date(startAssistTime).toLocaleTimeString()}
+          </span>
+          <span className="mr-4">
+            Finished: {new Date(stopAssistTime).toLocaleTimeString()}
+          </span>
+          <span className="mr-4">
+            Duration:{' '}
+            {getHumanReadableDuration(startAssistTime, stopAssistTime)}
+          </span>
+        </section>
+      )}
+
+      {startExportTime && stopExportTime && (
+        <section className="mt-4 text-sm text-slate-500">
+          <span className="mr-4">
+            Started: {new Date(startExportTime).toLocaleTimeString()}
+          </span>
+          <span className="mr-4">
+            Finished: {new Date(stopExportTime).toLocaleTimeString()}
+          </span>
+          <span className="mr-4">
+            Duration:{' '}
+            {getHumanReadableDuration(startExportTime, stopExportTime)}
+          </span>
         </section>
       )}
 
       <section className="mt-6">
-        <div className="flex items-center space-x-2">
-          <h3 className="text-lg font-bold border-b w-full mb-2">Files</h3>
-          {isAnyProcessing && (
-            <FaSpinner className="text-lg text-gray-500 animate-spin" />
+        <div className="flex items-center space-x-2 border-b mb-2">
+          {isLoading ? (
+            <FaSpinner className="text-2xl text-gray-500 animate-spin" />
+          ) : (
+            <FaListUl className="text-2xl text-gray-500" />
           )}
+          <h3 className="text-lg font-bold w-full ">Files</h3>
         </div>
         {files.length === 0 && <p>No files available</p>}
         <FileList
+          disabled={isAnyProcessing}
           files={files}
           onDelete={handleDeleteFile}
           onDeleteFolder={handleDeleteFolder}

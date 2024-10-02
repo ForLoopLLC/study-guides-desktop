@@ -1,7 +1,15 @@
 import { useState, useEffect, useRef } from 'react';
-import { FaEllipsisV, FaTrash, FaDatabase, FaRobot } from 'react-icons/fa';
+import {
+  FaEllipsisV,
+  FaTrash,
+  FaDatabase,
+  FaRobot,
+  FaFileExport,
+} from 'react-icons/fa';
+import clsx from 'clsx';
 
 interface FolderMoreButtonProps {
+  disabled: boolean;
   folderName: string;
   handleDelete: (folder: string) => void;
   handlePreParse: (folder: string) => void;
@@ -10,6 +18,7 @@ interface FolderMoreButtonProps {
 }
 
 const FolderMoreButton: React.FC<FolderMoreButtonProps> = ({
+  disabled,
   folderName,
   handleDelete,
   handlePreParse,
@@ -39,15 +48,26 @@ const FolderMoreButton: React.FC<FolderMoreButtonProps> = ({
   return (
     <div className="relative" ref={menuRef}>
       <button
+        disabled={disabled}
         onClick={() => toggleMenu(folderName)}
         className="ml-2 text-slate-700 hover:text-slate-900 focus:outline-none"
       >
-        <FaEllipsisV className="text-xl" />
+        <FaEllipsisV className={clsx('text-xl', { 'text-slate-300': disabled })} />
       </button>
       {openMenu === folderName && (
         <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">
           <ul className="py-1">
-          <li
+            <li
+              onClick={() => {
+                handlePreParse(folderName);
+                setOpenMenu(null);
+              }}
+              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
+            >
+              <FaDatabase className="mr-3 text-slate-500" />
+              <span>Parse</span>
+            </li>
+            <li
               onClick={() => {
                 handleAssist(folderName);
                 setOpenMenu(null);
@@ -57,16 +77,7 @@ const FolderMoreButton: React.FC<FolderMoreButtonProps> = ({
               <FaRobot className="mr-3 text-slate-500" />
               <span>AI Assist</span>
             </li>
-            <li
-              onClick={() => {
-                handlePreParse(folderName);
-                setOpenMenu(null);
-              }}
-              className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
-            >
-              <FaDatabase className="mr-3 text-slate-500" />
-              <span>Pre-parse</span>
-            </li>
+
             <li
               onClick={() => {
                 handleExport(folderName);
@@ -74,7 +85,7 @@ const FolderMoreButton: React.FC<FolderMoreButtonProps> = ({
               }}
               className="flex items-center px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 hover:text-gray-900 cursor-pointer"
             >
-              <FaTrash className="mr-3 text-slate-500" />
+              <FaFileExport className="mr-3 text-slate-500" />
               <span>Export</span>
             </li>
             <li

@@ -14,7 +14,8 @@ import { ParserType, Channels } from '../../../enums';
 
 const useManageFiles = (parserType: ParserType) => {
   const [files, setFiles] = useState<ImportFile[]>([]);
-  const [progress, setProgress] = useState<AssistFolderProgress | ExportFolderProgress | null>(null);
+  const [assistProgress, setAssistProgress] = useState<AssistFolderProgress  | null>(null);
+  const [exportProgress, setExportProgress] = useState<ExportFolderProgress | null>(null);
   const [feedback, setFeedback] = useState<
     | FileListFeedback
     | DeleteFileFeedback
@@ -41,7 +42,8 @@ const useManageFiles = (parserType: ParserType) => {
   const listFiles = () => {
     setIsProcessingList(true);
     setFeedback(null);
-    setProgress(null);
+    setAssistProgress(null);
+    setExportProgress(null);
     window.electron.ipcRenderer.invoke(Channels.ListFiles, { parserType });
   };
 
@@ -49,7 +51,8 @@ const useManageFiles = (parserType: ParserType) => {
   const deleteFile = (filePath: string) => {
     setIsProcessingDelete(true);
     setFeedback(null);
-    setProgress(null);
+    setAssistProgress(null);
+    setExportProgress(null);
     window.electron.ipcRenderer.invoke(Channels.DeleteFile, { filePath });
   };
 
@@ -57,7 +60,8 @@ const useManageFiles = (parserType: ParserType) => {
   const deleteFolder = (folderName: string) => {
     setIsProcessingDeleteFolder(true);
     setFeedback(null);
-    setProgress(null);
+    setAssistProgress(null);
+    setExportProgress(null);
     window.electron.ipcRenderer.invoke(Channels.DeleteFolder, {
       folderName,
       parserType,
@@ -68,7 +72,8 @@ const useManageFiles = (parserType: ParserType) => {
   const preParseFolder = (folderName: string, parserType: ParserType) => {
     setIsProcessingPreParseFolder(true);
     setFeedback(null);
-    setProgress(null);
+    setAssistProgress(null);
+    setExportProgress(null);
     window.electron.ipcRenderer.invoke(Channels.ParseFolder, {
       parserType,
       folderName,
@@ -79,7 +84,8 @@ const useManageFiles = (parserType: ParserType) => {
   const assistFolder = (folderName: string, parserType: ParserType) => {
     setIsProcessingAssistFolder(true);
     setFeedback(null);
-    setProgress(null);
+    setAssistProgress(null);
+    setExportProgress(null);
     window.electron.ipcRenderer.invoke(Channels.AssistFolder, {
       parserType,
       folderName,
@@ -90,7 +96,8 @@ const useManageFiles = (parserType: ParserType) => {
   const exportFolder = (folderName: string, parserType: ParserType) => {
     setIsProcessingExportFolder(true);
     setFeedback(null);
-    setProgress(null);
+    setAssistProgress(null);
+    setExportProgress(null);
     window.electron.ipcRenderer.invoke(Channels.ExportFolder, {
       folderName,
       parserType,
@@ -105,7 +112,7 @@ const useManageFiles = (parserType: ParserType) => {
 
   const handleExportFolderProgress = (payload: any) => {
     const response = payload as ExportFolderProgress;
-    setProgress(response);
+    setExportProgress(response);
   };
 
 
@@ -152,7 +159,7 @@ const useManageFiles = (parserType: ParserType) => {
   };
 
   const handleAssistFolderProgress = (payload: any) => {
-    setProgress(payload as AssistFolderProgress);
+    setAssistProgress(payload as AssistFolderProgress);
   };
 
   useEffect(() => {
@@ -216,7 +223,8 @@ const useManageFiles = (parserType: ParserType) => {
   return {
     files,
     feedback,
-    progress,
+    assistProgress,
+    exportProgress,
     isProcessingList,
     isProcessingDelete,
     isProcessingDeleteFolder,

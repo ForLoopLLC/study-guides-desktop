@@ -5,6 +5,7 @@ import FolderMoreButton from './FolderMoreButton';
 import { FaFolder, FaRegFile } from 'react-icons/fa';
 
 interface FileListProps {
+  disabled: boolean;
   files: ImportFile[]; // Adjusted type to include directory
   onDelete: (file: ImportFile) => void;
   onDeleteFolder: (folder: string) => void;
@@ -30,6 +31,7 @@ const groupFilesByFolder = (files: ImportFile[]) => {
 };
 
 const FileList: React.FC<FileListProps> = ({
+  disabled,
   files,
   onDelete,
   onDeleteFolder,
@@ -50,6 +52,7 @@ const FileList: React.FC<FileListProps> = ({
             <span className="folder-name font-bold text-lg">{folder}</span>
             {/* FolderMoreButton aligned to the far right */}
             <FolderMoreButton
+              disabled={disabled}
               folderName={folder}
               handleDelete={onDeleteFolder}
               handlePreParse={onPreParseFolder}
@@ -70,6 +73,7 @@ const FileList: React.FC<FileListProps> = ({
                   <span className="text-lg ml-2">{file.name}</span>
                 </div>
                 <FileListMoreButton
+                  disabled={disabled}
                   file={file}
                   handleDelete={onDelete}
                 />
