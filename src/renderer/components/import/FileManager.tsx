@@ -204,6 +204,7 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
           <FaFileImport className="text-2xl text-gray-500" />
         )}
         <input
+          disabled={isAnyProcessing}
           ref={fileInputRef} // Attach the ref to the input
           type="file"
           onChange={handleFileChangeWithReset} // Use the new handler with reset
