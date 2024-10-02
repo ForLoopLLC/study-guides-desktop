@@ -12,6 +12,8 @@ interface FileManagerProps {
 
 const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
   const [copySuccess, setCopySuccess] = useState<string | null>(null);
+  const [startAssistTime, setStartAssistTime] = useState<number | null>(null); // Store assist start time
+  const [stopAssistTime, setStopAssistTime] = useState<number | null>(null);   // Store assist stop time
   const fileInputRef = useRef<HTMLInputElement | null>(null); // Ref for the file input element
   const {
     feedback: uploadFeedback,
@@ -67,11 +69,21 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
     listFiles();
   }, [uploadFeedback]);
 
+  useEffect(() => {
+    // If assist is complete, capture the stop time
+    if (!isProcessingAssistFolder && startAssistTime) {
+      setStopAssistTime(Date.now());
+    }
+  }, [isProcessingAssistFolder, startAssistTime]);
+
   const handleExportFolder = (folderName: string) => {
     exportFolder(folderName, parserType);
   };
 
   const handleAssistFolder = (folderName: string) => {
+    // Set start time when assist process begins
+    setStartAssistTime(Date.now());
+    setStopAssistTime(null); // Clear stop time when starting new assist
     assistFolder(folderName, parserType);
   };
 
@@ -122,6 +134,37 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
       },
     );
   };
+
+  const getAssistDuration = () => {
+    if (startAssistTime && stopAssistTime) {
+      const durationMs = stopAssistTime - startAssistTime;
+      const durationSeconds = durationMs / 1000;
+  
+      const days = Math.floor(durationSeconds / (3600 * 24));
+      const hours = Math.floor((durationSeconds % (3600 * 24)) / 3600);
+      const minutes = Math.floor((durationSeconds % 3600) / 60);
+      const seconds = Math.floor(durationSeconds % 60);
+  
+      let durationString = '';
+  
+      if (days > 0) {
+        durationString += `${days} day${days > 1 ? 's' : ''} `;
+      }
+      if (hours > 0) {
+        durationString += `${hours} hour${hours > 1 ? 's' : ''} `;
+      }
+      if (minutes > 0) {
+        durationString += `${minutes} minute${minutes > 1 ? 's' : ''} `;
+      }
+      if (seconds > 0 || durationString === '') {
+        durationString += `${seconds} second${seconds > 1 ? 's' : ''}`;
+      }
+  
+      return durationString.trim(); // Remove any extra spaces at the end
+    }
+    return null;
+  };
+  
 
   return (
     <main className="p-6">
@@ -184,6 +227,14 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
             />
           </section>
         </div>
+      )}
+
+      {startAssistTime && stopAssistTime && (
+        <section className="mt-4 text-sm text-slate-500">
+          <span className='mr-4'>Started: {new Date(startAssistTime).toLocaleTimeString()}</span>
+          <span className='mr-4'>Finished: {new Date(stopAssistTime).toLocaleTimeString()}</span>
+          <span className='mr-4'>Duration: {getAssistDuration()}</span>
+        </section>
       )}
 
       <section className="mt-6">
