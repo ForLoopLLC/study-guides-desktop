@@ -160,22 +160,17 @@ app.whenReady().then(() => {
         message: string;
         processed: number;
         total: number;
-        tps?: number; // Topics per second
       };
       questionProgress: {
         message: string;
         processed: number;
         total: number;
-        qps?: number; // Optional: Questions per second
       };
     }) => void;
     totalRecords?: number;
   }) => {
     const totalTopics = totalRecords ?? topics.length;
     let processedTopics = 0;
-
-    // Track the start time for calculating TPS
-    const startTime = Date.now();
 
     // Calculate total questions across all topics
     const totalQuestionsAcrossTopics = topics.reduce(
@@ -194,25 +189,17 @@ app.whenReady().then(() => {
     for (const topic of topics) {
       const updatedTopic = await getParsedTopicAssist(
         topic,
-        ({ message, processed, total, qps }) => {
-          // Calculate elapsed time and TPS after a few topics have been processed
-          const elapsedTimeInSeconds = (Date.now() - startTime) / 1000;
-          const tps =
-            processedTopics > 0 ? processedTopics / elapsedTimeInSeconds : 0;
-
-          // Send question progress update along with TPS
+        ({ message, processed, total }) => {
           onProgress({
             topicProgress: {
               message: `Processing questions for: ${topic.name}`,
               processed: processedTopics + 1, // Topic progress
               total: totalTopics,
-              tps: tps > 0 ? tps : undefined, // Topics per second, only show if valid
             },
             questionProgress: {
               message,
               processed,
               total,
-              qps, // Questions per second
             },
           });
         },
@@ -221,18 +208,12 @@ app.whenReady().then(() => {
 
       processedTopics += 1;
 
-      // Calculate elapsed time and TPS again after each topic completes
-      const elapsedTimeInSeconds = (Date.now() - startTime) / 1000;
-      const tps =
-        processedTopics > 0 ? processedTopics / elapsedTimeInSeconds : 0;
-
       // Send final topic progress
       onProgress({
         topicProgress: {
           message: `Processed: ${topic.name}`,
           processed: processedTopics,
           total: totalTopics,
-          tps: tps > 0 ? tps : undefined, // Topics per second, only show if valid
         },
         questionProgress: {
           message: `Completed all questions for: ${topic.name}`,

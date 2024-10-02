@@ -122,12 +122,10 @@ export interface AssistFolderProgress {
     message: string;
     processed: number;
     total: number;
-    tps: number;
   };
   questionProgress: {
     message: string;
     processed: number;
     total: number;
-    qps: number;
   };
 }

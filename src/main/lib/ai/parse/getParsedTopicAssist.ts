@@ -21,7 +21,6 @@ const getParsedTopicAssist = async (
     message: string;
     processed: number;
     total: number;
-    qps?: number; // Optional: Questions per second
   }) => void,
   sharedQuestionCounter: { current: number; total: number },
 ): Promise<ParsedCertificationTopic | ParsedCollegeTopic> => {
@@ -31,10 +30,7 @@ const getParsedTopicAssist = async (
     preparedQuestions,
   );
 
-  const totalQuestions = topic.questions.length;
   const queue = new RunQueue({ maxConcurrency: 25 }); // Limit concurrency to 25
-
-  const startTime = Date.now(); // Track start time for QPS calculation
 
   // Function to handle each question processing
   const processQuestion = async (question: ParsedQuestion) => {
@@ -48,16 +44,10 @@ const getParsedTopicAssist = async (
     // Increment the shared question counter
     sharedQuestionCounter.current += 1;
 
-    // Calculate elapsed time and QPS
-    const elapsedTimeInSeconds = (Date.now() - startTime) / 1000;
-    const qps = sharedQuestionCounter.current / elapsedTimeInSeconds;
-
-    // Send progress update for each question with QPS
     onProgress({
       message: `Processed question: ${question.question}`,
       processed: sharedQuestionCounter.current, // Total questions processed so far
       total: sharedQuestionCounter.total, // Total number of questions across all topics
-      qps, // Questions per second
     });
 
     return { ...question, ...parsed };
