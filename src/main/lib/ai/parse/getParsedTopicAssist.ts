@@ -31,9 +31,12 @@ const getParsedTopicAssist = async (
   );
 
   const queue = new RunQueue({ maxConcurrency: 25 }); // Limit concurrency to 25
+  const processedQuestions: ParsedQuestion[] = [];
 
   // Function to handle each question processing
-  const processQuestion = async (question: ParsedQuestion) => {
+  const processQuestion = async (
+    question: ParsedQuestion,
+  ): Promise<ParsedQuestion> => {
     const preparedQuestion = prepareQuestion(question);
     const result = await generateChatCompletion(
       questionPrompt.text,
@@ -55,7 +58,10 @@ const getParsedTopicAssist = async (
 
   // Add questions to the queue
   topic.questions.forEach((question) => {
-    queue.add(1, () => processQuestion(question));
+    queue.add(1, async () => {
+      const processed = await processQuestion(question);
+      processedQuestions.push(processed); // Collect the processed question
+    });
   });
 
   // Wait for all tasks in the queue to finish
@@ -70,11 +76,14 @@ const getParsedTopicAssist = async (
     );
     return {
       ...updatedTopic,
-      questions: topic.questions, // Questions are processed and updated
+      questions: processedQuestions, // Questions are processed and updated
     };
   } catch (error) {
     const err = error as Error;
-    log.error('ai', `The result is not in a valid format ${result}. ${err.message}.`);
+    log.error(
+      'ai',
+      `The result is not in a valid format ${result}. ${err.message}.`,
+    );
     log.error('ai', `Bad result. ${JSON.stringify(result)}.`);
     throw new Error('Failed to parse AI response.');
   }
