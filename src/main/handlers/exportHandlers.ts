@@ -11,6 +11,7 @@ import {
   ExportFolderFeedback,
   ExportFolderProgress,
   ExportFolderComplete,
+  FolderListFeedback,
 } from '../../types';
 import { ParserType } from '../../enums';
 
@@ -50,6 +51,30 @@ app.whenReady().then(() => {
         throw new Error('Invalid parser type');
     }
     return destPath;
+  };
+
+  const listFolders = (dir: string, ignoreList: string[] = []): string[] => {
+    const folderList: string[] = [];
+
+    // Read the directory contents
+    const contents = fs.readdirSync(dir);
+
+    contents.forEach((entry) => {
+      if (ignoreList.includes(entry)) {
+        // Skip the entry if it's in the ignore list
+        return;
+      }
+
+      const entryPath = path.join(dir, entry);
+      const stat = fs.statSync(entryPath);
+
+      if (stat.isDirectory()) {
+        // If it's a directory, add it to the list
+        folderList.push(entryPath);
+      }
+    });
+
+    return folderList;
   };
 
   ipcMain.handle(
@@ -126,4 +151,32 @@ app.whenReady().then(() => {
       }
     },
   );
+
+  ipcMain.handle(Channels.ListFolders, async (event, { parserType }) => {
+    try {
+      const ignorelist: string[] = [];
+      const targetDir = getWorkingDir(parserType);
+      const folders = listFolders(targetDir, ignorelist);
+
+      const feedback: FolderListFeedback = {
+        folders,
+        message: 'Listed files',
+        success: true,
+        level: 'trace',
+        dateTime: new Date(),
+      };
+
+      logAndSend(event, Channels.ListFoldersFeedback, feedback);
+    } catch (error) {
+      const err = error as Error;
+      const feedback: FolderListFeedback = {
+        folders: [],
+        message: `Error listing files. ${err.message}`,
+        success: false,
+        level: 'error',
+        dateTime: new Date(),
+      };
+      logAndSend(event, Channels.ListFilesFeedback, feedback);
+    }
+  });
 });

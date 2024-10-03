@@ -102,6 +102,10 @@ export enum Channels {
   ListFiles = 'files:list',
   ListFilesFeedback = 'files:list-feedback',
 
+  // List Folders
+  ListFolders = 'folders:list',
+  ListFoldersFeedback = 'folders:list-feedback',
+
   // Parse Files
   ParseFolder = 'folder:parse',
   ParseFolderFeedback = 'folder:parse-feedback',

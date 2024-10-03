@@ -3,14 +3,10 @@ import { useFileUpload, useManageFiles } from '../../hooks';
 import { ParserType } from '../../../enums';
 import FileList from './FileList';
 import { ImportFile, Feedback } from '../../../types';
-import {
-  FaFileImport,
-  FaSpinner,
-  FaClipboard,
-  FaListUl,
-} from 'react-icons/fa';
+import { FaFileImport, FaSpinner, FaClipboard, FaListUl } from 'react-icons/fa';
 import ProgressBar from '../ProgressBar';
 import GlobalMoreButton from './GlobalMoreButton';
+import Duration from './Duration';
 
 interface FileManagerProps {
   parserType: ParserType;
@@ -22,6 +18,7 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
   const [stopAssistTime, setStopAssistTime] = useState<number | null>(null); // Store assist stop time
   const [startExportTime, setStartExportTime] = useState<number | null>(null); // Store export start time
   const [stopExportTime, setStopExportTime] = useState<number | null>(null); // Store export stop time
+  const [currentFolder, setCurrentFolder] = useState<string | null>(null); // Store the current folder being processed
   const fileInputRef = useRef<HTMLInputElement | null>(null); // Ref for the file input element
 
   const {
@@ -65,7 +62,7 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
         folderName = 'Unknown';
     }
     return folderName;
-  }
+  };
 
   useEffect(() => {
     const newerFeedback = (): Feedback | null => {
@@ -128,10 +125,12 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
   );
 
   const handleExportAll = (folderName: string) => {
+    setCurrentFolder(folderName);
     console.log(`Export all in ${folderName}`);
   };
 
   const handleAssistAll = (folderName: string) => {
+    setCurrentFolder(folderName);
     console.log(`Assist all in ${folderName}`);
   };
 
@@ -139,6 +138,7 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
     if (isAnyProcessing) return;
     setStartExportTime(Date.now());
     setStopExportTime(null);
+    setCurrentFolder(folderName);
     exportFolder(folderName, parserType);
   };
 
@@ -146,6 +146,7 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
     if (isAnyProcessing) return;
     setStartAssistTime(Date.now());
     setStopAssistTime(null);
+    setCurrentFolder(folderName);
     assistFolder(folderName, parserType);
   };
 
@@ -156,6 +157,7 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
 
   const handlePreParseFolder = (folderName: string) => {
     if (isAnyProcessing) return;
+    setCurrentFolder(folderName);
     preParseFolder(folderName, parserType);
   };
 
@@ -191,42 +193,10 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
     );
   };
 
-  const getHumanReadableDuration = (
-    startTime: number,
-    stopTime: number,
-  ): string | null => {
-    if (startTime && stopTime) {
-      const durationMs = stopTime - startTime;
-      const durationSeconds = durationMs / 1000;
-
-      const days = Math.floor(durationSeconds / (3600 * 24));
-      const hours = Math.floor((durationSeconds % (3600 * 24)) / 3600);
-      const minutes = Math.floor((durationSeconds % 3600) / 60);
-      const seconds = Math.floor(durationSeconds % 60);
-
-      let durationString = '';
-
-      if (days > 0) {
-        durationString += `${days} day${days > 1 ? 's' : ''} `;
-      }
-      if (hours > 0) {
-        durationString += `${hours} hour${hours > 1 ? 's' : ''} `;
-      }
-      if (minutes > 0) {
-        durationString += `${minutes} minute${minutes > 1 ? 's' : ''} `;
-      }
-      if (seconds > 0 || durationString === '') {
-        durationString += `${seconds} second${seconds > 1 ? 's' : ''}`;
-      }
-
-      return durationString.trim(); // Remove any extra spaces at the end
-    }
-    return null;
-  };
-
   return (
     <main className="p-6">
       <h2 className="text-xl font-bold mb-4">Select a data file</h2>
+      <p className="text-sm text-slate-300">{`${currentFolder || ''}`}</p>
       <div className="flex items-center space-x-4 border border-gray-300 rounded-md p-2 mb-2">
         {isLoading ? (
           <FaSpinner className="text-xl text-gray-500 animate-spin" />
@@ -302,35 +272,18 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
         </div>
       )}
 
-      {startAssistTime && stopAssistTime && (
-        <section className="mt-4 text-sm text-slate-500">
-          <span className="mr-4">
-            Assist - Started: {new Date(startAssistTime).toLocaleTimeString()}
-          </span>
-          <span className="mr-4">
-            Finished: {new Date(stopAssistTime).toLocaleTimeString()}
-          </span>
-          <span className="mr-4">
-            Duration:{' '}
-            {getHumanReadableDuration(startAssistTime, stopAssistTime)}
-          </span>
-        </section>
-      )}
-
-      {startExportTime && stopExportTime && (
-        <section className="mt-4 text-sm text-slate-500">
-          <span className="mr-4">
-            Export - Started: {new Date(startExportTime).toLocaleTimeString()}
-          </span>
-          <span className="mr-4">
-            Finished: {new Date(stopExportTime).toLocaleTimeString()}
-          </span>
-          <span className="mr-4">
-            Duration:{' '}
-            {getHumanReadableDuration(startExportTime, stopExportTime)}
-          </span>
-        </section>
-      )}
+      <section>
+        <Duration
+          startTime={startAssistTime}
+          stopTime={stopAssistTime}
+          title="Assist"
+        />
+        <Duration
+          startTime={startExportTime}
+          stopTime={stopExportTime}
+          title="Export"
+        />
+      </section>
 
       <section className="mt-2">
         <div className="flex items-center space-x-2 border-b mb-2 pl-2 pr-2">
@@ -341,7 +294,7 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
           )}
           <h3 className="text-base font-bold w-full ">Files</h3>
           <GlobalMoreButton
-            disabled={false}
+            disabled={isAnyProcessing}
             folderName={getGlobalFolderName(parserType)}
             handleAssistAll={handleAssistAll}
             handleExportAll={handleExportAll}
