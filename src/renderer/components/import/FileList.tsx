@@ -1,8 +1,8 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ImportFile } from '../../../types';
 import FileListMoreButton from './FileListMoreButton';
 import FolderMoreButton from './FolderMoreButton';
-import { FaFolder, FaRegFile } from 'react-icons/fa';
+import { FaFolder, FaFolderOpen, FaRegFile } from 'react-icons/fa';
 
 interface FileListProps {
   disabled: boolean;
@@ -39,6 +39,16 @@ const FileList: React.FC<FileListProps> = ({
   onAssistFolder,
   onExportFolder,
 }) => {
+  const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>({});
+
+  // Toggle the expand/collapse state for a folder
+  const toggleFolder = (folder: string) => {
+    setExpandedFolders((prevState) => ({
+      ...prevState,
+      [folder]: !prevState[folder], // Toggle the folder's expanded state
+    }));
+  };
+
   // Group the files by their parent directories
   const groupedFiles = groupFilesByFolder(files);
 
@@ -47,8 +57,15 @@ const FileList: React.FC<FileListProps> = ({
       {Object.entries(groupedFiles).map(([folder, folderFiles]) => (
         <div key={folder} className="folder-container mb-4">
           {/* Folder header */}
-          <div className="flex justify-between items-center bg-gray-200 p-2 rounded-t">
-            <FaFolder className="text-2xl text-slate-500" />
+          <div
+            className="flex justify-between items-center bg-gray-200 p-2 rounded-t cursor-pointer"
+            onClick={() => toggleFolder(folder)} // Toggle folder on click
+          >
+            {expandedFolders[folder] ? (
+              <FaFolderOpen className="text-2xl text-slate-500" />
+            ) : (
+              <FaFolder className="text-2xl text-slate-500" />
+            )}
             <span className="folder-name font-bold text-lg">{folder}</span>
             {/* FolderMoreButton aligned to the far right */}
             <FolderMoreButton
@@ -61,25 +78,27 @@ const FileList: React.FC<FileListProps> = ({
             />
           </div>
 
-          {/* Files in the folder */}
-          <ul id="files" className="border border-gray-200 rounded-b">
-            {folderFiles.map((file) => (
-              <li
-                key={file.name}
-                className="flex items-center justify-between cursor-pointer hover:bg-gray-100 p-2 rounded border-b"
-              >
-                <FaRegFile className="text-2xl text-slate-500" />
-                <div className="flex items-center w-full">
-                  <span className="text-lg ml-2">{file.name}</span>
-                </div>
-                <FileListMoreButton
-                  disabled={disabled}
-                  file={file}
-                  handleDelete={onDelete}
-                />
-              </li>
-            ))}
-          </ul>
+          {/* Conditionally render files in the folder if the folder is expanded */}
+          {expandedFolders[folder] && (
+            <ul id="files" className="border border-gray-200 rounded-b">
+              {folderFiles.map((file) => (
+                <li
+                  key={file.name}
+                  className="flex items-center justify-between cursor-pointer hover:bg-gray-100 p-2 rounded border-b"
+                >
+                  <FaRegFile className="text-2xl text-slate-500" />
+                  <div className="flex items-center w-full">
+                    <span className="text-lg ml-2">{file.name}</span>
+                  </div>
+                  <FileListMoreButton
+                    disabled={disabled}
+                    file={file}
+                    handleDelete={onDelete}
+                  />
+                </li>
+              ))}
+            </ul>
+          )}
         </div>
       ))}
     </div>
