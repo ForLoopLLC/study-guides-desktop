@@ -221,7 +221,7 @@ const useManageFiles = (parserType: ParserType) => {
   }, [parserType]);
 
   return {
-    files,
+    files: files.sort((a, b) => a.path.localeCompare(b.path)),
     feedback,
     assistProgress,
     exportProgress,

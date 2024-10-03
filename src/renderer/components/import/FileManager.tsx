@@ -3,8 +3,14 @@ import { useFileUpload, useManageFiles } from '../../hooks';
 import { ParserType } from '../../../enums';
 import FileList from './FileList';
 import { ImportFile, Feedback } from '../../../types';
-import { FaFileImport, FaSpinner, FaClipboard, FaListUl } from 'react-icons/fa';
+import {
+  FaFileImport,
+  FaSpinner,
+  FaClipboard,
+  FaListUl,
+} from 'react-icons/fa';
 import ProgressBar from '../ProgressBar';
+import GlobalMoreButton from './GlobalMoreButton';
 
 interface FileManagerProps {
   parserType: ParserType;
@@ -17,6 +23,7 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
   const [startExportTime, setStartExportTime] = useState<number | null>(null); // Store export start time
   const [stopExportTime, setStopExportTime] = useState<number | null>(null); // Store export stop time
   const fileInputRef = useRef<HTMLInputElement | null>(null); // Ref for the file input element
+
   const {
     feedback: uploadFeedback,
     isLoading,
@@ -44,6 +51,21 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
   const [combinedFeedback, setCombinedFeedback] = useState<Feedback | null>(
     null,
   );
+
+  const getGlobalFolderName = (parser: ParserType): string => {
+    let folderName = '';
+    switch (parser) {
+      case ParserType.Colleges:
+        folderName = 'colleges';
+        break;
+      case ParserType.Certifications:
+        folderName = 'certifications';
+        break;
+      default:
+        folderName = 'Unknown';
+    }
+    return folderName;
+  }
 
   useEffect(() => {
     const newerFeedback = (): Feedback | null => {
@@ -104,6 +126,14 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
       isProcessingAssistFolder,
     ],
   );
+
+  const handleExportAll = (folderName: string) => {
+    console.log(`Export all in ${folderName}`);
+  };
+
+  const handleAssistAll = (folderName: string) => {
+    console.log(`Assist all in ${folderName}`);
+  };
 
   const handleExportFolder = (folderName: string) => {
     if (isAnyProcessing) return;
@@ -196,19 +226,19 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
 
   return (
     <main className="p-6">
-      <h2 className="text-xl font-bold mb-4">Select Your File</h2>
-      <div className="flex items-center space-x-4 mb-6">
+      <h2 className="text-xl font-bold mb-4">Select a data file</h2>
+      <div className="flex items-center space-x-4 border border-gray-300 rounded-md p-2 mb-2">
         {isLoading ? (
-          <FaSpinner className="text-2xl text-gray-500 animate-spin" />
+          <FaSpinner className="text-xl text-gray-500 animate-spin" />
         ) : (
-          <FaFileImport className="text-2xl text-gray-500" />
+          <FaFileImport className="text-xl text-gray-500" />
         )}
         <input
           disabled={isAnyProcessing}
           ref={fileInputRef} // Attach the ref to the input
           type="file"
           onChange={handleFileChangeWithReset} // Use the new handler with reset
-          className="border border-gray-300 rounded-md p-2 w-full"
+          className=" w-full"
         />
       </div>
 
@@ -302,16 +332,24 @@ const FileManager: React.FC<FileManagerProps> = ({ parserType }) => {
         </section>
       )}
 
-      <section className="mt-6">
-        <div className="flex items-center space-x-2 border-b mb-2">
+      <section className="mt-2">
+        <div className="flex items-center space-x-2 border-b mb-2 pl-2 pr-2">
           {isLoading ? (
-            <FaSpinner className="text-2xl text-gray-500 animate-spin" />
+            <FaSpinner className="text-base text-gray-500 animate-spin" />
           ) : (
-            <FaListUl className="text-2xl text-gray-500" />
+            <FaListUl className="text-base text-gray-500" />
           )}
-          <h3 className="text-lg font-bold w-full ">Files</h3>
+          <h3 className="text-base font-bold w-full ">Files</h3>
+          <GlobalMoreButton
+            disabled={false}
+            folderName={getGlobalFolderName(parserType)}
+            handleAssistAll={handleAssistAll}
+            handleExportAll={handleExportAll}
+          />
         </div>
-        {files.length === 0 && <p>No files available</p>}
+        {files.length === 0 && (
+          <p className="text-base text-gray-500">No files available</p>
+        )}
         <FileList
           disabled={isAnyProcessing}
           files={files}

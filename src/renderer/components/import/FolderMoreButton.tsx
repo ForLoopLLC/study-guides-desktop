@@ -49,10 +49,15 @@ const FolderMoreButton: React.FC<FolderMoreButtonProps> = ({
     <div className="relative" ref={menuRef}>
       <button
         disabled={disabled}
-        onClick={() => toggleMenu(folderName)}
+        onClick={(e) => {
+          e.stopPropagation();
+          toggleMenu(folderName);
+        }}
         className="ml-2 text-slate-700 hover:text-slate-900 focus:outline-none"
       >
-        <FaEllipsisV className={clsx('text-xl', { 'text-slate-300': disabled })} />
+        <FaEllipsisV
+          className={clsx('text-base', { 'text-slate-300': disabled })}
+        />
       </button>
       {openMenu === folderName && (
         <div className="absolute right-0 mt-2 w-48 bg-white border border-gray-200 rounded-md shadow-lg z-10">

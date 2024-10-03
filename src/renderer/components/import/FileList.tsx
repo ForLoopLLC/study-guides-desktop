@@ -39,7 +39,9 @@ const FileList: React.FC<FileListProps> = ({
   onAssistFolder,
   onExportFolder,
 }) => {
-  const [expandedFolders, setExpandedFolders] = useState<Record<string, boolean>>({});
+  const [expandedFolders, setExpandedFolders] = useState<
+    Record<string, boolean>
+  >({});
 
   // Toggle the expand/collapse state for a folder
   const toggleFolder = (folder: string) => {
@@ -55,18 +57,18 @@ const FileList: React.FC<FileListProps> = ({
   return (
     <div id="file-list">
       {Object.entries(groupedFiles).map(([folder, folderFiles]) => (
-        <div key={folder} className="folder-container mb-4">
+        <div key={folder} className="folder-container mb-1">
           {/* Folder header */}
           <div
             className="flex justify-between items-center bg-gray-200 p-2 rounded-t cursor-pointer"
             onClick={() => toggleFolder(folder)} // Toggle folder on click
           >
             {expandedFolders[folder] ? (
-              <FaFolderOpen className="text-2xl text-slate-500" />
+              <FaFolderOpen className="text-base text-slate-500" />
             ) : (
-              <FaFolder className="text-2xl text-slate-500" />
+              <FaFolder className="text-base text-slate-500" />
             )}
-            <span className="folder-name font-bold text-lg">{folder}</span>
+            <span className="folder-name font-bold text-base">{folder}</span>
             {/* FolderMoreButton aligned to the far right */}
             <FolderMoreButton
               disabled={disabled}
@@ -86,9 +88,9 @@ const FileList: React.FC<FileListProps> = ({
                   key={file.name}
                   className="flex items-center justify-between cursor-pointer hover:bg-gray-100 p-2 rounded border-b"
                 >
-                  <FaRegFile className="text-2xl text-slate-500" />
+                  <FaRegFile className="text-base text-slate-500" />
                   <div className="flex items-center w-full">
-                    <span className="text-lg ml-2">{file.name}</span>
+                    <span className="text-base ml-2">{file.name}</span>
                   </div>
                   <FileListMoreButton
                     disabled={disabled}
